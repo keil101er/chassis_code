@@ -16,7 +16,7 @@
 #include "observe_task.h"
 #include "kalman_filter.h"
 #include "cmsis_os.h"
-
+extern float pre_v;
 KalmanFilter_t vaEstimateKF;	   // 卡尔曼滤波器结构体
 extern uint8_t filter_flag;
 float vaEstimateKF_F[4] = {1.0f, 0.001f, 
@@ -67,7 +67,7 @@ void observe_task(void)
 
   while(1)
 	{  
-		
+		pre_v=chassis_move_balance.v_filter2;
 		chassis_move_balance.wheel_motor[0].vel = chassis_move_balance.wheel_motor[0].speed_rpm * 0.00664267f;  //角速度
 		chassis_move_balance.wheel_motor[1].vel = chassis_move_balance.wheel_motor[1].speed_rpm * 0.00664267f;  //角速度
 		

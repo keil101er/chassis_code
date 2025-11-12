@@ -255,14 +255,14 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 
 	    vmcl->Tp=vmcl->Tp+chassis->leg_tp;//髋关节输出力矩=LQR得到的+防劈叉补偿
 //  	vmcl->Tp=vmcl->Tp;
-        // vmcl->Tp=0.0f;
-        // chassis->wheel_motor[1].wheel_T = 0.0f;
+         //vmcl->Tp=0.0f;
+         //chassis->wheel_motor[1].wheel_T = 0.0f;
 	    chassis->wheel_motor[1].wheel_T = chassis->wheel_motor[1].wheel_T-chassis->turn_T;	//轮毂电机输出力矩
 
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
         		
 		vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd
-		
+		//vmcl->F0=0.0f;
 		// float Poly_Coefficient[12][4] = {-421.75465, 404.14066, -163.18492, 1.52481, -100.33598, 88.97437, -33.12351, 0.46394, -13.79006, 20.45913, -5.20346, -6.44626, 0.23096, 8.70198, -1.16290, -7.84332, -145.33854, 158.48464, -89.03226, 32.92067, -27.19789, 19.76695, -10.47246, 4.95830, 615.75677, -496.49431, 155.68024, -1.46787, 129.15010, -93.95712, 23.77051, 0.02808, 207.43929, -152.95834, 33.54335, 1.53506, 211.73999, -148.21559, 29.04610, 2.57854, 88.69753, -151.25099, 93.98502, 36.97904, -21.28958, 10.81717, 4.85406, 2.35990};
 		//拟合矩阵
 		//		vmcl->F0=17.55f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;

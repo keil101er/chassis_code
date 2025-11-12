@@ -20,7 +20,15 @@
 #include "cmsis_os.h"
 #include "bsp_buzzer.h"
 #include "detect_task.h"
+#include "stdio.h"
+#include "string.h"
+#include "chassisR_task.h"
 
+uint8_t Txcplt_flag=1;
+extern UART_HandleTypeDef huart1;
+extern chassis_t chassis_move_balance;
+
+char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
 
 const error_t *error_list_test_local;
@@ -37,6 +45,16 @@ const error_t *error_list_test_local;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
+ void Buletooth_debug_task(void)
+{
+        sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter);
+        //发送完成标志位
+		if(Txcplt_flag==1)
+		{
+        HAL_UART_Transmit_DMA(&huart1,(uint8_t *)debug_info,strlen(debug_info));
+		Txcplt_flag=0;
+		}			
+}
 void test_task(void const * argument)
 {
     static uint8_t error, last_error;
@@ -72,6 +90,7 @@ void test_task(void const * argument)
         }
 
         last_error = error;
+        Buletooth_debug_task();
         osDelay(10);
     }
 }
@@ -121,6 +140,11 @@ static void buzzer_warn_error(uint8_t num)
     }
 }
 
-
-
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    //发送完成置标志位
+    if (huart==&huart1){ // 检查是否是我们关心的UART
+        Txcplt_flag=1;
+    }
+}
 

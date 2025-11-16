@@ -27,7 +27,7 @@
 uint8_t Txcplt_flag=1;
 extern UART_HandleTypeDef huart1;
 extern chassis_t chassis_move_balance;
-
+extern uint8_t Rc_flag;
 char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
 
@@ -45,10 +45,11 @@ const error_t *error_list_test_local;
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
+ //蓝牙调试信息输出任务 Bluetooth debugging information output task
  void Buletooth_debug_task(void)
 {
-        sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter);
-        //发送完成标志位
+       sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f,%d\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,Rc_flag);
+       //发送完成标志位
 		if(Txcplt_flag==1)
 		{
         HAL_UART_Transmit_DMA(&huart1,(uint8_t *)debug_info,strlen(debug_info));

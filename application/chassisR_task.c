@@ -16,6 +16,7 @@
 #include "VMC_calc.h"
 #define YAW_MOUSE_SEN   0.00005f//0.00005f
 #define PITCH_MOUSE_SEN -0.00015f//0.00015f
+#define VELOCITY_EPSILON 1e-4f
 ////reducation of 3508 motor
 ////m3508电机的减速比
 //#define M3508_MOTOR_REDUCATION 15.764705882f
@@ -42,9 +43,9 @@ float LQR_K_R[12]={
 -11.0224 , -2.664 ,-11.6436,	-20.2754 , 30.2361 , 3.3863,//      ??????????????????????
 10.2554 ,  0.9963 ,   1.0764  ,  3.2532 , 40.8928  , 3.5782	
 };
-float pre_v=0.0f;
-float pre_rc=0.0f;	//上一次右摇杆前后值
- uint8_t Rc_flag=0;	//遥控器状态标志位 
+volatile float pre_v=0.0f;
+volatile float pre_rc=0.0f;	//上一次右摇杆前后值
+ volatile uint8_t Rc_flag=0;	//遥控器状态标志位 
  
  
 
@@ -73,9 +74,16 @@ float pre_rc=0.0f;	//上一次右摇杆前后值
 	// Q=diag([20 1 120 270 3000 1]);
     // R=diag([18 35]); 
 	//好
- float Poly_Coefficient[12][4] = {-1054.29009, 897.17949, -300.39033, 10.24151, -358.65714, 284.42736, -83.87479, 5.24555, -80.54457, 60.46272, -14.73060, -0.72226, -277.78399, 209.48646, -51.74162, -1.19321, -1320.00788, 1000.29448, -250.90686, 23.50797, -52.73585, 40.39285, -10.43662, 1.23315, -1133.61702, 851.39937, -203.55656, 18.12949, -134.76995, 102.29154, -24.30619, 2.16750, -260.28510, 196.41486, -48.53919, 4.19676, -704.09611, 531.45447, -131.32041, 11.36997, 691.74977, -516.72698, 126.43761, 16.84215, 46.48765, -34.92827, 8.61994, 0.27783};
+float Poly_Coefficient[12][4] = {-1054.29009, 897.17949, -300.39033, 10.24151, -358.65714, 284.42736, -83.87479, 5.24555, -80.54457, 60.46272, -14.73060, -0.72226, -277.78399, 209.48646, -51.74162, -1.19321, -1320.00788, 1000.29448, -250.90686, 23.50797, -52.73585, 40.39285, -10.43662, 1.23315, -1133.61702, 851.39937, -203.55656, 18.12949, -134.76995, 102.29154, -24.30619, 2.16750, -260.28510, 196.41486, -48.53919, 4.19676, -704.09611, 531.45447, -131.32041, 11.36997, 691.74977, -516.72698, 126.43761, 16.84215, 46.48765, -34.92827, 8.61994, 0.27783};
+//还行，有点抖
+//float Poly_Coefficient[12][4] = {-1044.91898, 896.17401, -305.94395, 9.93175, -364.74585, 289.61572, -86.61439, 5.34840, -101.71679, 76.84763, -18.81232, -2.08688, -278.60004, 211.56238, -52.95230, -2.14800, -24.39467, 24.38926, -12.82165, 4.39256, -3.55375, 3.21099, -1.33734, 0.51115, 62.33241, -54.39456, 16.37891, -0.59255, 19.30616, -15.83073, 4.18692, -0.28987, 7.38939, -5.52288, 1.13374, 0.01499, 18.93493, -14.29749, 3.14990, -0.06873, 3.95726, -3.44633, 1.21504, 7.88095, 0.57412, -0.47224, 0.15719, 0.47704};
+//float Poly_Coefficient[12][4] = {-1084.03921, 928.10806, -316.61838, 10.47069, -371.64882, 295.02266, -88.67138, 5.46260, -96.79839, 73.14090, -17.87969, -1.84214, -285.02412, 216.36032, -54.02984, -2.37387, 60.93927, -40.02916, 2.83020, 3.22532, 0.70069, -0.00623, -0.55180, 0.45886, 80.02886, -67.82607, 19.67875, -0.88033, 21.41930, -17.45795, 4.58551, -0.32532, 12.57532, -9.45149, 2.13772, -0.08631, 30.25744, -22.85249, 5.26712, -0.25156, -0.95974, 0.26991, 0.28909, 7.68693, 0.00554, -0.04219, 0.05020, 0.47488};	
+//float Poly_Coefficient[12][4]  = {-1013.70825, 871.16953, -297.89630, 9.59437, -358.38117, 284.69087, -84.88293, 5.25455, -94.62788, 71.47741, -17.50459, -1.99002, -264.26851, 200.73792, -50.26839, -2.04283, -132.45145, 105.98562, -32.64533, 5.90968, -9.09972, 7.40615, -2.36033, 0.58532, 33.86243, -32.78798, 11.12202, -0.14132, 15.81825, -13.13968, 3.53517, -0.23265, -3.75043, 2.90633, -0.94907, 0.19262, 0.00599, 0.03623, -0.39419, 0.23500, 12.32686, -9.74977, 2.77487, 8.13935, 1.52551, -1.19081, 0.33536, 0.47515};
+//比较好
+ //float Poly_Coefficient[12][4] = {-941.51290, 812.59261, -278.44216, 8.52152, -349.47164, 277.82048, -81.95253, 5.11759, -91.60534, 69.16892, -16.97258, -2.21008, -244.76940, 185.94236, -46.60215, -1.72654, -256.90729, 199.77043, -55.31820, 7.54715, -15.77975, 12.44757, -3.58644, 0.66209, -21.30442, 9.03573, 0.85801, 0.74771, 10.37432, -8.95441, 2.51524, -0.14356, -28.06966, 21.26103, -5.51283, 0.59763, -32.69506, 24.70982, -6.47471, 0.74934, 27.91484, -21.46705, 5.66789, 8.35815, 3.35235, -2.56705, 0.67564, 0.45713};
 
-//暂时看挺不错的，停下后会前后晃动一点点但距离较小
+
+	//暂时看挺不错的，停下后会前后晃动一点点但距离较小
 // Q=diag([20 1 180 320 3000 1]);  %theta dot_theta x dot_x  phi dot_phi 
 // R=diag([25 35]); 
 //float Poly_Coefficient[12][4] = {-921.24989, 794.80830, -271.77373, 8.38625, -342.51291, 272.26920, -79.96352, 5.01883, -76.53405, 57.66199, -14.12034, -1.37072, -224.42536, 170.13538, -42.44051, -1.50707, -493.65078, 378.59458, -98.69851, 10.87708, -26.35907, 20.46377, -5.53791, 0.80768, -245.48244, 178.90247, -40.36916, 4.30717, -14.68851, 10.31970, -2.11798, 0.26511, -91.65922, 69.32622, -17.33006, 1.58333, -164.83770, 124.67704, -31.17466, 2.86897, 100.06658, -75.56822, 18.96247, 7.96030, 10.78173, -8.16150, 2.05681, 0.36404};
@@ -143,7 +151,6 @@ float pre_rc=0.0f;	//上一次右摇杆前后值
 //  816.2537,-784.2204,286.6425,19.7176,
 //  130.1190,-127.0704,47.4577,1.6458};
 vmc_leg_t right;//右腿
-
 extern INS_t INS;
 
 extern vmc_leg_t left;
@@ -153,7 +160,10 @@ extern c_fbpara_t  C_data;
 
 float jump_time_r;
 extern float jump_time_l;
-												
+
+
+
+pid_type_def jump_pid_R;//右腿跳跃pid
 pid_type_def LegR_Pid;//右腿的腿长pd
 pid_type_def Tp_Pid;//防劈叉补偿pd
 pid_type_def Turn_Pid;//转向pd
@@ -161,6 +171,10 @@ pid_type_def Roll_Pid;//横滚角补偿pd
 pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
+
+ const static float jump_pid[3] = {550.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+float jumpF0_R=17.2f;//右腿跳跃初始力
+uint8_t jump_module_R=0;
 
 extern shoot_control_t shoot_control;          
 uint8_t filter_flag =0;
@@ -256,6 +270,7 @@ float pitch_sen;
 float mode_rc;
 float fire_mode;
 
+//大约4ms执行一次
 void ChassisR_task(void)
 {
 	//保持平衡
@@ -273,9 +288,14 @@ void ChassisR_task(void)
 	}
 	//电机初始化
 	//包括了右边关节电机的id,mode初始化，以及电机的使能；
+
 	  ChassisR_init(&chassis_move_balance,&right,&LegR_Pid,&Wheel_Pid);
 	  Pensation_init(&Roll_Pid,&Tp_Pid,&Turn_Pid,&Wz_Pid);//pid初始化	
 	  shoot_init();	
+	PID_init(&jump_pid_R, PID_POSITION, jump_pid, 90.0f, 0.0f);
+
+
+
     //chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while(1)
 	{	
@@ -345,8 +365,8 @@ void ChassisR_task(void)
 	    
 		chassis_move_balance.target_v=
 		                            //    0;
- 		                            ((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.0050f);
-		slope_following(&chassis_move_balance.target_v,&chassis_move_balance.v_set,0.005f);	//斜坡函数
+ 		                            ((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.003f);
+		slope_following(&chassis_move_balance.target_v,&chassis_move_balance.v_set,0.004f);	//斜坡函数
 			
 //	    chassis_move_balance.v_set=((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.00450f);//???????0	
 	
@@ -354,31 +374,36 @@ void ChassisR_task(void)
         // chassis_move_balance.target_x=chassis_move_balance.target_x+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.000005f);
         chassis_move_balance.x_set = 
 		                            // 0.5f;................................................................................................................................
-		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*6.2f/1000.0f+0.000005f;
+		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*6.5f/1000.0f+0.000005f;
 									// chassis_move_balance.x_set+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.0000265f)+chassis_move_balance.v_set*(float)CHASSR_TIME*2.2f/1000.0f;
 		
 									// slope_following(&chassis_move_balance.target_x,&chassis_move_balance.x_set,0.012f);//斜坡函数，起一个补偿作用
-									
+
 		//通过判断机器人状态来对x_set进行修正从而抑制停车后的前后摆动
-		if(pre_rc>0&&chassis_move_balance.chassis_RC->rc.ch[1]==0)
+		if(pre_rc>10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
 		{
 			Rc_flag=1;
 		}
-		else if(pre_rc<0&&chassis_move_balance.chassis_RC->rc.ch[1]==0)
+		else if(pre_rc<-10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
 		{
 			Rc_flag=2;
 		}
+		if(Rc_flag==3)
+		{
+			chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.42f;
+			Rc_flag=0;
+		}
 
-		if(pre_v<0&&chassis_move_balance.v_filter2>=0&&Rc_flag==1)
-		{
-			chassis_move_balance.x_set=chassis_move_balance.x_filter+0.4f; 
-			Rc_flag=0;
-		}
-		else if(pre_v>0&&chassis_move_balance.v_filter2<=0&&Rc_flag==2)
-		{
-			chassis_move_balance.x_set=chassis_move_balance.x_filter+0.4f; 
-			Rc_flag=0;
-		}
+// if(pre_v < -VELOCITY_EPSILON && chassis_move_balance.v_filter2 >= -VELOCITY_EPSILON && Rc_flag == 1)
+// {
+//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.28f;
+//     Rc_flag = 0;
+// }
+// else if(pre_v > VELOCITY_EPSILON && chassis_move_balance.v_filter2 <= VELOCITY_EPSILON && Rc_flag == 2)
+// {
+//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.28f;
+//     Rc_flag = 0;
+// }
 
 //刹车补偿       
 		// if(chassis_move_balance.target_v<0.0125f && chassis_move_balance.target_v>-0.0125f&&right.leg_flag==0&&left.leg_flag==0)
@@ -401,7 +426,9 @@ void ChassisR_task(void)
 	   	chassis_move_balance.leg_set = chassis_move_balance.leg_set + 0.1; 
 	}
    	chassis_move_balance.leg_set = chassis_move_balance.leg_set+(((float)chassis_move_balance.chassis_RC->rc.ch[0])*(0.0000037f)); 
-		//腿长限幅
+	//腿长限幅
+
+			
 		mySaturate(&chassis_move_balance.leg_set,0.130f,0.32f);
 	
 		if(fabsf(chassis_move_balance.last_leg_set-chassis_move_balance.leg_set)>0.0007f)
@@ -414,7 +441,7 @@ void ChassisR_task(void)
 //小陀螺
 	if(chassis_move_balance.w_flag == 1)  
 	{
-		chassis_move_balance.Wz_target= 1.3;
+		chassis_move_balance.Wz_target= 1.2f;
 		chassis_move_balance.v_set = 0;
 		chassis_move_balance.x_set = 0;
 		chassis_move_balance.target_x=0;
@@ -510,7 +537,6 @@ void ChassisR_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legr,pid_type
 	}	
 	for(int m=0;m<2;m++)
     {
-       
        PID_init(&chassis->motor_speed_pid[m], PID_POSITION, motor_speed_pid, M3505_MOTOR_SPEED_PID_MAX_OUT, M3505_MOTOR_SPEED_PID_MAX_IOUT);
     }
 	
@@ -529,10 +555,11 @@ float turn_pid[3] =
 float wz_pid[3]   = 
 //                  {0,0,0};
                     {WZ_PID_KP, WZ_PID_KI, WZ_PID_KD};
+
 //PID初始化
 void Pensation_init(pid_type_def *roll,pid_type_def *Tp,pid_type_def *turn,pid_type_def *wz)
-{//补偿pid初始化：横滚角补偿、防劈叉补偿、偏航角补偿
-    
+{
+	//补偿pid初始化：横滚角补偿、防劈叉补偿、偏航角补偿
 //	const static float roll_pid[3] = {ROLL_PID_KP, ROLL_PID_KI,ROLL_PID_KD};
 //	const static float tp_pid[3] = {TP_PID_KP, TP_PID_KI, TP_PID_KD};
 //	const static float turn_pid[3] = {TURN_PID_KP, TURN_PID_KI, TURN_PID_KD};	
@@ -547,7 +574,6 @@ void Pensation_init(pid_type_def *roll,pid_type_def *Tp,pid_type_def *turn,pid_t
 //  Wz侧补偿	
 	PID_init(wz, PID_POSITION, wz_pid, WZ_PID_MAX_OUT, WZ_PID_MAX_IOUT);
 //	PID_init(&buffer_pid, PID_POSITION,power_pid,POWER_PID_MAX_OUT, POWER_PID_MAX_IOUT);
-
 }
 
 //底盘数据反馈更新
@@ -639,6 +665,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //       //chassis->turn_T = - PID_calc(&Turn_Pid,chassis->relative_angle,0);
 // 	}
 
+   	//小陀螺
    if(chassis->w_flag==1){	
 		slope_following(&chassis_move_balance.Wz_target,&chassis_move_balance.Wz_set,0.006f);	//斜坡函数
 	   chassis->turn_T=Turn_Pid.Kp*(chassis->Wz_set-0)-Turn_Pid.Kd*ins->Gyro[2];	//进入小陀螺模式
@@ -654,7 +681,10 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 			}
 		}
 		else{
+			//slope_following(&chassis->relative_angle,&angle,0.008f);
 			chassis->turn_T=Turn_Pid.Kp*(chassis->relative_angle-0)-Turn_Pid.Kd*ins->Gyro[2];
+			//chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
+			
 		}
 		
 	}
@@ -718,7 +748,15 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	mySaturate(&chassis->wheel_motor[0].wheel_T,-4.2f,4.2f);	
 	vmcr->Tp=vmcr->Tp+chassis->leg_tp;//髋关节输出力矩=LQR得到的+防劈叉补偿
 	//vmcr->Tp=0.0f;//测试使用
-	vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;	//f0=前馈(抵消重力)+腿长pd+roll轴补偿
+	if(chassis->help_jump_flag ==1)
+	{
+		vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+	}
+	else
+	{
+		vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;	//f0=前馈(抵消重力)+腿长pd+roll轴补偿
+	}
+	
 	//vmcr->F0=0.0f;		//测试使用
 	if(chassis_move_balance.chassis_RC->rc.s[0]==2)//右拨杆拨至最下边
 	{
@@ -730,6 +768,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //跳跃逻辑
  	if(chassis->chassis_RC->rc.s[1] ==1)//左上拨杆拨至最上边
  	{
+		jump_module_R=1;
  		if(chassis->chassis_RC->rc.ch[4] >500){  //左拨轮往下拨
 		
  		    chassis->help_jump_flag =1;		
@@ -737,13 +776,13 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//压缩阶段	
  		  if(chassis->jump_flag_r==0 && chassis->help_jump_flag ==1){
 			
- 		      chassis->leg_set = 0.130;
-
- 		       if(vmcr->L0<0.17f)
+ 		      chassis->leg_set = 0.13f;
+			  jumpF0_R=17.2f;
+ 		       if(vmcr->L0<0.15f)
  		     {
  		        jump_time_r++;  
  		      }
- 		     if(jump_time_r>=10&&jump_time_l>=10)
+ 		     if(jump_time_r>=20&&jump_time_l>=20)
  		     {  
  			   jump_time_r=0;
  			   jump_time_l=0;
@@ -755,9 +794,9 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  //上升加速阶段			
  		else if(chassis->jump_flag_r==1&& chassis->help_jump_flag ==1)
  		{		
- 			chassis->leg_set = 0.30;
-
- 			 if(vmcr->L0>0.22f)
+ 			chassis->leg_set = 0.32f;
+			 jumpF0_R=25.0f;
+ 			 if(vmcr->L0>0.24f)
  			 {
  				jump_time_r++;
  			 }
@@ -773,22 +812,23 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //缩腿阶段		
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
  		{
- 			chassis->leg_set = 0.13;
- 			chassis->theta_set=0.0f;
-			
+ 			chassis->leg_set = 0.15f;
+			jumpF0_R=0.0f;
+ 			chassis->theta_set=0.0f;			
  			chassis->x_filter=0.0f;
- 			chassis->x_set=chassis->x_filter;
+ 			chassis->x_set=chassis->x_filter+0.3f;
 			
- 		  if(vmcr->L0<0.17f)
+ 		  if(vmcr->L0<0.2f)
  		  {
  			 jump_time_r++;
  		  }
  		  if(jump_time_r>=5&&jump_time_l>=5)
  		  { 
+			jumpF0_R=17.2f;
  			 jump_time_r=0;
  			 jump_time_l=0;
- 			 chassis->leg_set=0.130f;
- 			 chassis->last_leg_set=0.130f;
+ 			 chassis->leg_set=0.22f;
+ 			 chassis->last_leg_set=0.22f;
  			 chassis->jump_flag_r=0;//缩腿完毕
  		     chassis->jump_flag_l=0;
          chassis->help_jump_flag = 0;	
@@ -797,8 +837,12 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		
  	else
  	{
- 		vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set);
+ 		vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set);
  	}
+ }
+ else 
+ {
+	jump_module_R=1;
  }	
 
    right_flag = ground_detectionR(vmcr,ins);//右腿离地检测

@@ -35,9 +35,10 @@ extern float jump_time_r;
 extern shoot_control_t shoot_control;          //射击数据
 pid_type_def LegL_Pid;	
 
+pid_type_def jump_pid_L;//跳跃pid
 
-
-
+ const static float jump_pid[3] =  {550.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+float jumpF0_L=17.2f;//左腿跳跃初始力
 
 extern INS_t INS;
 uint32_t CHASSL_TIME=1;	
@@ -53,6 +54,7 @@ void ChassisL_task(void)
 
 	
         ChassisL_init(&chassis_move_balance,&left,&LegL_Pid);// 初始化左边两个关节电机和左边轮毂电机的 id 和控制模式、初始化腿部
+		PID_init(&jump_pid_L, PID_POSITION, jump_pid, 90.0f, 0.0f);
 		    //shoot init
             // 射击初始化
             shoot_init();
@@ -131,7 +133,6 @@ void ChassisL_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legl)
     const static float legl_pid[3] = 
 	                                // {0,0,0};
 	                                {LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
-    
 	static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
 
 	joint_motor_init(&chassis->joint_motor[2],6,MIT_MODE);//发送id为6
@@ -260,8 +261,15 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 	    chassis->wheel_motor[1].wheel_T = chassis->wheel_motor[1].wheel_T-chassis->turn_T;	//轮毂电机输出力矩
 
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
-        		
-		vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd
+		if(chassis->help_jump_flag ==1)
+		{
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)-chassis->roll_f0;
+		}
+		else{
+			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd	
+		}
+		
+		
 		//vmcl->F0=0.0f;
 		// float Poly_Coefficient[12][4] = {-421.75465, 404.14066, -163.18492, 1.52481, -100.33598, 88.97437, -33.12351, 0.46394, -13.79006, 20.45913, -5.20346, -6.44626, 0.23096, 8.70198, -1.16290, -7.84332, -145.33854, 158.48464, -89.03226, 32.92067, -27.19789, 19.76695, -10.47246, 4.95830, 615.75677, -496.49431, 155.68024, -1.46787, 129.15010, -93.95712, 23.77051, 0.02808, 207.43929, -152.95834, 33.54335, 1.53506, 211.73999, -148.21559, 29.04610, 2.57854, 88.69753, -151.25099, 93.98502, 36.97904, -21.28958, 10.81717, 4.85406, 2.35990};
 		//拟合矩阵
@@ -274,21 +282,19 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  	if(chassis->chassis_RC->rc.s[1] ==1)
  {
  		if(chassis->chassis_RC->rc.ch[4] >500){
-		
  		chassis->help_jump_flag =1;
  		 }
-  
  //压缩阶段
  		 if(chassis->jump_flag_l==0&& chassis->help_jump_flag ==1)
  		{
 			
- 		 chassis->leg_set = 0.130;
-	
- 		 if(vmcl->L0<0.17f)
+ 		 chassis->leg_set = 0.13f;
+		jumpF0_L=17.2f;
+ 		 if(vmcl->L0<0.15f)
  		 {
  		  jump_time_l++;
  		 }
- 		 if(jump_time_l>=10&&jump_time_l>=10)
+ 		 if(jump_time_l>=20&&jump_time_l>=20)
  		 {  
  			 jump_time_l=0;
  			 jump_time_r=0;
@@ -301,10 +307,9 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		else if(chassis->jump_flag_l==1&& chassis->help_jump_flag ==1)
  		{
 
- 			chassis->leg_set = 0.30;
-			
-			
- 			 if(vmcl->L0>0.22f)
+ 			chassis->leg_set = 0.32f;
+			jumpF0_L=25.0f;
+ 			 if(vmcl->L0>0.24f)
  			 {
  				jump_time_l++;
  			 }
@@ -320,29 +325,31 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  //缩腿阶段
  		else if(chassis->jump_flag_l==2&& chassis->help_jump_flag ==1)
  		{
- 		 	chassis->leg_set = 0.13;
+ 		 	chassis->leg_set = 0.15f;
+			jumpF0_L=0.0f;
  			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
- 			chassis->x_set=chassis->x_filter;
- 		  if(vmcl->L0<0.18f)
+ 			chassis->x_set=chassis->x_filter+0.3f;
+ 		  if(vmcl->L0<0.2f)
  		  {
  			 jump_time_l++;
  		  }
  		  if(jump_time_l>=5&&jump_time_r>=5)
  		  { 
- 				 jump_time_l=0;
- 				 jump_time_r=0;
- 				 chassis->leg_set=0.130f;
- 				 chassis->last_leg_set=0.130f;
- 				 chassis->jump_flag_l=0;
- 				 chassis->jump_flag_r=0;
+			jumpF0_L=17.2f;
+ 			 jump_time_l=0;
+ 			 jump_time_r=0;
+ 			 chassis->leg_set=0.22f;
+ 			 chassis->last_leg_set=0.22f;
+ 			 chassis->jump_flag_l=0;
+ 			 chassis->jump_flag_r=0;
  			  chassis->help_jump_flag = 0;
 
  		  }
  		}
  	else
  	{
- 		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set);//前馈+pd
+ 		vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)*1.5f;
  	}
  }	
 

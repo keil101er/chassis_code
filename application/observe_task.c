@@ -12,7 +12,7 @@
   @endverbatim
   *********************************************************************
   */
-	
+#define VELOCITY_EPSILON 1e-4f	
 #include "observe_task.h"
 #include "kalman_filter.h"
 #include "cmsis_os.h"
@@ -45,7 +45,7 @@ const float vaEstimateKF_H[4] = {1.0f, 0.0f,
 														 															 
 extern INS_t INS;		
 extern chassis_t chassis_move_balance;																 															 
-																 
+extern uint8_t Rc_flag;																 
 extern vmc_leg_t right;			
 extern vmc_leg_t left;	
 
@@ -67,7 +67,7 @@ void observe_task(void)
 
   while(1)
 	{  
-		pre_v=chassis_move_balance.v_filter2;
+		
 		chassis_move_balance.wheel_motor[0].vel = chassis_move_balance.wheel_motor[0].speed_rpm * 0.00664267f;  //角速度
 		chassis_move_balance.wheel_motor[1].vel = chassis_move_balance.wheel_motor[1].speed_rpm * 0.00664267f;  //角速度
 		
@@ -79,7 +79,7 @@ void observe_task(void)
 		// vlb=wl*0.0755f+left.L0*left.d_theta*arm_cos_f32(left.theta)+left.d_L0*arm_sin_f32(left.theta);//机体b系的速度
 		//  aver_v=(vrb-vlb)/2.0f;
         //  xvEstimateKF_Update(&vaEstimateKF,INS.MotionAccel_b[1],aver_v);
-
+		
 		chassis_move_balance.v_filter = 
 		                                // aver_v;
 		                               ((chassis_move_balance.wheel_motor[0].vel) - (chassis_move_balance.wheel_motor[1].vel))*(0.0755f)/2 ;			
@@ -103,7 +103,7 @@ void observe_task(void)
 			// 	chassis_move_balance.x_filter=0.0f;
 			// 	chassis_move_balance.x_set=0.55f;
 			// 	// chassis_move_balance.x_set=0.7f;
-			// 		// chassis_move_balance.x_set=chassis_move_balance.x_set+(left.L0*sinf(left.theta)+right.L0*sinf(right.theta))/2.0f; 
+			// chassis_move_balance.x_set=chassis_move_balance.x_set+(left.L0*sinf(left.theta)+right.L0*sinf(right.theta))/2.0f; 
 			// 	filter_flag = 0;
 			// }            			
             // if(filter_flag == 0&&last_rc!=0&&(float)chassis_move_balance.chassis_RC->rc.ch[1]==0)
@@ -148,8 +148,32 @@ if(chassis_move_balance.w_flag==1){
 //	chassis_move_balance.v_filter=(chassis_move_balance.wheel_motor[0].vel-chassis_move_balance.wheel_motor[1].vel)*(-0.0755f)/2.0f;
 //	//0.0603是轮子半径，电机反馈的是角速度，乘半径后得到线速度，数学模型中定义的是轮子顺时针为正，所以要乘个负号
 //	chassis_move_balance.x_filter=chassis_move_balance.x_filter+chassis_move_balance.v_filter*((float)OBSERVE_TIME/1000.0f);
-//				 
+//
+if(pre_v < -VELOCITY_EPSILON && chassis_move_balance.v_filter2 >= -VELOCITY_EPSILON && Rc_flag == 1)
+{  
+	if(chassis_move_balance.chassis_RC->rc.ch[1]==0)
+    {
+		Rc_flag = 3;
+	}
+	else
+	{
+		Rc_flag = 0;
+	}
+}
+else if(pre_v > VELOCITY_EPSILON && chassis_move_balance.v_filter2 <= VELOCITY_EPSILON && Rc_flag == 2)
+{
+	if(chassis_move_balance.chassis_RC->rc.ch[1]==0)
+    {
+		Rc_flag = 3;
+	}
+	else
+	{
+		Rc_flag = 0;
+	}
+}
+pre_v=chassis_move_balance.v_filter2;				 
 	osDelay(OBSERVE_TIME);
+
 	}
 }
 

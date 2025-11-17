@@ -37,7 +37,7 @@ pid_type_def LegL_Pid;
 
 pid_type_def jump_pid_L;//Ã¯‘æpid
 
- const static float jump_pid[3] =  {550.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+const static float jump_pid[3] =  {550.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//◊ÛÕ»Ã¯‘æ≥ı º¡¶
 
 extern INS_t INS;
@@ -263,7 +263,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
 		if(chassis->help_jump_flag ==1)
 		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)-chassis->roll_f0;
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
 		}
 		else{
 			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//«∞¿°+pd	
@@ -308,12 +308,12 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		{
 
  			chassis->leg_set = 0.32f;
-			jumpF0_L=25.0f;
+			jumpF0_L=17.2f;
  			 if(vmcl->L0>0.24f)
  			 {
  				jump_time_l++;
  			 }
- 			 if(jump_time_l>=10&&jump_time_l>=10)
+ 			 if(jump_time_l>=10&&jump_time_r>=10)
  			 {  
  				 jump_time_l=0;
  				  jump_time_r=0;
@@ -321,12 +321,11 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  				 chassis->jump_flag_r=2;//…œ…˝ÕÍ±œΩ¯»ÎÀıÕ»Ω◊∂Œ
  			 }
  		}
-
  //ÀıÕ»Ω◊∂Œ
  		else if(chassis->jump_flag_l==2&& chassis->help_jump_flag ==1)
  		{
- 		 	chassis->leg_set = 0.15f;
-			jumpF0_L=0.0f;
+ 		 	chassis->leg_set = 0.13f;
+			jumpF0_L=17.2f;
  			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter+0.3f;
@@ -339,20 +338,19 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 			jumpF0_L=17.2f;
  			 jump_time_l=0;
  			 jump_time_r=0;
- 			 chassis->leg_set=0.22f;
- 			 chassis->last_leg_set=0.22f;
+ 			 chassis->leg_set=0.25f;
+ 			 chassis->last_leg_set=0.25f;
  			 chassis->jump_flag_l=0;
  			 chassis->jump_flag_r=0;
- 			  chassis->help_jump_flag = 0;
+ 			 chassis->help_jump_flag = 0;
 
  		  }
  		}
  	else
  	{
- 		vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)*1.5f;
+ 		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set);
  	}
  }	
-
 
 // 	 vmcl->F0=PID_calc(leg,vmcl->L0,chassis->leg_set);//«∞¿°+pd
 	 left_flag=ground_detectionL(vmcl,ins);//”“Õ»¿ÎµÿºÏ≤‚

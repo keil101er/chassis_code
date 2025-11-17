@@ -1,7 +1,7 @@
 chassis_task\freertos.o: ../Src/freertos.c
 chassis_task\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-chassis_task\freertos.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stddef.h
-chassis_task\freertos.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdint.h
+chassis_task\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+chassis_task\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 chassis_task\freertos.o: ../Inc/FreeRTOSConfig.h
 chassis_task\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 chassis_task\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -68,9 +68,9 @@ chassis_task\freertos.o: ../components/algorithm/QuaternionEKF.h
 chassis_task\freertos.o: ../components/algorithm/kalman_filter.h
 chassis_task\freertos.o: ../components/algorithm/Include/arm_math.h
 chassis_task\freertos.o: ../Drivers/CMSIS/Include/core_cm4.h
-chassis_task\freertos.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\string.h
-chassis_task\freertos.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\math.h
-chassis_task\freertos.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdlib.h
+chassis_task\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+chassis_task\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+chassis_task\freertos.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 chassis_task\freertos.o: ../application/remote_control.h
 chassis_task\freertos.o: ../bsp/boards/bsp_rc.h
 chassis_task\freertos.o: ../application/CAN_receive.h

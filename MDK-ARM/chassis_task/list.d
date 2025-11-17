@@ -1,8 +1,8 @@
 chassis_task\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/list.c
-chassis_task\list.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdlib.h
+chassis_task\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 chassis_task\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-chassis_task\list.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stddef.h
-chassis_task\list.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdint.h
+chassis_task\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+chassis_task\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 chassis_task\list.o: ../Inc/FreeRTOSConfig.h
 chassis_task\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 chassis_task\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

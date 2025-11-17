@@ -1,8 +1,8 @@
 chassis_task\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c
-chassis_task\stream_buffer.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdint.h
-chassis_task\stream_buffer.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\string.h
+chassis_task\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+chassis_task\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 chassis_task\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-chassis_task\stream_buffer.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stddef.h
+chassis_task\stream_buffer.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 chassis_task\stream_buffer.o: ../Inc/FreeRTOSConfig.h
 chassis_task\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 chassis_task\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

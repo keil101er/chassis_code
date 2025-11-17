@@ -3,8 +3,8 @@ chassis_task\can_receive.o: ..\application\CAN_receive.h
 chassis_task\can_receive.o: ..\application\struct_typedef.h
 chassis_task\can_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 chassis_task\can_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-chassis_task\can_receive.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stddef.h
-chassis_task\can_receive.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdint.h
+chassis_task\can_receive.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+chassis_task\can_receive.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 chassis_task\can_receive.o: ../Inc/FreeRTOSConfig.h
 chassis_task\can_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 chassis_task\can_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -68,9 +68,9 @@ chassis_task\can_receive.o: ../components/algorithm/QuaternionEKF.h
 chassis_task\can_receive.o: ../components/algorithm/kalman_filter.h
 chassis_task\can_receive.o: ../components/algorithm/Include/arm_math.h
 chassis_task\can_receive.o: ../Drivers/CMSIS/Include/core_cm4.h
-chassis_task\can_receive.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\string.h
-chassis_task\can_receive.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\math.h
-chassis_task\can_receive.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdlib.h
+chassis_task\can_receive.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+chassis_task\can_receive.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+chassis_task\can_receive.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 chassis_task\can_receive.o: ..\application\remote_control.h
 chassis_task\can_receive.o: ../bsp/boards/bsp_rc.h
 chassis_task\can_receive.o: ../components/algorithm/user_lib.h

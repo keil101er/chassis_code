@@ -425,10 +425,20 @@ void ChassisR_task(void)
 
 	   	chassis_move_balance.leg_set = chassis_move_balance.leg_set + 0.1; 
 	}
-   	chassis_move_balance.leg_set = chassis_move_balance.leg_set+(((float)chassis_move_balance.chassis_RC->rc.ch[0])*(0.0000037f)); 
-	//ÍÈ³¤ÏÞ·ù
+	// if(jump_module_R==1)
+	// {
+	// 	chassis_move_balance.leg_set = chassis_move_balance.leg_set+(((float)chassis_move_balance.chassis_RC->rc.ch[0])*(0.0000037f))*0.5f; //ÌøÔ¾Ä£Ê½¼õÐ¡ÍÈ³¤±ä»¯ÁéÃô¶È
+	
+	// }
+	// else
+	// {
+	// 	chassis_move_balance.leg_set = chassis_move_balance.leg_set+(((float)chassis_move_balance.chassis_RC->rc.ch[0])*(0.0000037f)); //Ò£¿ØÆ÷¸Ä±äÍÈ³¤
+	// }
 
-			
+	chassis_move_balance.leg_set = chassis_move_balance.leg_set+(((float)chassis_move_balance.chassis_RC->rc.ch[0])*(0.0000037f)); //Ò£¿ØÆ÷¸Ä±äÍÈ³¤
+
+
+   	//ÍÈ³¤ÏÞ·ù	
 		mySaturate(&chassis_move_balance.leg_set,0.130f,0.32f);
 	
 		if(fabsf(chassis_move_balance.last_leg_set-chassis_move_balance.leg_set)>0.0007f)
@@ -795,7 +805,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  		else if(chassis->jump_flag_r==1&& chassis->help_jump_flag ==1)
  		{		
  			chassis->leg_set = 0.32f;
-			 jumpF0_R=25.0f;
+			 jumpF0_R=17.2f;
  			 if(vmcr->L0>0.24f)
  			 {
  				jump_time_r++;
@@ -812,8 +822,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //ËõÍÈ½×¶Î		
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
  		{
- 			chassis->leg_set = 0.15f;
-			jumpF0_R=0.0f;
+ 			chassis->leg_set = 0.13f;
+			jumpF0_R=17.2f;
  			chassis->theta_set=0.0f;			
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter+0.3f;
@@ -827,11 +837,11 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 			jumpF0_R=17.2f;
  			 jump_time_r=0;
  			 jump_time_l=0;
- 			 chassis->leg_set=0.22f;
- 			 chassis->last_leg_set=0.22f;
+ 			 chassis->leg_set=0.25f;
+ 			 chassis->last_leg_set=0.25f;
  			 chassis->jump_flag_r=0;//ËõÍÈÍê±Ï
  		     chassis->jump_flag_l=0;
-         chassis->help_jump_flag = 0;	
+         	 chassis->help_jump_flag = 0;	
  		  }
  		}
 		
@@ -842,7 +852,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  }
  else 
  {
-	jump_module_R=1;
+	jump_module_R=0;
  }	
 
    right_flag = ground_detectionR(vmcr,ins);//ÓÒÍÈÀëµØ¼ì²â
@@ -854,10 +864,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		if(right_flag==1&&left_flag==1&&vmcr->leg_flag==0)
 		{ 
 			//µ±Á½ÍÈÍ¬Ê±ÀëµØ²¢ÇÒÒ£¿ØÆ÷Ã»ÓÐÔÚ¿ØÖÆÍÈµÄÉìËõÊ±£¬²ÅÈÏÎªÀëµØ
-			//ÅÅ³ýÌøÔ¾µÄÑ¹Ëõ½×¶Î¡¢ÉÏÉý½×¶Î¡¢ÌøÔ¾µÄËõÍÈ½×¶Î
 				chassis->wheel_motor[0].wheel_T=0.0f;
 				vmcr->Tp=LQR_K[6]*(vmcr->theta-0.0f)+ LQR_K[7]*(vmcr->d_theta-0.0f);
-
 				chassis->x_filter=0.0f;
 				chassis->x_set = chassis->x_filter;
 				vmcr->Tp=vmcr->Tp+chassis->leg_tp;			 

@@ -3,53 +3,64 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: ¦ÌVision V5.41.0.0
-Copyright (C) 2024 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: sd 1833627946@qq.com, ghj, LIC=ATTQ1-CX807-639MB-2QD8D-SV4YU-UL14E
+IDE-Version: ¦ÌVision V5.31.0.0
+Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: peng ye, qwe, LIC=FYKYW-Q5IGT-GKZBG-VL0WJ-65JIP-VDTZU
  
 Tool Versions:
-Toolchain:       MDK-ARM Plus  Version: 5.41.0.0
-Toolchain Path:  D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin
-C Compiler:      Armcc.exe V5.06 update 7 (build 960)
-Assembler:       Armasm.exe V5.06 update 7 (build 960)
-Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
-Library Manager: ArmAr.exe V5.06 update 7 (build 960)
-Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
-CPU DLL:         SARMCM3.DLL V5.41.0.0
-Dialog DLL:      DCM.DLL V1.17.5.0
-Target DLL:      CMSIS_AGDI.dll V1.33.21.0
-Dialog DLL:      TCM.DLL V1.56.4.0
+Toolchain:       MDK-ARM Plus  Version: 5.31.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 6 (build 750)
+Assembler:       Armasm.exe V5.06 update 6 (build 750)
+Linker/Locator:  ArmLink.exe V5.06 update 6 (build 750)
+Library Manager: ArmAr.exe V5.06 update 6 (build 750)
+Hex Converter:   FromElf.exe V5.06 update 6 (build 750)
+CPU DLL:         SARMCM3.DLL V5.31.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      CMSIS_AGDI.dll V1.32.6.0
+Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
-C:\Users\18336\Desktop\leg_test\code_rmuc (4)\code_rmuc\chassis\1.12VMC\1.12\MDK-ARM\chassis_task.uvprojx
-Project File Date:  09/20/2025
+D:\RM_code\code_rmuc\chassis\1.12VMC\1.12\MDK-ARM\chassis_task.uvprojx
+Project File Date:  11/12/2025
 
 <h2>Output:</h2>
-*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin'
+*** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'chassis_task'
-"chassis_task\chassis_task.axf" - 0 Error(s), 0 Warning(s).
+compiling chassisL_task.c...
+compiling chassisR_task.c...
+..\application\chassisR_task.c(198): warning:  #177-D: variable "H"  was declared but never referenced
+  	float H = 1;
+..\application\chassisR_task.c(426): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	   	chassis_move_balance.leg_set = chassis_move_balance.leg_set + 0.1; 
+..\application\chassisR_task.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=78812 RO-data=4076 RW-data=1296 ZI-data=53448  
+FromELF: creating hex file...
+"chassis_task\chassis_task.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
 Package Vendor: ARM
-                https://www.keil.com/pack/ARM.CMSIS.6.1.0.pack
-                ARM::CMSIS@6.1.0
-                CMSIS (Common Microcontroller Software Interface Standard)
-   * Component: CORE Version: 6.1.0
+                http://www.keil.com/pack/ARM.CMSIS.5.7.0.pack
+                ARM.CMSIS.5.7.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.4.0
 
 Package Vendor: Keil
-                https://www.keil.com/pack/Keil.STM32F4xx_DFP.3.0.0.pack
-                Keil::STM32F4xx_DFP@3.0.0
-                STMicroelectronics STM32F4 Series Device Support
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.14.0.pack
+                Keil.STM32F4xx_DFP.2.14.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
 
 <h2>Collection of Component include folders:</h2>
-  ./RTE/_chassis_task
-  D:/Keil_v5/Packs/ARM/CMSIS/6.1.0/CMSIS/Core/Include
+  .\RTE\_chassis_task
+  C:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
 <h2>Collection of Component Files used:</h2>
 
-   * Component: ARM::CMSIS:CORE@6.1.0
-Build Time Elapsed:  00:00:01
+   * Component: ARM::CMSIS:CORE:5.4.0
+Build Time Elapsed:  00:00:07
 </pre>
 </body>
 </html>

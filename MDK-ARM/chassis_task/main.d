@@ -7,7 +7,7 @@ chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 chassis_task\main.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 chassis_task\main.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 chassis_task\main.o: ../Drivers/CMSIS/Include/core_cm4.h
-chassis_task\main.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdint.h
+chassis_task\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 chassis_task\main.o: ../Drivers/CMSIS/Include/cmsis_version.h
 chassis_task\main.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 chassis_task\main.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -15,7 +15,7 @@ chassis_task\main.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 chassis_task\main.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-chassis_task\main.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stddef.h
+chassis_task\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 chassis_task\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -80,8 +80,8 @@ chassis_task\main.o: ../components/algorithm/QuaternionEKF.h
 chassis_task\main.o: ../components/algorithm/kalman_filter.h
 chassis_task\main.o: ../components/algorithm/Include/arm_math.h
 chassis_task\main.o: ../Drivers/CMSIS/Include/core_cm4.h
-chassis_task\main.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\string.h
-chassis_task\main.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\math.h
-chassis_task\main.o: D:\Keil_v5\ARM\Arm_Compiler_5.06\Bin\..\include\stdlib.h
+chassis_task\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+chassis_task\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+chassis_task\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 chassis_task\main.o: ../application/detect_task.h
 chassis_task\main.o: ../application/led_flow_task.h

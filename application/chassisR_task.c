@@ -14,6 +14,7 @@
 #include "chassis_power_control.h"
 #include "shoot.h"
 #include "VMC_calc.h"
+#include "test_task.h"
 #define YAW_MOUSE_SEN   0.00005f//0.00005f
 #define PITCH_MOUSE_SEN -0.00015f//0.00015f
 #define VELOCITY_EPSILON 1e-4f
@@ -161,7 +162,8 @@ extern c_fbpara_t  C_data;
 float jump_time_r;
 extern float jump_time_l;
 
-
+uint8_t debug_flag=1;
+uint16_t debug_count=0;
 
 pid_type_def jump_pid_R;//右腿跳跃pid
 pid_type_def LegR_Pid;//右腿的腿长pd
@@ -172,7 +174,7 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {550.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+ const static float jump_pid[3] = {500.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//右腿跳跃初始力
 uint8_t jump_module_R=0;
 
@@ -269,7 +271,7 @@ float yaw_sen;
 float pitch_sen;
 float mode_rc;
 float fire_mode;
-
+uint8_t jump_status=0;
 //大约4ms执行一次
 void ChassisR_task(void)
 {
@@ -299,6 +301,15 @@ void ChassisR_task(void)
     //chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while(1)
 	{	
+		if(debug_flag==0)
+		{
+			debug_count++;
+		}
+		if(debug_count<=100)
+		{
+			Buletooth_debug_task();
+		}
+		
 		 //等待电机使能
 		chassis_move_balance.DUBS_ON=toe_is_error(DBUS_TOE);//0:正常 1:异常
 //		c_transmit_date(&hcan1,chassis_move_balance.chassis_RC->rc.s[0],
@@ -760,7 +771,14 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//vmcr->Tp=0.0f;//测试使用
 	if(chassis->help_jump_flag ==1)
 	{
-		vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+		if(chassis->jump_flag_r==1)
+		{
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+		}
+		else
+		{
+				vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set);
+		}
 	}
 	else
 	{
@@ -768,7 +786,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	}
 	
 	//vmcr->F0=0.0f;		//测试使用
-	if(chassis_move_balance.chassis_RC->rc.s[0]==2)//右拨杆拨至最下边
+	if(chassis_move_balance.chassis_RC->rc.s[0]==2)//右拨杆拨至最下边,失能
 	{
 		chassis_move_balance.target_x=0.0f;
 		chassis_move_balance.x_set=0.0f;
@@ -785,7 +803,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  		}
 	//压缩阶段	
  		  if(chassis->jump_flag_r==0 && chassis->help_jump_flag ==1){
-			
+			jump_status=1;
  		      chassis->leg_set = 0.13f;
 			  jumpF0_R=17.2f;
  		       if(vmcr->L0<0.15f)
@@ -804,13 +822,14 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  //上升加速阶段			
  		else if(chassis->jump_flag_r==1&& chassis->help_jump_flag ==1)
  		{		
+			jump_status=2;
  			chassis->leg_set = 0.32f;
-			 jumpF0_R=17.2f;
- 			 if(vmcr->L0>0.24f)
+			 jumpF0_R=25.0f;
+ 			 if(vmcr->L0>0.13f)
  			 {
  				jump_time_r++;
  			 }
- 			 if(jump_time_r>=10&&jump_time_l>=10)
+ 			 if(jump_time_r>=23&&jump_time_l>=23)
  			 {  
  				 jump_time_r=0;
  				 jump_time_l=0;
@@ -822,23 +841,25 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //缩腿阶段		
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
  		{
+			jump_status=3;
  			chassis->leg_set = 0.13f;
-			jumpF0_R=17.2f;
+			jumpF0_R=0.0f;
  			chassis->theta_set=0.0f;			
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter+0.3f;
-			
- 		  if(vmcr->L0<0.2f)
+ 		  if(vmcr->L0<0.22f)
  		  {
  			 jump_time_r++;
  		  }
  		  if(jump_time_r>=5&&jump_time_l>=5)
  		  { 
+			debug_flag=0;
+			jump_status=0;
 			jumpF0_R=17.2f;
  			 jump_time_r=0;
  			 jump_time_l=0;
- 			 chassis->leg_set=0.25f;
- 			 chassis->last_leg_set=0.25f;
+ 			 chassis->leg_set=0.20f;
+ 			 chassis->last_leg_set=0.20f;
  			 chassis->jump_flag_r=0;//缩腿完毕
  		     chassis->jump_flag_l=0;
          	 chassis->help_jump_flag = 0;	
@@ -847,7 +868,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		
  	else
  	{
- 		vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set);
+ 		vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set);
  	}
  }
  else 
@@ -891,7 +912,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
   //功率控制
     chassis_power_control(chassis);
 
-	mySaturate(&vmcr->F0,-100.0f,100.0f);//限幅
+	mySaturate(&vmcr->F0,-50.0f,150.0f);//限幅
 
 	VMC_calc_2(vmcr);//计算期望的关节输出力矩
 

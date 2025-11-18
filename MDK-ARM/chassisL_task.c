@@ -37,7 +37,7 @@ pid_type_def LegL_Pid;
 
 pid_type_def jump_pid_L;//跳跃pid
 
-const static float jump_pid[3] =  {550.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+const static float jump_pid[3] =  {500.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//左腿跳跃初始力
 
 extern INS_t INS;
@@ -263,7 +263,15 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
 		if(chassis->help_jump_flag ==1)
 		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+			if(chassis->jump_flag_l==1)
+			{
+				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+			}
+			else
+			{
+				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set);
+			}
+
 		}
 		else{
 			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd	
@@ -308,12 +316,12 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		{
 
  			chassis->leg_set = 0.32f;
-			jumpF0_L=17.2f;
- 			 if(vmcl->L0>0.24f)
+			jumpF0_L=25.0f;
+ 			 if(vmcl->L0>0.13f)
  			 {
  				jump_time_l++;
  			 }
- 			 if(jump_time_l>=10&&jump_time_r>=10)
+ 			 if(jump_time_l>=23&&jump_time_r>=23)
  			 {  
  				 jump_time_l=0;
  				  jump_time_r=0;
@@ -325,11 +333,11 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		else if(chassis->jump_flag_l==2&& chassis->help_jump_flag ==1)
  		{
  		 	chassis->leg_set = 0.13f;
-			jumpF0_L=17.2f;
+			jumpF0_L=0.0f;
  			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter+0.3f;
- 		  if(vmcl->L0<0.2f)
+ 		  if(vmcl->L0<0.22f)
  		  {
  			 jump_time_l++;
  		  }
@@ -338,8 +346,8 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 			jumpF0_L=17.2f;
  			 jump_time_l=0;
  			 jump_time_r=0;
- 			 chassis->leg_set=0.25f;
- 			 chassis->last_leg_set=0.25f;
+ 			 chassis->leg_set=0.20f;
+ 			 chassis->last_leg_set=0.20f;
  			 chassis->jump_flag_l=0;
  			 chassis->jump_flag_r=0;
  			 chassis->help_jump_flag = 0;
@@ -364,7 +372,6 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		if(right_flag==1&&left_flag==1&&vmcl->leg_flag==0)
 		{  
 			 //当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
-			//排除跳跃的压缩阶段和跳跃的缩腿阶段
 				chassis->wheel_motor[1].wheel_T=0.0f;
 				vmcl->Tp=LQR_K[6]*(vmcl->theta-0.0f)+ LQR_K[7]*(vmcl->d_theta-0.0f);
 
@@ -393,7 +400,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		 vmcl->F0=0.0f;
 	 }
 
-	mySaturate(&vmcl->F0,-100.0f,100.0f);//限幅 
+	mySaturate(&vmcl->F0,-50.0f,150.0f);//限幅 
 
 	VMC_calc_2(vmcl);//计算期望的关节输出力矩
 

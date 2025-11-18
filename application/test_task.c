@@ -14,7 +14,7 @@
   @endverbatim
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
-
+#include "VMC_calc.h"
 #include "test_task.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -32,8 +32,8 @@ char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
 
 const error_t *error_list_test_local;
-
-
+extern vmc_leg_t right;
+extern uint8_t jump_status;
 
 /**
   * @brief          test task
@@ -48,7 +48,9 @@ const error_t *error_list_test_local;
  //蓝牙调试信息输出任务 Bluetooth debugging information output task
  void Buletooth_debug_task(void)
 {
-       sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f,%d\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,Rc_flag);
+       //sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f,%d\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,Rc_flag);
+    //    sprintf(debug_info,"%.2f,%.2f,%d\n",right.F0,right.L0,jump_status);
+    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%d\n",right.L0,right.torque_set[0],right.torque_set[1],right.F0,jump_status);
        //发送完成标志位
 		if(Txcplt_flag==1)
 		{
@@ -91,7 +93,7 @@ void test_task(void const * argument)
         }
 
         last_error = error;
-        Buletooth_debug_task();
+        //Buletooth_debug_task();
         osDelay(10);
     }
 }

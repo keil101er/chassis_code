@@ -82,3 +82,4 @@ chassis_task\chassisr_task.o: ..\application\detect_task.h
 chassis_task\chassisr_task.o: ../components/controller/chassis_power_control.h
 chassis_task\chassisr_task.o: ..\application\shoot.h
 chassis_task\chassisr_task.o: ..\application\gimbal_task.h
+chassis_task\chassisr_task.o: ..\application\test_task.h

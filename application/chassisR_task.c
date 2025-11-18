@@ -174,7 +174,7 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {500.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+ const static float jump_pid[3] = {550.0f,0.0f,450.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//”“Õ»Ã¯‘æ≥ı º¡¶
 uint8_t jump_module_R=0;
 
@@ -305,7 +305,7 @@ void ChassisR_task(void)
 		{
 			debug_count++;
 		}
-		if(debug_count<=100)
+		if(debug_count<=50)
 		{
 			Buletooth_debug_task();
 		}
@@ -829,7 +829,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  			 {
  				jump_time_r++;
  			 }
- 			 if(jump_time_r>=23&&jump_time_l>=23)
+ 			 if(jump_time_r>=25&&jump_time_l>=25)
  			 {  
  				 jump_time_r=0;
  				 jump_time_l=0;
@@ -851,15 +851,15 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  		  {
  			 jump_time_r++;
  		  }
- 		  if(jump_time_r>=5&&jump_time_l>=5)
+ 		  if(jump_time_r>=15&&jump_time_l>=15)
  		  { 
 			debug_flag=0;
 			jump_status=0;
 			jumpF0_R=17.2f;
  			 jump_time_r=0;
  			 jump_time_l=0;
- 			 chassis->leg_set=0.20f;
- 			 chassis->last_leg_set=0.20f;
+ 			 chassis->leg_set=0.18f;
+ 			 chassis->last_leg_set=0.18f;
  			 chassis->jump_flag_r=0;//ÀıÕ»ÕÍ±œ
  		     chassis->jump_flag_l=0;
          	 chassis->help_jump_flag = 0;	
@@ -868,7 +868,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		
  	else
  	{
- 		vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set);
+ 		vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)*1.5f;
  	}
  }
  else 

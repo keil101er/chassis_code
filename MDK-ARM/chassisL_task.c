@@ -37,7 +37,7 @@ pid_type_def LegL_Pid;
 
 pid_type_def jump_pid_L;//ÌøÔ¾pid
 
-const static float jump_pid[3] =  {500.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+const static float jump_pid[3] =  {550.0f,0.0f,450.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//×óÍÈÌøÔ¾³õÊ¼Á¦
 
 extern INS_t INS;
@@ -321,7 +321,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  			 {
  				jump_time_l++;
  			 }
- 			 if(jump_time_l>=23&&jump_time_r>=23)
+ 			 if(jump_time_l>=25&&jump_time_r>=25)
  			 {  
  				 jump_time_l=0;
  				  jump_time_r=0;
@@ -341,13 +341,13 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		  {
  			 jump_time_l++;
  		  }
- 		  if(jump_time_l>=5&&jump_time_r>=5)
+ 		  if(jump_time_l>=15&&jump_time_r>=15)
  		  { 
 			jumpF0_L=17.2f;
  			 jump_time_l=0;
  			 jump_time_r=0;
- 			 chassis->leg_set=0.20f;
- 			 chassis->last_leg_set=0.20f;
+ 			 chassis->leg_set=0.18f;
+ 			 chassis->last_leg_set=0.18f;
  			 chassis->jump_flag_l=0;
  			 chassis->jump_flag_r=0;
  			 chassis->help_jump_flag = 0;
@@ -356,7 +356,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		}
  	else
  	{
- 		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set);
+ 		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)*1.5f;
  	}
  }	
 

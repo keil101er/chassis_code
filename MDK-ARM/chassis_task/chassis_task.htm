@@ -3,7 +3,7 @@
 <title>Static Call Graph - [chassis_task\chassis_task.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image chassis_task\chassis_task.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sun Nov 16 19:50:14 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue Nov 18 21:31:28 2025
 <BR><P>
 <H3>Maximum Stack Usage =        400 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -717,8 +717,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[194]"></a>__aeabi_memclr</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, rt_memclr.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Kalman_Filter_Init
-<LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_referee_struct_data
+<BR><BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_referee_struct_data
+<LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Kalman_Filter_Init
 <LI><a href="#[1b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLS_Init
 </UL>
 
@@ -1156,7 +1156,7 @@ Global Symbols
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strlen
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;test_task
+<BR>[Called By]<UL><LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
 <P><STRONG><a name="[c]"></a>BusFault_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.BusFault_Handler))
@@ -1234,7 +1234,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[77]"></a>ChassisR_Task</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, freertos.o(i.ChassisR_Task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 400<LI>Call Chain = ChassisR_Task &rArr; ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
+<BR><BR>[Stack]<UL><LI>Max Depth = 400 + Unknown Stack Size
+<LI>Call Chain = ChassisR_Task &rArr; ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
@@ -1253,8 +1254,9 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
-<P><STRONG><a name="[ef]"></a>ChassisR_task</STRONG> (Thumb, 1446 bytes, Stack size 32 bytes, chassisr_task.o(i.ChassisR_task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 400<LI>Call Chain = ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
+<P><STRONG><a name="[ef]"></a>ChassisR_task</STRONG> (Thumb, 1484 bytes, Stack size 32 bytes, chassisr_task.o(i.ChassisR_task))
+<BR><BR>[Stack]<UL><LI>Max Depth = 400 + Unknown Stack Size
+<LI>Call Chain = ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;slope_following
@@ -1268,6 +1270,7 @@ Global Symbols
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassisR_control_loop
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Pensation_init
 <LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_init
+<LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Buletooth_debug_task
 <LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;toe_is_error
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CAN_cmd_chassis
 <LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
@@ -3002,7 +3005,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[ed]"></a>chassisL_control_loop</STRONG> (Thumb, 1418 bytes, Stack size 40 bytes, chassisl_task.o(i.chassisL_control_loop))
+<P><STRONG><a name="[ed]"></a>chassisL_control_loop</STRONG> (Thumb, 1480 bytes, Stack size 40 bytes, chassisl_task.o(i.chassisL_control_loop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = chassisL_control_loop &rArr; VMC_calc_1_left &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ground_detectionL
@@ -3024,7 +3027,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisL_task
 </UL>
 
-<P><STRONG><a name="[fb]"></a>chassisR_control_loop</STRONG> (Thumb, 1784 bytes, Stack size 40 bytes, chassisr_task.o(i.chassisR_control_loop))
+<P><STRONG><a name="[fb]"></a>chassisR_control_loop</STRONG> (Thumb, 1876 bytes, Stack size 40 bytes, chassisr_task.o(i.chassisR_control_loop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 368<LI>Call Chain = chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;slope_following
@@ -3433,13 +3436,11 @@ Global Symbols
 <LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_acosf
 </UL>
 
-<P><STRONG><a name="[76]"></a>test_task</STRONG> (Thumb, 128 bytes, Stack size 0 bytes, test_task.o(i.test_task))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200 + Unknown Stack Size
-<LI>Call Chain = test_task &rArr; Buletooth_debug_task &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[76]"></a>test_task</STRONG> (Thumb, 124 bytes, Stack size 0 bytes, test_task.o(i.test_task))
+<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = test_task &rArr; osDelay &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[1db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_off
-<LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Buletooth_debug_task
 <LI><a href="#[1da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_warn_error
 <LI><a href="#[236]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_error_list_point
 </UL>

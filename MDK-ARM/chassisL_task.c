@@ -36,7 +36,8 @@ extern shoot_control_t shoot_control;          //射击数据
 pid_type_def LegL_Pid;	
 
 pid_type_def jump_pid_L;//跳跃pid
-
+float leg_l_pid_int=0;		//腿长pid误差积分
+float jump_pid_i_L=0;		//跳跃pid积分分量
 const static float jump_pid[3] =  {550.0f,0.0f,450.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//左腿跳跃初始力
 
@@ -263,14 +264,18 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
 		if(chassis->help_jump_flag ==1)
 		{
-			if(chassis->jump_flag_l==1)
-			{
-				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
-			}
-			else
-			{
-				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set);
-			}
+		if(chassis->jump_flag_l==1)
+		{
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+		}
+		else if(chassis->jump_flag_l==3)
+		{
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+jump_pid_i_L+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set);
+		}			
+		else
+		{
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set);
+		}
 
 		}
 		else{
@@ -317,11 +322,12 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 
  			chassis->leg_set = 0.32f;
 			jumpF0_L=25.0f;
- 			 if(vmcl->L0>0.13f)
- 			 {
- 				jump_time_l++;
- 			 }
- 			 if(jump_time_l>=25&&jump_time_r>=25)
+ 			//  if(vmcl->L0>0.13f)
+ 			//  {
+ 			// 	jump_time_l++;
+ 			//  }
+			jump_time_l++;
+ 			 if(jump_time_l>=28&&jump_time_r>=28)
  			 {  
  				 jump_time_l=0;
  				  jump_time_r=0;
@@ -337,26 +343,46 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter+0.3f;
- 		  if(vmcl->L0<0.22f)
- 		  {
- 			 jump_time_l++;
- 		  }
- 		  if(jump_time_l>=15&&jump_time_r>=15)
+ 		//   if(vmcl->L0<0.22f)
+ 		//   {
+ 		// 	 jump_time_l++;
+ 		//   }
+		jump_time_l++;
+ 		  if(jump_time_l>=35&&jump_time_r>=35)
  		  { 
-			jumpF0_L=17.2f;
  			 jump_time_l=0;
  			 jump_time_r=0;
- 			 chassis->leg_set=0.18f;
- 			 chassis->last_leg_set=0.18f;
- 			 chassis->jump_flag_l=0;
- 			 chassis->jump_flag_r=0;
- 			 chassis->help_jump_flag = 0;
-
+ 			//  chassis->leg_set=0.2f;
+ 			//  chassis->last_leg_set=0.2f;
+ 			//  chassis->jump_flag_l=0;
+ 			//  chassis->jump_flag_r=0;
+ 			//  chassis->help_jump_flag = 0;
+			chassis->jump_flag_l=3;
+ 			chassis->jump_flag_r=3;	
  		  }
  		}
+		 //落地阶段
+		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
+		{
+			leg_l_pid_int+=chassis->leg_set - vmcl->L0;
+			mySaturate(&leg_l_pid_int,-2.0f,0.0f);
+			jump_pid_i_L=leg_l_pid_int*17.0f;
+			chassis->leg_set = 0.2f;
+			jumpF0_L=11.2f;
+			jump_time_l++;
+			if(jump_time_l>=85&&jump_time_r>=85)
+			{
+				jump_time_l=0;
+				jump_time_r=0;
+				chassis->last_leg_set=0.2f;
+				chassis->jump_flag_l=0;//缩腿完毕
+				chassis->jump_flag_r=0;
+				chassis->help_jump_flag = 0;
+			}
+		}
  	else
  	{
- 		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)*1.5f;
+ 		vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
  	}
  }	
 
@@ -400,7 +426,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		 vmcl->F0=0.0f;
 	 }
 
-	mySaturate(&vmcl->F0,-50.0f,150.0f);//限幅 
+	mySaturate(&vmcl->F0,-80.0f,120.0f);//限幅 
 
 	VMC_calc_2(vmcl);//计算期望的关节输出力矩
 

@@ -174,7 +174,8 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {550.0f,0.0f,450.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+ const static float jump_pid[3] = {600.0f,0.0f,100.0f};
+ //{450.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//右腿跳跃初始力
 uint8_t jump_module_R=0;
 float leg_r_pid_int=0;		//腿长pid误差积分
@@ -282,7 +283,9 @@ void ChassisR_task(void)
 	chassis_move_balance.x_set = 0;
 	chassis_move_balance.v_set = 0;
 	chassis_move_balance.recover_flag = 0;
-	chassis_move_balance.roll_set = 0.0005;
+	chassis_move_balance.roll_set = 
+	                                // 0.0005;
+	                                0.000f;
 	shoot_control.shoot_send_flag = 0;
 	chassis_move_balance.target_x = 0;
 	while(INS.ins_flag==0)
@@ -306,7 +309,7 @@ void ChassisR_task(void)
 		{
 			debug_count++;
 		}
-		if(debug_count<=10)
+		if(debug_count<=50)
 		{
 			Buletooth_debug_task();
 		}
@@ -659,11 +662,13 @@ void dm4310_fbdata(Joint_Motor_t *motor, uint8_t *rx_data,uint32_t data_len)
 	  motor->para.Tcoil = (float)(rx_data[7]);
 	}
 }
-	
+uint8_t pre_right_flag=0;
 uint8_t right_flag=0;
 extern uint8_t left_flag;
 int jump_right_flag = 0;
 
+uint8_t land_r_flag = 0; //右腿落地标志
+extern uint8_t land_l_flag; //左腿落地标志
 void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *LQR_K,pid_type_def *leg)
 {
 	
@@ -780,6 +785,10 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		{
 			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+jump_pid_i_R+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set);
 		}
+		else if(chassis->jump_flag_r==0)
+		{
+			vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+		}
 		else
 		{
 			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set);
@@ -809,19 +818,19 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//压缩阶段	
  		  if(chassis->jump_flag_r==0 && chassis->help_jump_flag ==1){
 			jump_status=1;
- 		      chassis->leg_set = 0.13f;
-			  jumpF0_R=17.2f;
- 		       if(vmcr->L0<0.15f)
- 		     {
+ 		    chassis->leg_set = 0.13f;
+			jumpF0_R=17.2f;
+ 		    if(vmcr->L0<0.15f)
+ 		    {
  		        jump_time_r++;  
- 		      }
- 		     if(jump_time_r>=20&&jump_time_l>=20)
- 		     {  
+ 		    }
+ 		    if(jump_time_r>=25&&jump_time_l>=25)
+ 		    {  
  			   jump_time_r=0;
  			   jump_time_l=0;
  			   chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
 			   chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段
-		     }			 		 
+		    }			 		 
  		   }
 
  //上升加速阶段			
@@ -829,13 +838,13 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  		{		
 			jump_status=2;
  			chassis->leg_set = 0.32f;
-			 jumpF0_R=25.0f;
+			 jumpF0_R=20.0f;
  			//  if(vmcr->L0>0.13f)
  			//  {
  			// 	jump_time_r++;
  			//  }
 			jump_time_r++;
- 			 if(jump_time_r>=28&&jump_time_l>=28)
+ 			 if(jump_time_r>=30&&jump_time_l>=30)
  			 {  
  				 jump_time_r=0;
  				 jump_time_l=0;
@@ -858,39 +867,51 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  		// 	 jump_time_r++;
  		//   }
 		 jump_time_r++;
- 		  if(jump_time_r>=35&&jump_time_l>=35)
+ 		  if(jump_time_r>=40&&jump_time_l>=40)
  		  { 
  			 jump_time_r=0;
  			 jump_time_l=0;
- 			// chassis->leg_set=0.2f;
-			//  chassis->last_leg_set=0.2f;
+ 			// chassis->leg_set=0.15f;
+			// chassis->last_leg_set=0.15f;
  			//  chassis->jump_flag_r=0;//缩腿完毕
  		    //  chassis->jump_flag_l=0;
          	//  chassis->help_jump_flag = 0;
-			chassis->jump_flag_r=3;//缩腿完毕
- 		    chassis->jump_flag_l=3;
+			 chassis->jump_flag_r=3;//缩腿完毕
+ 		     chassis->jump_flag_l=3;
+			
  		  }
  		}
 		//落地阶段
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
-			leg_r_pid_int+=chassis->leg_set - vmcr->L0;
-			mySaturate(&leg_r_pid_int,-2.0f,0.0f);
-			jump_pid_i_R=leg_r_pid_int*17.0f;
-			jump_time_r++;
-			jumpF0_R=11.2f;
-			jump_status=4;
+			 jumpF0_R=11.2f;
 			chassis->leg_set=0.2f;
+			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
+			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
+			// jump_pid_i_R=leg_r_pid_int*15.0f;
+			jump_time_r++;
+			jump_status=4;
+			//测试代码
+			// if(pre_right_flag==1&&right_flag==0)
+			// {
+			// 	land_r_flag=1;
+			// }
+			// if(land_r_flag==1&&land_l_flag==1)
+			// {
+			// 	jumpF0_R=17.2f; //着陆时加重力前馈
+			// }
 			if(jump_time_r>=85&&jump_time_l>=85)
 			{
 				debug_flag=0;
 				jump_time_r=0;
 				jump_time_l=0;
 				 chassis->last_leg_set=0.2f;
-				chassis->jump_flag_r=0;//跳跃结束
+				chassis->jump_flag_r=0;		//跳跃结束
 				chassis->jump_flag_l=0;
 				chassis->help_jump_flag = 0;
 				jump_status=0;
+				land_r_flag=0;
+				land_l_flag=0;
 			}
 		}
 		
@@ -903,7 +924,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  {
 	jump_module_R=0;
  }	
-
+ 	pre_right_flag=right_flag;
    right_flag = ground_detectionR(vmcr,ins);//右腿离地检测
 	 if(chassis->recover_flag==0)	//倒地自起不需要检测是否离地		
 	 { 
@@ -940,7 +961,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
   //功率控制
     chassis_power_control(chassis);
 
-	mySaturate(&vmcr->F0,-80.0f,120.0f);//限幅
+	mySaturate(&vmcr->F0,-80.0f,100.0f);//限幅
 
 	VMC_calc_2(vmcr);//计算期望的关节输出力矩
 

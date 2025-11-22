@@ -33,8 +33,10 @@ static void buzzer_warn_error(uint8_t num);
 
 const error_t *error_list_test_local;
 extern vmc_leg_t right;
+extern vmc_leg_t left;
 extern uint8_t jump_status;
 
+float F_r=0,F_l=0;
 /**
   * @brief          test task
   * @param[in]      pvParameters: NULL
@@ -48,9 +50,12 @@ extern uint8_t jump_status;
  //蓝牙调试信息输出任务 Bluetooth debugging information output task
  void Buletooth_debug_task(void)
 {
+    
        //sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f,%d\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,Rc_flag);
     //    sprintf(debug_info,"%.2f,%.2f,%d\n",right.F0,right.L0,jump_status);
-    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%d\n",right.L0,right.torque_set[0],right.torque_set[1],right.F0,jump_status);
+    F_r=right.torque_set[1]-right.torque_set[0];
+    F_l=left.torque_set[1]-left.torque_set[0];
+    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%d\n",left.L0,right.L0,F_r,F_l,right.F0,jump_status);
        //发送完成标志位
 		if(Txcplt_flag==1)
 		{
@@ -67,7 +72,6 @@ void test_task(void const * argument)
     while(1)
     {
         error = 0;
-
         //find error
         //发现错误
         for(error_num = 0; error_num < REFEREE_TOE; error_num++)

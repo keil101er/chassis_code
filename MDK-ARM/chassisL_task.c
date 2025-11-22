@@ -38,7 +38,8 @@ pid_type_def LegL_Pid;
 pid_type_def jump_pid_L;//跳跃pid
 float leg_l_pid_int=0;		//腿长pid误差积分
 float jump_pid_i_L=0;		//跳跃pid积分分量
-const static float jump_pid[3] =  {550.0f,0.0f,450.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+const static float jump_pid[3] = {600.0f,0.0f,100.0f};
+// {450.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//左腿跳跃初始力
 
 extern INS_t INS;
@@ -189,12 +190,13 @@ void chassisL_feedback_update(chassis_t *chassis,vmc_leg_t *vmc,INS_t *ins)
 	
 }
 
-
+uint8_t pre_left_flag=0;
 extern uint8_t right_flag;
 uint8_t left_flag;
 extern float mg;
 extern float jump_time_r;
-
+uint8_t land_l_flag=0; //左腿落地标志
+extern uint8_t land_r_flag; //右腿落地标志
 void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *LQR_K,pid_type_def *leg)
 {
 	VMC_calc_1_left(vmcl,ins,((float)CHASSL_TIME)*3.0f/1000.0f);//计算theta和d_theta给lqr用，同时也计算左腿长L0,该任务控制周期是3*0.001秒
@@ -271,6 +273,10 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		else if(chassis->jump_flag_l==3)
 		{
 			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+jump_pid_i_L+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set);
+		}
+		else if(chassis->jump_flag_l==0)
+		{
+			vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
 		}			
 		else
 		{
@@ -307,7 +313,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		 {
  		  jump_time_l++;
  		 }
- 		 if(jump_time_l>=20&&jump_time_l>=20)
+ 		 if(jump_time_l>=25&&jump_time_l>=25)
  		 {  
  			 jump_time_l=0;
  			 jump_time_r=0;
@@ -321,13 +327,13 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		{
 
  			chassis->leg_set = 0.32f;
-			jumpF0_L=25.0f;
+			jumpF0_L=20.0f;
  			//  if(vmcl->L0>0.13f)
  			//  {
  			// 	jump_time_l++;
  			//  }
 			jump_time_l++;
- 			 if(jump_time_l>=28&&jump_time_r>=28)
+ 			 if(jump_time_l>=30&&jump_time_r>=30)
  			 {  
  				 jump_time_l=0;
  				  jump_time_r=0;
@@ -348,36 +354,49 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		// 	 jump_time_l++;
  		//   }
 		jump_time_l++;
- 		  if(jump_time_l>=35&&jump_time_r>=35)
+ 		  if(jump_time_l>=40&&jump_time_r>=40)
  		  { 
  			 jump_time_l=0;
  			 jump_time_r=0;
- 			//  chassis->leg_set=0.2f;
- 			//  chassis->last_leg_set=0.2f;
+ 			//  chassis->leg_set=0.15f;
+ 			//  chassis->last_leg_set=0.15f;
  			//  chassis->jump_flag_l=0;
  			//  chassis->jump_flag_r=0;
  			//  chassis->help_jump_flag = 0;
-			chassis->jump_flag_l=3;
- 			chassis->jump_flag_r=3;	
+			 chassis->jump_flag_l=3;
+ 			 chassis->jump_flag_r=3;
+			
  		  }
  		}
 		 //落地阶段
 		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
 		{
-			leg_l_pid_int+=chassis->leg_set - vmcl->L0;
-			mySaturate(&leg_l_pid_int,-2.0f,0.0f);
-			jump_pid_i_L=leg_l_pid_int*17.0f;
+			 jumpF0_L=11.2f;	
 			chassis->leg_set = 0.2f;
-			jumpF0_L=11.2f;
+			// leg_l_pid_int+=chassis->leg_set - vmcl->L0;
+			// mySaturate(&leg_l_pid_int,-2.0f,0.0f);
+			// jump_pid_i_L=leg_l_pid_int*15.0f;
+
+			// 测试代码
+			// if(pre_left_flag==1&&left_flag==0)
+			// {
+			// 	land_l_flag=1;
+			// }
+			// if(land_r_flag==1&&land_l_flag==1)
+			// {
+			// 	jumpF0_L=17.2f; //着陆时加重力前馈
+			// }
 			jump_time_l++;
 			if(jump_time_l>=85&&jump_time_r>=85)
 			{
 				jump_time_l=0;
 				jump_time_r=0;
 				chassis->last_leg_set=0.2f;
-				chassis->jump_flag_l=0;//缩腿完毕
+				chassis->jump_flag_l=0;		//缩腿完毕
 				chassis->jump_flag_r=0;
 				chassis->help_jump_flag = 0;
+				land_r_flag=0;
+				land_l_flag=0;
 			}
 		}
  	else
@@ -387,6 +406,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  }	
 
 // 	 vmcl->F0=PID_calc(leg,vmcl->L0,chassis->leg_set);//前馈+pd
+ 	pre_left_flag=left_flag;
 	 left_flag=ground_detectionL(vmcl,ins);//右腿离地检测
 
 	 if(chassis->recover_flag==0)
@@ -426,7 +446,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		 vmcl->F0=0.0f;
 	 }
 
-	mySaturate(&vmcl->F0,-80.0f,120.0f);//限幅 
+	mySaturate(&vmcl->F0,-80.0f,100.0f);//限幅 
 
 	VMC_calc_2(vmcl);//计算期望的关节输出力矩
 

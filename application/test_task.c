@@ -28,14 +28,15 @@ uint8_t Txcplt_flag=1;
 extern UART_HandleTypeDef huart1;
 extern chassis_t chassis_move_balance;
 extern uint8_t Rc_flag;
+
 char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
-
 const error_t *error_list_test_local;
 extern vmc_leg_t right;
 extern vmc_leg_t left;
 extern uint8_t jump_status;
-
+extern uint8_t land_flag;
+extern float aver_fnr;
 float F_r=0,F_l=0;
 /**
   * @brief          test task
@@ -55,7 +56,7 @@ float F_r=0,F_l=0;
     //    sprintf(debug_info,"%.2f,%.2f,%d\n",right.F0,right.L0,jump_status);
     F_r=right.torque_set[1]-right.torque_set[0];
     F_l=left.torque_set[1]-left.torque_set[0];
-    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%d\n",left.L0,right.L0,F_r,F_l,right.F0,jump_status);
+    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d\n",left.L0,right.L0,F_r,F_l,aver_fnr,jump_status,land_flag);
        //发送完成标志位
 		if(Txcplt_flag==1)
 		{

@@ -174,7 +174,7 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {600.0f,0.0f,100.0f};
+ const static float jump_pid[3] = {550.0f,0.0f,100.0f};
  //{450.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//右腿跳跃初始力
 uint8_t jump_module_R=0;
@@ -667,6 +667,7 @@ uint8_t right_flag=0;
 extern uint8_t left_flag;
 int jump_right_flag = 0;
 
+uint8_t land_flag=0; //落地标志
 uint8_t land_r_flag = 0; //右腿落地标志
 extern uint8_t land_l_flag; //左腿落地标志
 void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *LQR_K,pid_type_def *leg)
@@ -783,7 +784,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		}
 		else if(chassis->jump_flag_r==3)
 		{
-			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+jump_pid_i_R+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set);
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+jump_pid_i_R+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)*0.7f;
 		}
 		else if(chassis->jump_flag_r==0)
 		{
@@ -805,8 +806,6 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		chassis_move_balance.target_x=0.0f;
 		chassis_move_balance.x_set=0.0f;
 	}
-
-
 //跳跃逻辑
  	if(chassis->chassis_RC->rc.s[1] ==1)//左上拨杆拨至最上边
  	{
@@ -857,17 +856,17 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
  		{
 			jump_status=3;
- 			chassis->leg_set = 0.13f;
+ 			chassis->leg_set = 0.2f;
 			jumpF0_R=0.0f;
  			chassis->theta_set=0.0f;			
  			chassis->x_filter=0.0f;
- 			chassis->x_set=chassis->x_filter+0.3f;
+ 			chassis->x_set=chassis->x_filter;
  		//   if(vmcr->L0<0.22f)
  		//   {
  		// 	 jump_time_r++;
  		//   }
 		 jump_time_r++;
- 		  if(jump_time_r>=40&&jump_time_l>=40)
+ 		  if(jump_time_r>=35&&jump_time_l>=35)
  		  { 
  			 jump_time_r=0;
  			 jump_time_l=0;
@@ -885,7 +884,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_R=11.2f;
-			chassis->leg_set=0.2f;
+			chassis->leg_set=0.22f;
 			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
 			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
 			// jump_pid_i_R=leg_r_pid_int*15.0f;
@@ -905,7 +904,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 				debug_flag=0;
 				jump_time_r=0;
 				jump_time_l=0;
-				 chassis->last_leg_set=0.2f;
+				chassis->leg_set=0.20f;
+				chassis->last_leg_set=0.20f;
 				chassis->jump_flag_r=0;		//跳跃结束
 				chassis->jump_flag_l=0;
 				chassis->help_jump_flag = 0;
@@ -933,6 +933,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		//||chassis->jump_flag==3)
 		if(right_flag==1&&left_flag==1&&vmcr->leg_flag==0)
 		{ 
+			land_flag=1;
 			//当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
 				chassis->wheel_motor[0].wheel_T=0.0f;
 				vmcr->Tp=LQR_K[6]*(vmcr->theta-0.0f)+ LQR_K[7]*(vmcr->d_theta-0.0f);
@@ -942,6 +943,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		}
 		else
 		{//没有离地
+			land_flag=0;
 			vmcr->leg_flag=0;//置为0
 							
 			// if(chassis->jump_flag_r==0)

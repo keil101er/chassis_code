@@ -877,14 +877,13 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
          	//  chassis->help_jump_flag = 0;
 			 chassis->jump_flag_r=3;//ËõÍÈÍê±Ï
  		     chassis->jump_flag_l=3;
-			
  		  }
  		}
 		//ÂäµØ½×¶Î
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_R=11.2f;
-			chassis->leg_set=0.22f;
+			chassis->leg_set=0.24f;
 			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
 			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
 			// jump_pid_i_R=leg_r_pid_int*15.0f;
@@ -910,8 +909,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 				chassis->jump_flag_l=0;
 				chassis->help_jump_flag = 0;
 				jump_status=0;
-				land_r_flag=0;
-				land_l_flag=0;
+				// land_r_flag=0;
+				// land_l_flag=0;
 			}
 		}
 		
@@ -926,6 +925,10 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  }	
  	pre_right_flag=right_flag;
    right_flag = ground_detectionR(vmcr,ins);//ÓÒÍÈÀëµØ¼ì²â
+   if(chassis->jump_flag_r==2)
+   {
+	   right_flag=1; //ËõÍÈ½×¶Î²»½øĞĞÀëµØ¼ì²â
+   }
 	 if(chassis->recover_flag==0)	//µ¹µØ×ÔÆğ²»ĞèÒª¼ì²âÊÇ·ñÀëµØ		
 	 { 
 		// if((right_flag==1&&left_flag==1&&vmcr->leg_flag==0&&chassis->jump_flag!=1&&chassis->jump_flag2!=1&&chassis->jump_flag!=2&&chassis->jump_flag2!=2)

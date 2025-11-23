@@ -371,7 +371,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_L=11.2f;	
-			chassis->leg_set = 0.22f;
+			chassis->leg_set = 0.24f;
 			// leg_l_pid_int+=chassis->leg_set - vmcl->L0;
 			// mySaturate(&leg_l_pid_int,-2.0f,0.0f);
 			// jump_pid_i_L=leg_l_pid_int*15.0f;
@@ -395,8 +395,8 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 				chassis->jump_flag_l=0;		//缩腿完毕
 				chassis->jump_flag_r=0;
 				chassis->help_jump_flag = 0;
-				land_r_flag=0;
-				land_l_flag=0;
+				// land_r_flag=0;
+				// land_l_flag=0;
 			}
 		}
  	else
@@ -408,7 +408,10 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 // 	 vmcl->F0=PID_calc(leg,vmcl->L0,chassis->leg_set);//前馈+pd
  	pre_left_flag=left_flag;
 	 left_flag=ground_detectionL(vmcl,ins);//右腿离地检测
-
+ 	if(chassis->jump_flag_l==2)
+	{
+		left_flag=1; //缩腿阶段不进行离地检测
+	}
 	 if(chassis->recover_flag==0)
 	 {
 //倒地自起不需要检测是否离地	 

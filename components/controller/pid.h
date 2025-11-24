@@ -43,7 +43,7 @@ typedef struct
     fp32 Dout;
     fp32 Dbuf[3];  //微分项 0最新 1上一次 2上上次
     fp32 error[3]; //误差项 0最新 1上一次 2上上次
-
+    fp32 ref[3];
 } pid_type_def;
 /**
   * @brief          pid struct data init
@@ -94,5 +94,11 @@ extern fp32 PID_calc(pid_type_def *pid, fp32 ref, fp32 set);
   * @retval         none
   */
 extern void PID_clear(pid_type_def *pid);
+
+
+extern fp32 PID_calc_1(pid_type_def *pid, fp32 ref, fp32 set);
+
+
+
 
 #endif

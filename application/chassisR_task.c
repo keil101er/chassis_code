@@ -784,7 +784,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		}
 		else if(chassis->jump_flag_r==3)
 		{
-			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+jump_pid_i_R+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)*0.7f;
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)*0.7f;
 		}
 		else if(chassis->jump_flag_r==0)
 		{
@@ -883,7 +883,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_R=11.2f;
-			chassis->leg_set=0.23f;
+			chassis->leg_set=0.24f;
 			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
 			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
 			// jump_pid_i_R=leg_r_pid_int*15.0f;

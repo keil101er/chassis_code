@@ -272,7 +272,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		}
 		else if(chassis->jump_flag_l==3)
 		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+jump_pid_i_L+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)*0.7f;
+			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc(&jump_pid_L,vmcl->L0,chassis->leg_set)*0.7f;
 		}
 		else if(chassis->jump_flag_l==0)
 		{
@@ -371,7 +371,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_L=11.2f;	
-			chassis->leg_set = 0.23f;
+			chassis->leg_set = 0.24f;
 			// leg_l_pid_int+=chassis->leg_set - vmcl->L0;
 			// mySaturate(&leg_l_pid_int,-2.0f,0.0f);
 			// jump_pid_i_L=leg_l_pid_int*15.0f;

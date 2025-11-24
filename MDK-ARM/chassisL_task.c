@@ -38,7 +38,7 @@ pid_type_def LegL_Pid;
 pid_type_def jump_pid_L;//跳跃pid
 float leg_l_pid_int=0;		//腿长pid误差积分
 float jump_pid_i_L=0;		//跳跃pid积分分量
-const static float jump_pid[3] = {550.0f,0.0f,100.0f};
+const static float jump_pid[3] = {600.0f,0.0f,100.0f};
 // {450.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//左腿跳跃初始力
 
@@ -306,7 +306,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		 if(chassis->jump_flag_l==0&& chassis->help_jump_flag ==1)
  		{
 			
- 		 chassis->leg_set = 0.13f;
+ 		 chassis->leg_set = 0.12f;
 		jumpF0_L=17.2f;
  		 if(vmcl->L0<0.15f)
  		 {
@@ -371,7 +371,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_L=11.2f;	
-			chassis->leg_set = 0.24f;
+			chassis->leg_set = 0.23f;
 			// leg_l_pid_int+=chassis->leg_set - vmcl->L0;
 			// mySaturate(&leg_l_pid_int,-2.0f,0.0f);
 			// jump_pid_i_L=leg_l_pid_int*15.0f;
@@ -390,8 +390,8 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 			{
 				jump_time_l=0;
 				jump_time_r=0;
-				chassis->leg_set = 0.20f;
-				chassis->last_leg_set=0.20f;
+				chassis->leg_set = 0.2f;
+				chassis->last_leg_set=0.2f;
 				chassis->jump_flag_l=0;		//缩腿完毕
 				chassis->jump_flag_r=0;
 				chassis->help_jump_flag = 0;
@@ -437,7 +437,6 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 //不跳跃的时候需要roll轴补偿
 			if(chassis->jump_flag_l==0)
 			{
-				
 				vmcl->F0=vmcl->F0+chassis->roll_f0;//roll轴补偿取反然后加上去					
 			}
 		}

@@ -56,7 +56,7 @@ float F_r=0,F_l=0;
     //    sprintf(debug_info,"%.2f,%.2f,%d\n",right.F0,right.L0,jump_status);
     F_r=right.torque_set[1]-right.torque_set[0];
     F_l=left.torque_set[1]-left.torque_set[0];
-    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d\n",left.L0,right.L0,F_r,F_l,aver_fnr,jump_status,land_flag);
+    sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d\n",left.L0,right.L0,F_r,F_l,chassis_move_balance.myPithR,jump_status,land_flag);
        //发送完成标志位
 		if(Txcplt_flag==1)
 		{

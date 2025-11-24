@@ -174,7 +174,7 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {550.0f,0.0f,100.0f};
+ const static float jump_pid[3] = {600.0f,0.0f,100.0f};
  //{450.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//ÓÒÍÈÌøÔ¾³õÊ¼Á¦
 uint8_t jump_module_R=0;
@@ -817,7 +817,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//Ñ¹Ëõ½×¶Î	
  		  if(chassis->jump_flag_r==0 && chassis->help_jump_flag ==1){
 			jump_status=1;
- 		    chassis->leg_set = 0.13f;
+ 		    chassis->leg_set = 0.12f;
 			jumpF0_R=17.2f;
  		    if(vmcr->L0<0.15f)
  		    {
@@ -883,7 +883,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_R=11.2f;
-			chassis->leg_set=0.24f;
+			chassis->leg_set=0.23f;
 			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
 			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
 			// jump_pid_i_R=leg_r_pid_int*15.0f;
@@ -903,8 +903,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 				debug_flag=0;
 				jump_time_r=0;
 				jump_time_l=0;
-				chassis->leg_set=0.20f;
-				chassis->last_leg_set=0.20f;
+				chassis->leg_set=0.2f;
+				chassis->last_leg_set=0.2f;
 				chassis->jump_flag_r=0;		//ÌøÔ¾½áÊø
 				chassis->jump_flag_l=0;
 				chassis->help_jump_flag = 0;
@@ -993,8 +993,11 @@ void mySaturate(float *in,float min,float max)
 
 uint8_t recover_detect(chassis_t *chassis)
 {	
+	// if(((chassis->myPithR<((-3.1415926f)/10.5f)&&chassis->myPithR>((-3.1415926f)/2.0f))
+	// 				  ||(chassis->myPithR>(3.1415926f/12.8f)&&chassis->myPithR<(3.1415926f/2.0f))))	
+	//²âÊÔ
 	if(((chassis->myPithR<((-3.1415926f)/10.5f)&&chassis->myPithR>((-3.1415926f)/2.0f))
-					  ||(chassis->myPithR>(3.1415926f/12.8f)&&chassis->myPithR<(3.1415926f/2.0f))))	
+					  ||(chassis->myPithR>(3.1415926f/12.4f)&&chassis->myPithR<(3.1415926f/2.0f))))	
 	{
 				
 			chassis->leg_set = 0.130;

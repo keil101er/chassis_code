@@ -174,7 +174,7 @@ pid_type_def Wheel_Pid; //3508PID
 pid_type_def Wz_Pid;
 extern pid_type_def buffer_pid;
 
- const static float jump_pid[3] = {600.0f,0.0f,100.0f};
+ const static float jump_pid[3] = {600.0f,0.0f,200.0f};
  //{450.0f,0.0f,500.0f};		//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_R=17.2f;//右腿跳跃初始力
 uint8_t jump_module_R=0;
@@ -298,7 +298,7 @@ void ChassisR_task(void)
 	  ChassisR_init(&chassis_move_balance,&right,&LegR_Pid,&Wheel_Pid);
 	  Pensation_init(&Roll_Pid,&Tp_Pid,&Turn_Pid,&Wz_Pid);//pid初始化	
 	  shoot_init();	
-	PID_init(&jump_pid_R, PID_POSITION, jump_pid, 90.0f, 0.0f);
+	PID_init(&jump_pid_R, PID_POSITION, jump_pid, 80.0f, 0.0f);
 
 
 
@@ -405,7 +405,7 @@ void ChassisR_task(void)
 		}
 		if(Rc_flag==3)
 		{
-			chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.42f;
+			chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.6f;
 			Rc_flag=0;
 		}
 
@@ -780,19 +780,19 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	{
 		if(chassis->jump_flag_r==1)
 		{
-			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc_1(&jump_pid_R,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
 		}
 		else if(chassis->jump_flag_r==3)
 		{
-			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set)*0.7f;
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc_1(&jump_pid_R,vmcr->L0,chassis->leg_set)*0.8f;
 		}
 		else if(chassis->jump_flag_r==0)
 		{
-			vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
+			vmcr->F0=11.2f/arm_cos_f32(vmcr->theta)+PID_calc_1(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;
 		}
 		else
 		{
-			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc(&jump_pid_R,vmcr->L0,chassis->leg_set);
+			vmcr->F0=jumpF0_R/arm_cos_f32(vmcr->theta)+PID_calc_1(&jump_pid_R,vmcr->L0,chassis->leg_set);
 		}
 	}
 	else
@@ -809,6 +809,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //跳跃逻辑
  	if(chassis->chassis_RC->rc.s[1] ==1)//左上拨杆拨至最上边
  	{
+		 chassis->leg_set = 0.14f;
 		jump_module_R=1;
  		if(chassis->chassis_RC->rc.ch[4] >500){  //左拨轮往下拨
 		
@@ -817,26 +818,30 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//压缩阶段	
  		  if(chassis->jump_flag_r==0 && chassis->help_jump_flag ==1){
 			jump_status=1;
- 		    chassis->leg_set = 0.12f;
-			jumpF0_R=17.2f;
- 		    if(vmcr->L0<0.15f)
+ 		    //chassis->leg_set = 0.12f;
+			//jumpF0_R=17.2f;
+ 		    if(vmcr->L0<0.16f)
  		    {
- 		        jump_time_r++;  
+				jump_time_r=0;
+ 			    jump_time_l=0;
+ 		        jump_time_r++;
+				chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
+			   chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段  
  		    }
- 		    if(jump_time_r>=25&&jump_time_l>=25)
- 		    {  
- 			   jump_time_r=0;
- 			   jump_time_l=0;
- 			   chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
-			   chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段
-		    }			 		 
+ 		    // if(jump_time_r>=25&&jump_time_l>=25)
+ 		    // {  
+ 			//    jump_time_r=0;
+ 			//    jump_time_l=0;
+ 			//    chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
+			//    chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段
+		    // }			 		 
  		   }
 
  //上升加速阶段			
  		else if(chassis->jump_flag_r==1&& chassis->help_jump_flag ==1)
  		{		
 			jump_status=2;
- 			chassis->leg_set = 0.32f;
+ 			chassis->leg_set = 0.3f;
 			 jumpF0_R=20.0f;
  			//  if(vmcr->L0>0.13f)
  			//  {
@@ -856,11 +861,11 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
  		{
 			jump_status=3;
- 			chassis->leg_set = 0.2f;
-			jumpF0_R=0.0f;
+ 			chassis->leg_set = 0.22f;
+			jumpF0_R=17.0f;
  			chassis->theta_set=0.0f;			
  			chassis->x_filter=0.0f;
- 			chassis->x_set=chassis->x_filter;
+ 			chassis->x_set=chassis->x_filter+0.6f;
  		//   if(vmcr->L0<0.22f)
  		//   {
  		// 	 jump_time_r++;
@@ -883,7 +888,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		else if(chassis->jump_flag_r==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_R=11.2f;
-			chassis->leg_set=0.24f;
+			chassis->leg_set=0.25f;
 			// leg_r_pid_int+=chassis->leg_set - vmcr->L0;
 			// mySaturate(&leg_r_pid_int,-2.0f,0.0f);
 			// jump_pid_i_R=leg_r_pid_int*15.0f;
@@ -903,8 +908,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 				debug_flag=0;
 				jump_time_r=0;
 				jump_time_l=0;
-				chassis->leg_set=0.2f;
-				chassis->last_leg_set=0.2f;
+				chassis->leg_set=0.14f;
+				chassis->last_leg_set=0.14f;
 				chassis->jump_flag_r=0;		//跳跃结束
 				chassis->jump_flag_l=0;
 				chassis->help_jump_flag = 0;
@@ -921,6 +926,8 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  }
  else 
  {
+	debug_count=0;
+	debug_flag=1;
 	jump_module_R=0;
  }	
  	pre_right_flag=right_flag;
@@ -940,8 +947,11 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 			//当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
 				chassis->wheel_motor[0].wheel_T=0.0f;
 				vmcr->Tp=LQR_K[6]*(vmcr->theta-0.0f)+ LQR_K[7]*(vmcr->d_theta-0.0f);
+
+				//离地时重置x_set和x_filter
 				chassis->x_filter=0.0f;
-				chassis->x_set = chassis->x_filter;
+				 chassis->x_set = chassis->x_filter+0.6f;
+				// chassis->x_set = chassis->x_filter;
 				vmcr->Tp=vmcr->Tp+chassis->leg_tp;			 
 		}
 		else
@@ -971,8 +981,10 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	VMC_calc_2(vmcr);//计算期望的关节输出力矩
 
 //限幅函数，后期要改参数
-	mySaturate(&vmcr->torque_set[1],-18.0f,18.0f);	
-	mySaturate(&vmcr->torque_set[0],-18.0f,18.0f);	
+	// mySaturate(&vmcr->torque_set[1],-18.0f,18.0f);	
+	// mySaturate(&vmcr->torque_set[0],-18.0f,18.0f);
+	mySaturate(&vmcr->torque_set[1],-10.0f,10.0f);	
+	mySaturate(&vmcr->torque_set[0],-10.0f,10.0f);	
 		 
 }
 	

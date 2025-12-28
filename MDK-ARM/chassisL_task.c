@@ -328,7 +328,6 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 //ÉÏÉý¼ÓËÙ½×¶Î	
  		else if(chassis->jump_flag_l==1&& chassis->help_jump_flag ==1)
  		{
-
  			chassis->leg_set = 0.3f;
 			jumpF0_L=20.0f;
  			//  if(vmcl->L0>0.13f)
@@ -348,10 +347,10 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  		else if(chassis->jump_flag_l==2&& chassis->help_jump_flag ==1)
  		{
  		 	chassis->leg_set = 0.22f;
-			jumpF0_L=17.0f;
+			jumpF0_L=15.0f;
  			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
- 			chassis->x_set=chassis->x_filter+0.6f;
+ 			chassis->x_set=chassis->x_filter;
  		//   if(vmcl->L0<0.22f)
  		//   {
  		// 	 jump_time_l++;
@@ -375,7 +374,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		else if(chassis->jump_flag_l==3&& chassis->help_jump_flag ==1)
 		{
 			 jumpF0_L=11.2f;	
-			chassis->leg_set = 0.24f;
+			chassis->leg_set = 0.25f;
 			// leg_l_pid_int+=chassis->leg_set - vmcl->L0;
 			// mySaturate(&leg_l_pid_int,-2.0f,0.0f);
 			// jump_pid_i_L=leg_l_pid_int*15.0f;
@@ -429,7 +428,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 				vmcl->Tp=LQR_K[6]*(vmcl->theta-0.0f)+ LQR_K[7]*(vmcl->d_theta-0.0f);
 
 				chassis->x_filter=0.0f;
-				chassis->x_set=chassis->x_filter+0.6f;
+				chassis->x_set=chassis->x_filter;
 				chassis->turn_set=chassis->total_yaw;
 				vmcl->Tp=vmcl->Tp+chassis->leg_tp;	
 		}

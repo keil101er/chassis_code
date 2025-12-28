@@ -53,11 +53,11 @@ float F_r=0,F_l=0;
  void Buletooth_debug_task(void)
 {
     
-    //   sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f,%d\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,Rc_flag);
+    sprintf(debug_info,"%.1f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_set,chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter);
     //sprintf(debug_info,"%.2f,%.2f,%d,%d\n",right.F0,right.L0,jump_status,chassis_move_balance.joint_motor[0].para.state);
     // F_r=right.torque_set[1]-right.torque_set[0];
     // F_l=left.torque_set[1]-left.torque_set[0];
-     sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%d\n",right.torque_set[0],right.torque_set[1],right.L0,right.F0,jump_status);
+     //sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%d\n",right.torque_set[0],right.torque_set[1],right.L0,right.F0,jump_status);
     // sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f\n",right.phi1,right.phi2,right.phi3,right.phi4,right.L0);
     //sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%d\n",left.L0,right.L0,F_r,F_l,aver_fn,aver_fnr,jump_status);
        //发送完成标志位

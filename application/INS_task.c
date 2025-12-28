@@ -168,17 +168,7 @@ void INS_task(void)
 		
    
 	}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+			
 //		
 //        // demo function,用于修正安装误差,可以不管,本demo暂时没用
 //        IMU_Param_Correction(&IMU_Param, INS.Gyro, INS.Accel);

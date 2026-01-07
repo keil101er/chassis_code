@@ -10,7 +10,7 @@ frame_header_struct_t referee_send_header;
 
 game_status_t game_state;//
 game_result_t game_result;//
-game_robot_HP_t robot_HP_t;//ÑªÁ¿
+game_robot_HP_t robot_HP_t;//è¡€é‡
 
 event_data_t field_event;
 ext_supply_projectile_action_t supply_projectile_action_t;

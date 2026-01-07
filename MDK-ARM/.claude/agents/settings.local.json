@@ -1,0 +1,37 @@
+{
+  "env": {
+    "KEIL_PATH": "C:\\Keil_v5",
+    "PROJECT_ROOT": "D:\\RM_code\\code_rmuc (4)\\code_rmuc\\yuntai _send"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "LS",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "WebFetch",
+      "Bash(wc:*)"
+    ],
+    "deny": [],
+    "ask": [
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "Create",
+      "Update"
+    ],
+    "additionalDirectories": [
+      "D:\\RM_code\\code_rmuc\\chassis\\1.12VMC\\1.12"
+    ]
+  },
+  "companyAnnouncements": []
+}

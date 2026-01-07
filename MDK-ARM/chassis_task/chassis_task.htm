@@ -3,7 +3,7 @@
 <title>Static Call Graph - [chassis_task\chassis_task.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image chassis_task\chassis_task.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sun Dec 28 13:28:41 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Mon Dec 29 21:58:10 2025
 <BR><P>
 <H3>Maximum Stack Usage =        400 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1051,7 +1051,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
-<P><STRONG><a name="[c9]"></a>ChassisR_task</STRONG> (Thumb, 1392 bytes, Stack size 32 bytes, chassisr_task.o(i.ChassisR_task))
+<P><STRONG><a name="[c9]"></a>ChassisR_task</STRONG> (Thumb, 1418 bytes, Stack size 32 bytes, chassisr_task.o(i.ChassisR_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 400<LI>Call Chain = ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -1280,9 +1280,9 @@ Global Symbols
 <P><STRONG><a name="[e5]"></a>HAL_CAN_RxFifo0MsgPendingCallback</STRONG> (Thumb, 910 bytes, Stack size 64 bytes, can_receive.o(i.HAL_CAN_RxFifo0MsgPendingCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = HAL_CAN_RxFifo0MsgPendingCallback &rArr; __aeabi_d2uiz
 </UL>
-<BR>[Calls]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;C_fbdata1
-<LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dm4310_fbdata1
+<BR>[Calls]<UL><LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dm4310_fbdata1
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_CAN_GetRxMessage
+<LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;C_fbdata1
 <LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdrcmple
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdcmple
@@ -1440,11 +1440,11 @@ Global Symbols
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_CAN_Init
 <LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[131]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_ClockConfig
+<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_CAN_Start
+<LI><a href="#[130]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCCEx_PeriphCLKConfig
 <LI><a href="#[196]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFlagStateUntilTimeout
 <LI><a href="#[139]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_EnterInitMode
 <LI><a href="#[13b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_WaitForSynchro
-<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_CAN_Start
-<LI><a href="#[130]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCCEx_PeriphCLKConfig
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
 <LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Abort
@@ -1601,12 +1601,12 @@ Global Symbols
 <P><STRONG><a name="[129]"></a>HAL_PCD_Init</STRONG> (Thumb, 230 bytes, Stack size 24 bytes, stm32f4xx_hal_pcd.o(i.HAL_PCD_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = HAL_PCD_Init &rArr; HAL_PCD_MspInit &rArr; HAL_GPIO_Init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[12d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
+<BR>[Calls]<UL><LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_MspInit
+<LI><a href="#[12d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
 <LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_DisableGlobalInt
 <LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_DevInit
 <LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_DevDisconnect
 <LI><a href="#[12c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_CoreInit
-<LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_MspInit
 </UL>
 <BR>[Called By]<UL><LI><a href="#[18f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_USB_OTG_FS_PCD_Init
 </UL>
@@ -1716,9 +1716,9 @@ Global Symbols
 <P><STRONG><a name="[137]"></a>HAL_RTC_Init</STRONG> (Thumb, 158 bytes, Stack size 8 bytes, stm32f4xx_hal_rtc.o(i.HAL_RTC_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = HAL_RTC_Init &rArr; HAL_RTC_MspInit &rArr; HAL_RCCEx_PeriphCLKConfig
 </UL>
-<BR>[Calls]<UL><LI><a href="#[13a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_ExitInitMode
+<BR>[Calls]<UL><LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_MspInit
+<LI><a href="#[13a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_ExitInitMode
 <LI><a href="#[139]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_EnterInitMode
-<LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_MspInit
 </UL>
 <BR>[Called By]<UL><LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_RTC_Init
 </UL>
@@ -2531,8 +2531,8 @@ Global Symbols
 <P><STRONG><a name="[11b]"></a>USB_FlushTxFifo</STRONG> (Thumb, 78 bytes, Stack size 4 bytes, stm32f4xx_ll_usb.o(i.USB_FlushTxFifo))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = USB_FlushTxFifo
 </UL>
-<BR>[Called By]<UL><LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_DevInit
-<LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_IRQHandler
+<BR>[Called By]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_IRQHandler
+<LI><a href="#[12e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_DevInit
 </UL>
 
 <P><STRONG><a name="[122]"></a>USB_GetDevSpeed</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, stm32f4xx_ll_usb.o(i.USB_GetDevSpeed))
@@ -2540,8 +2540,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[10f]"></a>USB_GetMode</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, stm32f4xx_ll_usb.o(i.USB_GetMode))
-<BR><BR>[Called By]<UL><LI><a href="#[12d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
-<LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_IRQHandler
+<BR><BR>[Called By]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_IRQHandler
+<LI><a href="#[12d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
 </UL>
 
 <P><STRONG><a name="[117]"></a>USB_ReadDevAllInEpInterrupt</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, stm32f4xx_ll_usb.o(i.USB_ReadDevAllInEpInterrupt))
@@ -3211,9 +3211,9 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = test_task &rArr; osDelay &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_off
 <LI><a href="#[1b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_warn_error
 <LI><a href="#[20e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_error_list_point
+<LI><a href="#[1b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_off
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(.constdata)
 </UL>
@@ -3408,10 +3408,10 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[1f7]"></a>vTaskSuspendAll</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, tasks.o(i.vTaskSuspendAll))
-<BR><BR>[Called By]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
+<BR><BR>[Called By]<UL><LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
+<LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
 <LI><a href="#[21e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
 <LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortFree
-<LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
 <LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pvPortMalloc
 <LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvProcessTimerOrBlockTask
 </UL>
@@ -3476,7 +3476,8 @@ Global Symbols
 <P><STRONG><a name="[21e]"></a>xQueueGenericSend</STRONG> (Thumb, 362 bytes, Stack size 56 bytes, queue.o(i.xQueueGenericSend))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = xQueueGenericSend &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskRemoveFromEventList
+<BR>[Calls]<UL><LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
+<LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskRemoveFromEventList
 <LI><a href="#[220]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskCheckForTimeOut
 <LI><a href="#[214]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskPlaceOnEventList
 <LI><a href="#[21f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskInternalSetTimeOutState
@@ -3487,7 +3488,6 @@ Global Symbols
 <LI><a href="#[1f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskSuspendAll
 <LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
 <LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortEnterCritical
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTimerGenericCommand
 </UL>
@@ -3505,7 +3505,8 @@ Global Symbols
 <P><STRONG><a name="[1f4]"></a>xQueueReceive</STRONG> (Thumb, 322 bytes, Stack size 56 bytes, queue.o(i.xQueueReceive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = xQueueReceive &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskRemoveFromEventList
+<BR>[Calls]<UL><LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
+<LI><a href="#[1fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskRemoveFromEventList
 <LI><a href="#[220]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskCheckForTimeOut
 <LI><a href="#[214]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskPlaceOnEventList
 <LI><a href="#[21f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskInternalSetTimeOutState
@@ -3516,7 +3517,6 @@ Global Symbols
 <LI><a href="#[1f7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskSuspendAll
 <LI><a href="#[1de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
 <LI><a href="#[1dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortEnterCritical
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvProcessReceivedCommands
 </UL>
@@ -3557,9 +3557,9 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[198]"></a>xTaskGetSchedulerState</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, tasks.o(i.xTaskGetSchedulerState))
-<BR><BR>[Called By]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
+<BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+<LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
 <LI><a href="#[21e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
-<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 <LI><a href="#[1f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTimerGenericCommand
 </UL>
 
@@ -3576,8 +3576,8 @@ Global Symbols
 <LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uxListRemove
 <LI><a href="#[222]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvResetNextTaskUnblockTime
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskResumeAll
-<LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xPortSysTickHandler
+<BR>[Called By]<UL><LI><a href="#[199]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xPortSysTickHandler
+<LI><a href="#[1f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskResumeAll
 </UL>
 
 <P><STRONG><a name="[1e7]"></a>xTaskPriorityDisinherit</STRONG> (Thumb, 146 bytes, Stack size 16 bytes, tasks.o(i.xTaskPriorityDisinherit))
@@ -3612,10 +3612,10 @@ Global Symbols
 <LI><a href="#[21d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskIncrementTick
 <LI><a href="#[222]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvResetNextTaskUnblockTime
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
+<BR>[Called By]<UL><LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
+<LI><a href="#[1f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueReceive
 <LI><a href="#[21e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
 <LI><a href="#[1e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortFree
-<LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
 <LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pvPortMalloc
 <LI><a href="#[1f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvProcessTimerOrBlockTask
 </UL>
@@ -3634,9 +3634,9 @@ Global Symbols
 <P><STRONG><a name="[1f2]"></a>xTimerGenericCommand</STRONG> (Thumb, 112 bytes, Stack size 40 bytes, timers.o(i.xTimerGenericCommand))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = xTimerGenericCommand &rArr; xQueueGenericSend &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
-<BR>[Calls]<UL><LI><a href="#[221]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSendFromISR
+<BR>[Calls]<UL><LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
+<LI><a href="#[221]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSendFromISR
 <LI><a href="#[21e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
-<LI><a href="#[198]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskGetSchedulerState
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvSwitchTimerLists
 <LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvProcessReceivedCommands
@@ -4263,9 +4263,9 @@ Local Symbols
 <LI><a href="#[1da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vListInsert
 <LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uxListRemove
 </UL>
-<BR>[Called By]<UL><LI><a href="#[213]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskPlaceOnEventListRestricted
+<BR>[Called By]<UL><LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
+<LI><a href="#[213]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskPlaceOnEventListRestricted
 <LI><a href="#[214]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskPlaceOnEventList
-<LI><a href="#[1c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
 </UL>
 
 <P><STRONG><a name="[1db]"></a>prvAddNewTaskToReadyList</STRONG> (Thumb, 124 bytes, Stack size 16 bytes, tasks.o(i.prvAddNewTaskToReadyList))

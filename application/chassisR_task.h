@@ -27,14 +27,6 @@
 
 #define CHASSIS_LEG_KEY KEY_PRESSED_OFFSET_CTRL 
 
-
-
-
-
-
-
-
-
 //reducation of 3508 motor
 //m3508电机的减速比
 #define M3508_MOTOR_REDUCATION 15.764705882f

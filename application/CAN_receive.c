@@ -85,9 +85,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
       {
 				case 0x15 ://上板数据发送函数  ID为 0x15
 				{
-				
 					C_fbdata1(&C_data, rx_data,8);
-				
 					break;
 				}
 				

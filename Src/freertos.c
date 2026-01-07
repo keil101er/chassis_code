@@ -182,7 +182,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   
-    osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);//RM����ϵͳ���ݴ���
+    osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);//RM裁判系统串口通信
     referee_usart_task_handle = osThreadCreate(osThread(REFEREE), NULL);
 
 //    osThreadDef(cali, calibrate_task, osPriorityNormal, 0, 512);

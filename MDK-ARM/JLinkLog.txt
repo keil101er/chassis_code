@@ -1,0 +1,174 @@
+T6BA0 000:166.992   SEGGER J-Link V8.44a Log File
+T6BA0 000:167.459   DLL Compiled: Jun 18 2025 16:28:32
+T6BA0 000:167.482   Logging started @ 2025-12-30 07:39
+T6BA0 000:167.504   Process: C:\Keil_v5\UV4\UV4.exe
+T6BA0 000:167.853 - 167.526ms 
+T6BA0 000:167.983 JLINK_SetWarnOutHandler(...)
+T6BA0 000:168.006 - 0.125ms 
+T6BA0 000:168.035 JLINK_OpenEx(...)
+T6BA0 000:174.609   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T6BA0 000:175.278   Firmware: J-Link V9 compiled May  7 2021 16:26:12
+T6BA0 000:175.663   Decompressing FW timestamp took 233 us
+T6BA0 000:181.027   Hardware: V9.70
+T6BA0 000:181.078   S/N: 609788888
+T6BA0 000:181.119   OEM: SEGGER
+T6BA0 000:181.160   Feature(s): GDB, RDI, FlashBP, FlashDL, JFlash
+T6BA0 000:182.029   Bootloader: (FW returned invalid version)
+T6BA0 000:182.686   TELNET listener socket opened on port 19021
+T6BA0 000:182.974   WEBSRV WEBSRV_Init(): Starting webserver thread(s)
+T6BA0 000:183.106   WEBSRV Webserver running on local port 19080
+T6BA0 000:183.408   Looking for J-Link GUI Server exe at: C:\Keil_v5\ARM\Segger\JLinkGUIServer.exe
+T6BA0 000:183.637   Looking for J-Link GUI Server exe at: D:\Jlink\JLink\JLinkGUIServer.exe
+T6BA0 000:183.670   Forking J-Link GUI Server: D:\Jlink\JLink\JLinkGUIServer.exe
+T6BA0 000:508.818   J-Link GUI Server info: "J-Link GUI server V8.44a "
+T6BA0 000:510.879 - 342.686ms returns "O.K."
+T6BA0 000:511.051 JLINK_GetEmuCaps()
+T6BA0 000:511.086 - 0.146ms returns 0xB9FF7BBF
+T6BA0 000:511.125 JLINK_TIF_GetAvailable(...)
+T6BA0 000:511.331 - 0.202ms 
+T6BA0 000:511.377 JLINK_SetErrorOutHandler(...)
+T6BA0 000:511.400 - 0.022ms 
+T6BA0 000:511.740 JLINK_ExecCommand("ProjectFile = "D:\RM_code\code_rmuc\chassis\1.12VMC\1.12\MDK-ARM\JLinkSettings.ini"", ...). 
+T6BA0 000:540.520   Ref file found at: C:\Keil_v5\ARM\Segger\JLinkDevices.ref
+T6BA0 000:540.825   REF file references invalid XML file: D:\Jlink\JLink\JLinkDevices.xml
+T6BA0 000:541.974 - 30.236ms returns 0x00
+T6BA0 000:542.065 JLINK_ExecCommand("Device = STM32F407IGHx", ...). 
+T6BA0 000:543.404   Device "STM32F407IG" selected.
+T6BA0 000:543.885 - 1.793ms returns 0x00
+T6BA0 000:543.913 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T6BA0 000:544.069   ERROR: Unknown command
+T6BA0 000:544.106 - 0.168ms returns 0x01
+T6BA0 000:544.130 JLINK_GetHardwareVersion()
+T6BA0 000:544.155 - 0.022ms returns 97000
+T6BA0 000:544.178 JLINK_GetDLLVersion()
+T6BA0 000:544.200 - 0.022ms returns 84401
+T6BA0 000:544.229 JLINK_GetOEMString(...)
+T6BA0 000:544.253 JLINK_GetFirmwareString(...)
+T6BA0 000:544.275 - 0.022ms 
+T6BA0 000:544.300 JLINK_GetDLLVersion()
+T6BA0 000:544.322 - 0.021ms returns 84401
+T6BA0 000:544.346 JLINK_GetCompileDateTime()
+T6BA0 000:544.367 - 0.022ms 
+T6BA0 000:544.392 JLINK_GetFirmwareString(...)
+T6BA0 000:544.414 - 0.021ms 
+T6BA0 000:544.437 JLINK_GetHardwareVersion()
+T6BA0 000:544.459 - 0.022ms returns 97000
+T6BA0 000:544.483 JLINK_GetSN()
+T6BA0 000:544.505 - 0.022ms returns 609788888
+T6BA0 000:544.529 JLINK_GetOEMString(...)
+T6BA0 000:544.555 JLINK_TIF_Select(JLINKARM_TIF_JTAG)
+T6BA0 000:545.297 - 0.742ms returns 0x00
+T6BA0 000:545.340 JLINK_HasError()
+T6BA0 000:545.369 JLINK_SetSpeed(5000)
+T6BA0 000:545.448 - 0.079ms 
+T6BA0 000:545.756 JLINK_HasError()
+T6BA0 000:545.788 JLINK_SetResetType(JLINKARM_RESET_TYPE_NORMAL)
+T6BA0 000:545.811 - 0.023ms returns JLINKARM_RESET_TYPE_NORMAL
+T6BA0 000:545.834 JLINK_Reset()
+T6BA0 000:546.237   InitTarget() start
+T6BA0 000:546.275    J-Link Script File: Executing InitTarget()
+T6BA0 000:546.544   JTAG selected. Identifying JTAG Chain...
+T6BA0 000:547.327   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 000:547.571   Error: Scanning JTAG chain failed.
+T6BA0 000:547.606   Can not attach to CPU. Trying connect under reset.
+T6BA0 000:748.131   
+  ***** Warning: 
+T6BA0 000:748.245   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 000:799.005   JTAG selected. Identifying JTAG Chain...
+T6BA0 000:800.032   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 000:800.328   Error: Scanning JTAG chain failed.
+T6BA0 000:800.421   Connecting to CPU via connect under reset failed.
+T6BA0 000:850.888   InitTarget() end - Took 304ms
+T6BA0 000:851.014   Connect failed. Resetting via Reset pin and trying again.
+T6BA0 001:052.105   
+  ***** Warning: 
+T6BA0 001:052.153   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 001:112.890   InitTarget() start
+T6BA0 001:112.986    J-Link Script File: Executing InitTarget()
+T6BA0 001:113.203   JTAG selected. Identifying JTAG Chain...
+T6BA0 001:114.099   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 001:114.338   Error: Scanning JTAG chain failed.
+T6BA0 001:114.373   Can not attach to CPU. Trying connect under reset.
+T6BA0 001:314.933   
+  ***** Warning: 
+T6BA0 001:314.986   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 001:365.600   JTAG selected. Identifying JTAG Chain...
+T6BA0 001:366.579   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 001:366.834   Error: Scanning JTAG chain failed.
+T6BA0 001:366.868   Connecting to CPU via connect under reset failed.
+T6BA0 001:417.346   InitTarget() end - Took 304ms
+T6BA0 001:417.449 - 871.614ms 
+T6BA0 001:417.524 JLINK_GetIdData(pIdData)
+T6BA0 001:417.758   InitTarget() start
+T6BA0 001:417.835    J-Link Script File: Executing InitTarget()
+T6BA0 001:418.079   JTAG selected. Identifying JTAG Chain...
+T6BA0 001:418.995   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 001:419.240   Error: Scanning JTAG chain failed.
+T6BA0 001:419.275   Can not attach to CPU. Trying connect under reset.
+T6BA0 001:620.703   
+  ***** Warning: 
+T6BA0 001:620.751   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 001:671.791   JTAG selected. Identifying JTAG Chain...
+T6BA0 001:672.764   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 001:673.028   Error: Scanning JTAG chain failed.
+T6BA0 001:673.063   Connecting to CPU via connect under reset failed.
+T6BA0 001:723.628   InitTarget() end - Took 305ms
+T6BA0 001:723.729   Connect failed. Resetting via Reset pin and trying again.
+T6BA0 001:924.017   
+  ***** Warning: 
+T6BA0 001:924.066   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 001:984.366   InitTarget() start
+T6BA0 001:984.466    J-Link Script File: Executing InitTarget()
+T6BA0 001:984.699   JTAG selected. Identifying JTAG Chain...
+T6BA0 001:985.694   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 001:985.929   Error: Scanning JTAG chain failed.
+T6BA0 001:985.973   Can not attach to CPU. Trying connect under reset.
+T6BA0 002:186.201   
+  ***** Warning: 
+T6BA0 002:186.247   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 002:236.764   JTAG selected. Identifying JTAG Chain...
+T6BA0 002:237.824   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 002:238.159   Error: Scanning JTAG chain failed.
+T6BA0 002:238.202   Connecting to CPU via connect under reset failed.
+T6BA0 002:288.853   InitTarget() end - Took 304ms
+T6BA0 002:288.950 - 871.425ms 
+T6BA0 002:289.022 JLINK_GetIdData(pIdData)
+T6BA0 002:289.236   InitTarget() start
+T6BA0 002:289.333    J-Link Script File: Executing InitTarget()
+T6BA0 002:289.532   JTAG selected. Identifying JTAG Chain...
+T6BA0 002:290.462   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 002:290.697   Error: Scanning JTAG chain failed.
+T6BA0 002:290.734   Can not attach to CPU. Trying connect under reset.
+T6BA0 002:491.886   
+  ***** Warning: 
+T6BA0 002:491.933   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 002:542.112   JTAG selected. Identifying JTAG Chain...
+T6BA0 002:543.220   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 002:543.590   Error: Scanning JTAG chain failed.
+T6BA0 002:543.625   Connecting to CPU via connect under reset failed.
+T6BA0 002:594.429   InitTarget() end - Took 305ms
+T6BA0 002:594.475   Connect failed. Resetting via Reset pin and trying again.
+T6BA0 002:795.197   
+  ***** Warning: 
+T6BA0 002:795.261   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 002:855.511   InitTarget() start
+T6BA0 002:855.609    J-Link Script File: Executing InitTarget()
+T6BA0 002:855.821   JTAG selected. Identifying JTAG Chain...
+T6BA0 002:856.778   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 002:857.050   Error: Scanning JTAG chain failed.
+T6BA0 002:857.092   Can not attach to CPU. Trying connect under reset.
+T6BA0 003:058.912   
+  ***** Warning: 
+T6BA0 003:059.010   RESET (pin 15) high, but should be low. Please check target hardware.
+T6BA0 003:109.136   JTAG selected. Identifying JTAG Chain...
+T6BA0 003:110.168   TotalIRLen = ?, IRPrint = 0x..000000000000000000000000
+T6BA0 003:110.491   Error: Scanning JTAG chain failed.
+T6BA0 003:110.579   Connecting to CPU via connect under reset failed.
+T6BA0 003:160.886   InitTarget() end - Took 305ms
+T6BA0 003:160.982 - 871.960ms 
+T6BA0 003:168.837 JLINK_GetFirmwareString(...)
+T6BA0 003:168.870 - 0.033ms 
+T6BA0 013:992.291 JLINK_Close()
+T6BA0 014:003.923 - 11.632ms
+T6BA0 014:003.965   
+T6BA0 014:003.992   Closed

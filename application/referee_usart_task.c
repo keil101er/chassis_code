@@ -1,7 +1,7 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       referee_usart_task.c/h
-  * @brief      RM referee system data solve. RM²ÃÅĞÏµÍ³Êı¾İ´¦Àí
+  * @brief      RM referee system data solve. RMè£åˆ¤ç³»ç»Ÿæ•°æ®å¤„ç†
   * @note       
   * @history
   *  Version    Date            Author          Modification
@@ -35,7 +35,7 @@
   * @retval         none
   */
 /**
-  * @brief          µ¥×Ö½Ú½â°ü
+  * @brief          å•å­—èŠ‚è§£åŒ…
   * @param[in]      void
   * @retval         none
   */
@@ -56,7 +56,7 @@ unpack_data_t referee_unpack_obj;
   * @retval         none
   */
 /**
-  * @brief          ²ÃÅĞÏµÍ³ÈÎÎñ
+  * @brief          è£åˆ¤ç³»ç»Ÿä»»åŠ¡
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
@@ -81,7 +81,7 @@ void referee_usart_task(void const * argument)
   * @retval         none
   */
 /**
-  * @brief          µ¥×Ö½Ú½â°ü
+  * @brief          å•å­—èŠ‚è§£åŒ…
   * @param[in]      void
   * @retval         none
   */

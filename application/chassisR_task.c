@@ -78,8 +78,11 @@ volatile float pre_rc=0.0f;	//上一次右摇杆前后值
 //float Poly_Coefficient[12][4] = {-1054.29009, 897.17949, -300.39033, 10.24151, -358.65714, 284.42736, -83.87479, 5.24555, -80.54457, 60.46272, -14.73060, -0.72226, -277.78399, 209.48646, -51.74162, -1.19321, -1320.00788, 1000.29448, -250.90686, 23.50797, -52.73585, 40.39285, -10.43662, 1.23315, -1133.61702, 851.39937, -203.55656, 18.12949, -134.76995, 102.29154, -24.30619, 2.16750, -260.28510, 196.41486, -48.53919, 4.19676, -704.09611, 531.45447, -131.32041, 11.36997, 691.74977, -516.72698, 126.43761, 16.84215, 46.48765, -34.92827, 8.61994, 0.27783};
 //新好
 //float Poly_Coefficient[12][4]  = {-1199.78375, 1015.33102, -337.77679, 12.44195, -390.52173, 309.42001, -92.18308, 5.79837, -149.97521, 112.75791, -27.45491, -1.81980, -364.58826, 276.09308, -68.83602, -1.24067, -1323.79091, 1002.56876, -251.25939, 23.76150, -48.37194, 37.07660, -9.61639, 1.19965, -862.29578, 645.58390, -152.64361, 13.75545, -102.42096, 77.50204, -18.10522, 1.62050, -397.21334, 299.46758, -73.90052, 6.41314, -624.40449, 470.90145, -116.14455, 10.10627, 502.38510, -375.28300, 91.80650, 20.32962, 36.50029, -27.44679, 6.78477, 0.32702};
-float Poly_Coefficient[12][4] = {-1141.28159, 968.05327, -322.59164, 11.61631, -379.80518, 301.06890, -89.21456, 5.62495, -136.50935, 102.59646, -25.00145, -1.65248, -336.97480, 255.10414, -63.57381, -1.13286, -1126.01249, 854.13070, -214.99524, 20.66858, -43.96222, 33.75623, -8.80083, 1.11575, -836.99054, 626.33520, -148.20598, 13.42883, -94.19680, 71.20052, -16.62103, 1.50335, -369.69499, 278.85408, -68.89689, 5.99570, -587.42300, 443.22210, -109.46163, 9.55364, 430.01737, -321.55844, 78.83626, 16.16095, 34.60662, -26.03578, 6.44363, 0.26532};
-
+//float Poly_Coefficient[12][4] = {-1141.28159, 968.05327, -322.59164, 11.61631, -379.80518, 301.06890, -89.21456, 5.62495, -136.50935, 102.59646, -25.00145, -1.65248, -336.97480, 255.10414, -63.57381, -1.13286, -1126.01249, 854.13070, -214.99524, 20.66858, -43.96222, 33.75623, -8.80083, 1.11575, -836.99054, 626.33520, -148.20598, 13.42883, -94.19680, 71.20052, -16.62103, 1.50335, -369.69499, 278.85408, -68.89689, 5.99570, -587.42300, 443.22210, -109.46163, 9.55364, 430.01737, -321.55844, 78.83626, 16.16095, 34.60662, -26.03578, 6.44363, 0.26532};
+//不错
+//float Poly_Coefficient[12][4] = {-1269.42188, 1069.42166, -352.92851, 13.46250, -401.42108, 317.79482, -94.72184, 5.97018, -174.41732, 131.10451, -31.92916, -1.64761, -406.34055, 307.53433, -76.60241, -0.88876, -1035.66665, 787.15866, -198.87965, 19.49915, -39.30634, 30.28460, -7.96247, 1.07212, -818.43805, 613.32371, -144.78830, 13.23263, -96.36819, 73.05657, -16.99519, 1.54768, -392.24209, 296.25682, -73.30443, 6.42135, -611.62805, 462.12174, -114.28160, 10.04195, 382.10873, -286.17990, 70.32324, 12.27131, 32.86405, -24.76099, 6.13871, 0.20212};
+//float Poly_Coefficient[12][4] = {-1183.34876, 997.61378, -327.07270, 12.31285, -384.43004, 304.50953, -89.34507, 5.69115, -188.42804, 141.44331, -34.53494, -1.44967, -387.46082, 293.15132, -73.07736, -0.09254, -670.63844, 512.59771, -131.50087, 13.62403, -28.61140, 22.21453, -5.97199, 0.86693, -907.75177, 680.57068, -161.61533, 14.85983, -93.55146, 70.87535, -16.52469, 1.54386, -497.81978, 376.45147, -93.40323, 8.21640, -640.16803, 484.33405, -120.14364, 10.61462, 331.04059, -248.61649, 61.43177, 6.10800, 33.98931, -25.64061, 6.37374, 0.02815};
+float Poly_Coefficient[12][4] = {-1236.25893, 1036.26936, -335.86629, 13.08037, -389.43795, 308.14146, -90.08373, 5.76115, -197.01720, 147.72714, -36.03745, -0.75991, -413.28940, 311.99491, -77.44530, 0.42921, -686.63561, 525.03284, -134.53551, 13.85113, -28.01082, 21.79648, -5.87277, 0.85713, -1273.74456, 958.73043, -229.00859, 20.73448, -136.45026, 104.00741, -24.44708, 2.24784, -594.78083, 449.99128, -111.59352, 9.78083, -871.67416, 659.81923, -163.58964, 14.38498, 459.04447, -344.59398, 84.99467, 4.15362, 46.36719, -34.97407, 8.68005, -0.16797};
 //测试
 //float Poly_Coefficient[12][4]  = {-1184.60908, 1004.04445, -335.06223, 12.22691, -388.40720, 307.83786, -91.80156, 5.76813, -143.50847, 107.97205, -26.30369, -1.91043, -354.24700, 268.43683, -66.99384, -1.38593, -1196.66332, 907.09427, -228.03061, 21.88714, -45.52722, 34.93013, -9.09212, 1.15695, -667.50408, 498.02081, -116.97276, 10.74802, -76.30714, 57.45626, -13.29474, 1.21176, -313.08063, 236.10882, -58.35007, 5.10204, -490.21550, 369.78476, -91.33453, 8.01246, 377.39443, -282.22011, 69.20919, 18.84522, 29.16899, -21.95088, 5.43850, 0.38232};
 
@@ -195,8 +198,11 @@ float jump_pid_i_R=0;		//跳跃pid积分分量
 extern shoot_control_t shoot_control;          
 uint8_t filter_flag =0;
 
-float w_time=0;	    //小陀螺持续时间
 
+
+float heng_target = -1.5707963f;
+float w_time=0;	    //小陀螺持续时间
+float heng_angle=0;
 
 
 /**
@@ -362,7 +368,7 @@ void ChassisR_task(void)
 			mode_rc  = 1; 
 		}
 	
-		if( chassis_move_balance.chassis_RC->rc.s[0] == 2)//右拨杆最下，失能
+		else if( chassis_move_balance.chassis_RC->rc.s[0] == 2)//右拨杆最下，失能
 		{
 			
 		   chassis_move_balance.start_flag=0;
@@ -374,9 +380,9 @@ void ChassisR_task(void)
 			chassis_move_balance.w_flag  = 1;//底盘不跟随云台，小陀螺模式
 
 		}
-		else if(chassis_move_balance.chassis_RC->rc.s[0] == 3)//右拨杆中间
+		else if(chassis_move_balance.chassis_RC->rc.s[0] == 3 &&chassis_move_balance.chassis_RC->rc.s[1]==3)
 		{
-			chassis_move_balance.w_flag= 2;//底盘不跟随云台，横车模式
+			chassis_move_balance.w_flag  = 2;//底盘不跟随云台，横车模式
 		}
 		else{
 		chassis_move_balance.w_flag= 0;//底盘跟随云台
@@ -411,34 +417,34 @@ void ChassisR_task(void)
         // chassis_move_balance.target_x=chassis_move_balance.target_x+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.000005f);
         chassis_move_balance.x_set = 
 		                            // 0.5f;................................................................................................................................
-		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*5.825f/1000.0f;
+		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*8.0f/1000.0f;
 									// chassis_move_balance.x_set+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.0000265f)+chassis_move_balance.v_set*(float)CHASSR_TIME*2.2f/1000.0f;
 		
 									// slope_following(&chassis_move_balance.target_x,&chassis_move_balance.x_set,0.012f);//斜坡函数，起一个补偿作用
 
 		//通过判断机器人状态来对x_set进行修正从而抑制停车后的前后摆动
-		// if(pre_rc>10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
-		// {
-		// 	Rc_flag=1;
-		// }
-		// else if(pre_rc<-10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
-		// {
-		// 	Rc_flag=2;
-		// }
-		// if(Rc_flag==3)
-		// {
-		// 	chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.6f;
-		// 	Rc_flag=0;
-		// }
+		if(pre_rc>10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
+		{
+			Rc_flag=1;
+		}
+		else if(pre_rc<-10&&abs(chassis_move_balance.chassis_RC->rc.ch[1])<=10)
+		{
+			Rc_flag=2;
+		}
+		if(Rc_flag==3)
+		{
+			chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.3f;
+			Rc_flag=0;
+		}
 
 // if(pre_v < -VELOCITY_EPSILON && chassis_move_balance.v_filter2 >= -VELOCITY_EPSILON && Rc_flag == 1)
 // {
-//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.28f;
+//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.4f;
 //     Rc_flag = 0;
 // }
 // else if(pre_v > VELOCITY_EPSILON && chassis_move_balance.v_filter2 <= VELOCITY_EPSILON && Rc_flag == 2)
 // {
-//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.28f;
+//     chassis_move_balance.x_set = chassis_move_balance.x_filter + 0.4f;
 //     Rc_flag = 0;
 // }
 
@@ -498,13 +504,8 @@ void ChassisR_task(void)
 		chassis_move_balance.x_set = 0;
 		chassis_move_balance.target_x=0;
 	}
-	else if(chassis_move_balance.w_flag == 2)
-	{
-
-	}
 	else {
 	w_time=0;
-	chassis_move_balance.w_flag=0;	
 	chassis_move_balance.Wz_target=0;
 	}		
 }	
@@ -705,7 +706,6 @@ uint8_t land_r_flag = 0; //右腿落地标志
 extern uint8_t land_l_flag; //左腿落地标志
 void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *LQR_K,pid_type_def *leg)
 {
-	
 	VMC_calc_1_right(vmcr,ins,((float)CHASSR_TIME)*3.0f/1000.0f);
      
     for(int i=0;i<12;i++)
@@ -726,41 +726,56 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 //       //chassis->turn_T = - PID_calc(&Turn_Pid,chassis->relative_angle,0);
 // 	}
 
-   	//小陀螺
-   if(chassis->w_flag==1){	
+   	//开始小陀螺状态
+   if(chassis->w_flag==1)
+   {	
 		slope_following(&chassis_move_balance.Wz_target,&chassis_move_balance.Wz_set,0.006f);	//斜坡函数
 	   chassis->turn_T=Turn_Pid.Kp*(chassis->Wz_set-0)-Turn_Pid.Kd*ins->Gyro[2];	//进入小陀螺模式
 	   W_cplt_flag=1;
+	   heng_angle=0.0f;
 	}
-	else{
-		if(W_cplt_flag==1){
-			slope_following(&chassis_move_balance.Wz_target,&chassis_move_balance.Wz_set,0.005f);	//斜坡函数
-	   		chassis->turn_T=Turn_Pid.Kp*(chassis->Wz_set-0)-Turn_Pid.Kd*ins->Gyro[2];	//进入小陀螺模式
-			chassis_move_balance.v_set = 0;
-			chassis_move_balance.x_set = 0;
-			chassis_move_balance.target_x=0;
-			if((chassis_move_balance.Wz_set==0)||((chassis->relative_angle<1.5f)&&(chassis->relative_angle>-1.5f)))		//当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
-			{
-				W_cplt_flag=2;
-				angle=0;
-			}
-		}
-		else if(W_cplt_flag==2)
+	//退出小陀螺减速状态
+	else if(W_cplt_flag==1&&chassis->w_flag!=1)
+	{
+		chassis_move_balance.Wz_target=0.2f;
+		slope_following(&chassis_move_balance.Wz_target,&chassis_move_balance.Wz_set,0.005f);	//斜坡函数
+	   	chassis->turn_T=Turn_Pid.Kp*(chassis->Wz_set-0)-Turn_Pid.Kd*ins->Gyro[2];	
+		chassis_move_balance.v_set = 0;
+		chassis_move_balance.x_set = 0;
+		chassis_move_balance.target_x=0;
+		if((chassis->relative_angle<0.8f)&&(chassis->relative_angle>-0.8f))		//当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
 		{
-			slope_following(&chassis->relative_angle,&angle,0.003f);	//斜坡函数
-			chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
-			if(chassis->relative_angle<0.2f&&chassis->relative_angle>-0.2f)
-			{				
+			chassis_move_balance.Wz_target=0.0f;
+			chassis_move_balance.Wz_set=0.0f;
 			W_cplt_flag=0;
-			}
+			angle=0;
 		}
-		else{
-			//slope_following(&chassis->relative_angle,&angle,0.008f);
-			chassis->turn_T=Turn_Pid.Kp*(chassis->relative_angle-0)-Turn_Pid.Kd*ins->Gyro[2];
-			//chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
-			
-		}
+	}
+	else if(chassis->w_flag==2)
+	{
+		// 横车模式 / Sideways mode
+		// 底盘转向与云台呈90度，云台独立运动，底盘左右平移
+		// Chassis turns 90 degrees relative to gimbal, gimbal moves independently, chassis translates laterally
+
+		// 目标角度为-PI/2（-1.5708rad），底盘相对云台向右转90度
+		// Target angle is -PI/2 (-1.5708rad), chassis turns 90 degrees to the right relative to gimbal
 		
+
+		// 使用斜坡函数平滑过渡到目标角度
+		// Use slope function to smoothly transition to target angle
+		slope_following(&heng_target, &heng_angle, 0.01f);
+
+		// PID控制，使底盘相对角度保持在目标角度
+		// PID control to keep chassis relative angle at target angle
+		chassis->turn_T = Turn_Pid.Kp * (chassis->relative_angle - heng_angle) - Turn_Pid.Kd * ins->Gyro[2];
+		angle=0;
+	}
+	//正常模式
+	else{
+		heng_angle=0.0f;
+		slope_following(&chassis->relative_angle,&angle,0.025f);
+		chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
+		//chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
 	}
 	//Roll轴补偿
 	chassis->roll_f0=Roll_Pid.Kp*(chassis->roll_set-chassis->roll)-Roll_Pid.Kd*ins->Gyro[0];
@@ -872,7 +887,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  			    jump_time_l=0;
  		        jump_time_r++;
 				chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
-			   chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段  
+			    chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段  
  		    }
  		    // if(jump_time_r>=25&&jump_time_l>=25)
  		    // {  
@@ -882,8 +897,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 			//    chassis->jump_flag_l=1;//压缩完毕进入上升加速阶段
 		    // }			 		 
  		   }
-
- //上升加速阶段			
+ //上升加速阶段	
  		else if(chassis->jump_flag_r==1&& chassis->help_jump_flag ==1)
  		{		
 			jump_status=2;
@@ -901,7 +915,6 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
  				 chassis->jump_flag_l=2;//上升完毕进入缩腿阶段
  				 chassis->jump_flag_r=2;
  			 }	 
-
  		}
 //缩腿阶段		
  	 else if(chassis->jump_flag_r==2&& chassis->help_jump_flag ==1)
@@ -909,7 +922,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 			jump_status=3;
  			chassis->leg_set = 0.22f;
 			jumpF0_R=15.0f;
- 			chassis->theta_set=0.0f;			
+ 			chassis->theta_set=0.0f;
  			chassis->x_filter=0.0f;
  			chassis->x_set=chassis->x_filter;
  		//   if(vmcr->L0<0.22f)
@@ -975,7 +988,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	debug_count=0;
 	debug_flag=1;
 	jump_module_R=0;
- }	
+ }
  	pre_right_flag=right_flag;
    right_flag = ground_detectionR(vmcr,ins);//右腿离地检测
    if(chassis->jump_flag_r==2)
@@ -1012,8 +1025,9 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 		}
 	 }
 	 else if(chassis->recover_flag==1)
-
 	 {
+		 chassis->x_filter=0.0f;
+		 chassis->x_set = chassis->x_filter;
 		 vmcr->Tp=0.0f;
 		 vmcr->F0=0.0f;
 	 }
@@ -1051,11 +1065,11 @@ void mySaturate(float *in,float min,float max)
 
 uint8_t recover_detect(chassis_t *chassis)
 {	
-	// if(((chassis->myPithR<((-3.1415926f)/10.5f)&&chassis->myPithR>((-3.1415926f)/2.0f))
-	// 				  ||(chassis->myPithR>(3.1415926f/12.8f)&&chassis->myPithR<(3.1415926f/2.0f))))	
-	//测试
 	if(((chassis->myPithR<((-3.1415926f)/10.5f)&&chassis->myPithR>((-3.1415926f)/2.0f))
-					  ||(chassis->myPithR>(3.1415926f/12.4f)&&chassis->myPithR<(3.1415926f/2.0f))))	
+					  ||(chassis->myPithR>(3.1415926f/12.8f)&&chassis->myPithR<(3.1415926f/2.0f))))	
+	//测试
+	// if(((chassis->myPithR<((-3.1415926f)/10.5f)&&chassis->myPithR>((-3.1415926f)/2.0f))
+	// 				  ||(chassis->myPithR>(3.1415926f/12.4f)&&chassis->myPithR<(3.1415926f/2.0f))))	
 	{
 				
 			chassis->leg_set = 0.130;

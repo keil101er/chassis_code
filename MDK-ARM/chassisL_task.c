@@ -66,7 +66,7 @@ void ChassisL_task(void)
 	
 		chassisL_feedback_update(&chassis_move_balance,&left,&INS);// 更新数据
 		
-		shoot_can_set_current = shoot_control_loop();    //拨弹轮电机控制循环，返回shoot_can_set_current拨弹轮电机电流
+//		shoot_can_set_current = shoot_control_loop();    //拨弹轮电机控制循环，返回shoot_can_set_current拨弹轮电机电流,暂时关闭
 		
 		chassisL_control_loop(&chassis_move_balance,&left,&INS,LQR_K_L,&LegL_Pid);//控制计算
 	  
@@ -100,7 +100,6 @@ void ChassisL_task(void)
 //		osDelay(CHASSL_TIME);	
 		
 	 }
-	
 	 	else if(chassis_move_balance.start_flag==0)	
 		{
 			
@@ -114,10 +113,7 @@ void ChassisL_task(void)
 		}
 		
 
-//		if(chassis_move_balance.start_flag==1)	{
-//			
-//			
-//			
+//		if(chassis_move_balance.start_flag==1)	{			
 ////测试
 //		shoot_control.speed_set = -READY_TRIGGER_SPEED;
 //		PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
@@ -173,8 +169,8 @@ void chassisL_feedback_update(chassis_t *chassis,vmc_leg_t *vmc,INS_t *ins)
 	chassis->wheel_motor[1].vel = chassis->wheel_motor[1].speed_rpm * CHASSIS_MOTOR_RPM_TO_OMG_SEN; //角速度
 	chassis->wheel_motor[1].speed = 0.0004998609952f * chassis->wheel_motor[1].speed_rpm;  //速度
 	chassis->wheel_motor[1].wheel_T = CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN * chassis->wheel_motor[1].given_current;
-	chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
-	
+	//chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
+	chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd+HALF_ECD_RANGE,0);     //获取相对角度值
 //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 	
 	static fp32 speed_fliter_1 = 0.0f;
@@ -468,8 +464,8 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 	// {
     // mySaturate(&vmcl->torque_set[1],-18.0f,18.0f);	
 	// mySaturate(&vmcl->torque_set[0],-18.0f,18.0f);
-	mySaturate(&vmcl->torque_set[1],-10.0f,10.0f);	
-	mySaturate(&vmcl->torque_set[0],-10.0f,10.0f);		
+	mySaturate(&vmcl->torque_set[1],-10.0f,10.0f);
+	mySaturate(&vmcl->torque_set[0],-10.0f,10.0f);
 	// }		
 
 }

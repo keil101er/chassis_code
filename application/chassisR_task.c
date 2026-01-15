@@ -46,12 +46,12 @@ float LQR_K_R[12]={
 };
 volatile float pre_v=0.0f;
 volatile float pre_rc=0.0f;	//上一次右摇杆前后值
- volatile uint8_t Rc_flag=0;	//遥控器状态标志位 
- 
- 
+ volatile uint8_t Rc_flag=0;//遥控器状态标志位 
+ float a_x[4]={0.0f, 0.0f, 0.0f, 0.0f};
+ float theat_set=0.0f;
 
 //遛弯
-//float Poly_Coefficient[12][4] = {{-611.59342, 639.61534, -247.78576, 7.63222},
+//float Poly_Coefficient[12][4] = {{-611.59342, 639.61534, -247.78576, 7.63222],
 //	{-123.40484, 125.69906, -50.31432, 2.10250},
 //	{-72.27129, 64.81787, -16.29453, -1.47444},
 //	{-239.70338, 215.35520, -54.84512, -4.70619},
@@ -409,15 +409,29 @@ void ChassisR_task(void)
 		chassis_move_balance.target_v=
 		                            //    0;
  		                            ((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.0027f);
-		slope_following(&chassis_move_balance.target_v,&chassis_move_balance.v_set,0.0035f);	//斜坡函数
-			
+		
+		 if(chassis_move_balance.target_v==0)
+		 {
+			slope_following(&chassis_move_balance.target_v,&chassis_move_balance.v_set,0.005f);	//斜坡函数
+		 }
+		 else
+		 {
+			slope_following(&chassis_move_balance.target_v,&chassis_move_balance.v_set,0.0035f);	//斜坡函数
+		 }
+		//刹车补偿
+		a_x[3]=a_x[2];
+		a_x[2]=a_x[1];
+		a_x[1]=(chassis_move_balance.v_set-chassis_move_balance.v_filter2)/(4.0f/1000.0f);
+		a_x[0]=(a_x[1]+a_x[2]+a_x[3])/3.0f;
+		 theat_set=a_x[0]*0.00025f;
+		mySaturate(&theat_set,-0.1f,0.1f);
 //	    chassis_move_balance.v_set=((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.00450f);//???????0	
 	
 //x位控
         // chassis_move_balance.target_x=chassis_move_balance.target_x+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.000005f);
         chassis_move_balance.x_set = 
 		                            // 0.5f;................................................................................................................................
-		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*8.0f/1000.0f;
+		                            chassis_move_balance.x_set+chassis_move_balance.v_set*(float)CHASSR_TIME*6.0f/1000.0f;
 									// chassis_move_balance.x_set+((float)chassis_move_balance.chassis_RC->rc.ch[1])*(0.0000265f)+chassis_move_balance.v_set*(float)CHASSR_TIME*2.2f/1000.0f;
 		
 									// slope_following(&chassis_move_balance.target_x,&chassis_move_balance.x_set,0.012f);//斜坡函数，起一个补偿作用
@@ -528,7 +542,6 @@ void ChassisR_task(void)
 			osDelay(CHASSR_TIME);	
 			//顺时针为正
 			chassis_move_balance.wheel_motor[0].given_current = (chassis_move_balance.wheel_motor[0].wheel_T/0.000396211f);
-    	   
 			CAN_cmd_chassis(-chassis_move_balance.wheel_motor[0].given_current);
             osDelay(CHASSR_TIME);
 		}
@@ -569,7 +582,7 @@ void ChassisR_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legr,pid_type
 
    const static float legr_pid[3] = 
                                     //   {0,0,0};
-                                   {200.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+                                   {250.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 
    const static fp32 power_pid[3] = {POWER_PID_KP, POWER_PID_KI, POWER_PID_KD};
   
@@ -763,7 +776,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 
 		// 使用斜坡函数平滑过渡到目标角度
 		// Use slope function to smoothly transition to target angle
-		slope_following(&heng_target, &heng_angle, 0.01f);
+		slope_following(&heng_target, &heng_angle, 0.015f);
 
 		// PID控制，使底盘相对角度保持在目标角度
 		// PID control to keep chassis relative angle at target angle
@@ -773,7 +786,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	//正常模式
 	else{
 		heng_angle=0.0f;
-		slope_following(&chassis->relative_angle,&angle,0.025f);
+		slope_following(&chassis->relative_angle,&angle,0.02f);
 		chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
 		//chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
 	}
@@ -807,7 +820,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 
 	//轮毂电机
     // chassis->wheel_motor[0].wheel_T =   0;
- 	chassis->wheel_motor[0].wheel_T =   (LQR_K[0]*(vmcr->theta-0.0f)
+ 	chassis->wheel_motor[0].wheel_T =   (LQR_K[0]*(vmcr->theta-theat_set)
 									    +LQR_K[1]*(vmcr->d_theta-0.0f)
 //										+LQR_K[2]*(chassis->x-chassis->x_set)
 //										+LQR_K[3]*(chassis->v-chassis->v_set)
@@ -819,7 +832,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 									    +LQR_K[5]*(chassis->myPithGyroR-0.0f));	
 	
 	//右边髋关节输出力矩				
-	  vmcr->Tp = (LQR_K[6]*(vmcr->theta-0.0f)	
+	  vmcr->Tp = (LQR_K[6]*(vmcr->theta-theat_set)	
 				 +LQR_K[7]*(vmcr->d_theta-0.0f)
 //	             +LQR_K[8]*(chassis->x-chassis->x_set)
 //	             +LQR_K[9]*(chassis->v-chassis->v_set)
@@ -858,7 +871,7 @@ void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,float *
 	}
 	else
 	{
-		vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;	//f0=前馈(抵消重力)+腿长pd+roll轴补偿
+		vmcr->F0=17.2f/arm_cos_f32(vmcr->theta)+PID_calc_1(leg,vmcr->L0,chassis->leg_set)-chassis->roll_f0;	//f0=前馈(抵消重力)+腿长pd+roll轴补偿
 	}
 	
 	//vmcr->F0=0.0f;		//测试使用

@@ -79,7 +79,7 @@ void observe_task(void)
 		// vlb=wl*0.0755f+left.L0*left.d_theta*arm_cos_f32(left.theta)+left.d_L0*arm_sin_f32(left.theta);//机体b系的速度
 		//  aver_v=(vrb-vlb)/2.0f;
         //  xvEstimateKF_Update(&vaEstimateKF,INS.MotionAccel_b[1],aver_v);
-		
+		pre_v=chassis_move_balance.v_filter2;
 		chassis_move_balance.v_filter = 
 		                                // aver_v;
 		                               ((chassis_move_balance.wheel_motor[0].vel) - (chassis_move_balance.wheel_motor[1].vel))*(0.0755f)/2 ;			
@@ -171,7 +171,7 @@ else if(pre_v > VELOCITY_EPSILON && chassis_move_balance.v_filter2 <= VELOCITY_E
 		Rc_flag = 0;
 	}
 }
-pre_v=chassis_move_balance.v_filter2;				 
+				 
 	osDelay(OBSERVE_TIME);
 
 	}

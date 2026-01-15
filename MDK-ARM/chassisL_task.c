@@ -42,6 +42,9 @@ const static float jump_pid[3] = {600.0f,0.0f,200.0f};
 // {450.0f,0.0f,500.0f};//{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 float jumpF0_L=17.2f;//左腿跳跃初始力
 
+extern float theat_set;
+
+
 extern INS_t INS;
 uint32_t CHASSL_TIME=1;	
 int16_t	  shoot_can_set_current;
@@ -131,7 +134,7 @@ void ChassisL_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legl)
 {
     const static float legl_pid[3] = 
 	                                // {0,0,0};
-	                                {LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+	                                {250, LEG_PID_KI,LEG_PID_KD};
 	static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
 
 	joint_motor_init(&chassis->joint_motor[2],6,MIT_MODE);//发送id为6
@@ -230,7 +233,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 //						+LQR_K[11]*(chassis->myPithGyroL-0.01f));	
    
     // chassis->wheel_motor[0].wheel_T =   0;
-	chassis->wheel_motor[1].wheel_T=   ( LQR_K[0]*(vmcl->theta-0.0f)
+	chassis->wheel_motor[1].wheel_T=   ( LQR_K[0]*(vmcl->theta+theat_set)
 	                                    +LQR_K[1]*(vmcl->d_theta-0.0f)
 //										+LQR_K[2]*(chassis->x_set-chassis->x)
 //										+LQR_K[3]*(chassis->v_set-chassis->v)
@@ -243,7 +246,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 											
 
 
-	     vmcl->Tp=(      LQR_K[6]*(vmcl->theta-0.0f)
+	     vmcl->Tp=(      LQR_K[6]*(vmcl->theta+theat_set)
 						+LQR_K[7]*(vmcl->d_theta-0.0f)
 //						+LQR_K[8]*(chassis->x_set-chassis->x)
 //						+LQR_K[9]*(chassis->v_set-chassis->v)
@@ -281,7 +284,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		}
 		}
 		else{
-			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd	
+			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc_1(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd	
 		}
 		
 		
@@ -364,7 +367,6 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
  			//  chassis->help_jump_flag = 0;
 			 chassis->jump_flag_l=3;
  			 chassis->jump_flag_r=3;
-			
  		  }
  		}
 		 //落地阶段
@@ -423,7 +425,6 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 			 //当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
 				chassis->wheel_motor[1].wheel_T=0.0f;
 				vmcl->Tp=LQR_K[6]*(vmcl->theta-0.0f)+ LQR_K[7]*(vmcl->d_theta-0.0f);
-
 				chassis->x_filter=0.0f;
 				chassis->x_set=chassis->x_filter;
 				chassis->turn_set=chassis->total_yaw;
@@ -437,7 +438,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 //不跳跃的时候需要roll轴补偿
 			if(chassis->jump_flag_l==0)
 			{
-				vmcl->F0=vmcl->F0+chassis->roll_f0;//roll轴补偿取反然后加上去					
+				// vmcl->F0=vmcl->F0+chassis->roll_f0;//roll轴补偿取反然后加上去					
 			}
 		}
 	 }

@@ -23,7 +23,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "chassisR_task.h"
-
+#include "shoot.h"
 uint8_t Txcplt_flag=1;
 extern UART_HandleTypeDef huart1;
 extern chassis_t chassis_move_balance;
@@ -40,7 +40,9 @@ extern float aver_fnr;
 extern float aver_fn;
 float F_r=0,F_l=0;
 extern float theat_set;
-
+extern int16_t shoot_can_set_current;
+extern shoot_control_t shoot_control;  
+extern float relative_angle;
 
 
 // STP-23激光测距传感器接收相关变量 / STP-23 Laser Sensor Receive Variables
@@ -68,8 +70,9 @@ uint16_t stp23_timestamp = 0;                    // 时间戳(ms) / Timestamp
  //蓝牙调试信息输出任务 Bluetooth debugging information output task
  void Buletooth_debug_task(void)
 {
+    sprintf(debug_info,"%d,%.2f,%.2f,%.2f,%.2f,%.2f\n",shoot_can_set_current,shoot_control.speed,shoot_control.speed_set,shoot_control.angle,shoot_control.set_angle,relative_angle);
     //sprintf(debug_info,"%.2f,%.2f\n",left.theta,right.theta);
-     sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,theat_set);
+    //  sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,theat_set);
     //sprintf(debug_info,"%.2f,%.2f,%d,%d\n",right.F0,right.L0,jump_status,chassis_move_balance.joint_motor[0].para.state);
     // F_r=right.torque_set[1]-right.torque_set[0];
     // F_l=left.torque_set[1]-left.torque_set[0];

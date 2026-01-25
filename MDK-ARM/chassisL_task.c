@@ -69,15 +69,12 @@ void ChassisL_task(void)
 	
 		chassisL_feedback_update(&chassis_move_balance,&left,&INS);// 更新数据
 		
-//		shoot_can_set_current = shoot_control_loop();    //拨弹轮电机控制循环，返回shoot_can_set_current拨弹轮电机电流,暂时关闭
-		
+		 shoot_can_set_current = shoot_control_loop();    //拨弹轮电机控制循环，返回shoot_can_set_current拨弹轮电机电流,暂时关闭
 		chassisL_control_loop(&chassis_move_balance,&left,&INS,LQR_K_L,&LegL_Pid);//控制计算
-	  
 //		shoot_can_set_current = shoot_control_loop();        //射击任务控制循环，fire_key有
 //			
 //			
-		if(chassis_move_balance.start_flag==1)	
-	
+	if(chassis_move_balance.start_flag==1)
 	{
 		
 	//关节电机控制	
@@ -89,7 +86,7 @@ void ChassisL_task(void)
 	chassis_move_balance.wheel_motor[1].given_current = chassis_move_balance.wheel_motor[1].wheel_T/0.000366211f;
 			
 	CAN_cmd_gimbal(-chassis_move_balance.wheel_motor[1].given_current,0,shoot_can_set_current,0);  //足电机和拨弹轮电机控制
-	osDelay(CHASSL_TIME);	
+	osDelay(CHASSL_TIME);
 ////		
 //		
 //		mit_ctrl(&hcan2,0x08, 0.0f, 0.0f,0.0f, 0.0f,0.0f);//left.torque_set[1]
@@ -135,7 +132,6 @@ void ChassisL_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legl)
     const static float legl_pid[3] = 
 	                                // {0,0,0};
 	                                {250, LEG_PID_KI,LEG_PID_KD};
-	static const fp32 Trigger_speed_pid[3] = {TRIGGER_ANGLE_PID_KP, TRIGGER_ANGLE_PID_KI, TRIGGER_ANGLE_PID_KD};
 
 	joint_motor_init(&chassis->joint_motor[2],6,MIT_MODE);//发送id为6
 	joint_motor_init(&chassis->joint_motor[3],8,MIT_MODE);//发送id为8
@@ -145,7 +141,6 @@ void ChassisL_init(chassis_t *chassis,vmc_leg_t *vmc,pid_type_def *legl)
 	PID_init(legl, PID_POSITION,legl_pid, LEG_PID_MAX_OUT, LEG_PID_MAX_IOUT);//初始化腿部pid
 
      //拨弹轮PID初始化
-    PID_init(&shoot_control.trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
  
 	//使能关节电机
 	for(int j=0;j<10;j++)
@@ -176,18 +171,17 @@ void chassisL_feedback_update(chassis_t *chassis,vmc_leg_t *vmc,INS_t *ins)
 	chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd+HALF_ECD_RANGE,0);     //获取相对角度值
 //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 	
-	static fp32 speed_fliter_1 = 0.0f;
-    static fp32 speed_fliter_2 = 0.0f;
-    static fp32 speed_fliter_3 = 0.0f;
+	// static fp32 speed_fliter_1 = 0.0f;
+    // static fp32 speed_fliter_2 = 0.0f;
+    // static fp32 speed_fliter_3 = 0.0f;
 
-    //拨弹轮电机速度滤波一下
-    static const fp32 fliter_num[3] = {1.725709860247969f, -0.75594777109163436f, 0.030237910843665373f};
+    // //拨弹轮电机速度滤波一下
+    // static const fp32 fliter_num[3] = {1.725709860247969f, -0.75594777109163436f, 0.030237910843665373f};
 
-	speed_fliter_1 = speed_fliter_2;
-    speed_fliter_2 = speed_fliter_3;
-    speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (chassis->wheel_motor[3].speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
-    shoot_control.speed = speed_fliter_3;   //拨弹轮电机速度
-	
+	// speed_fliter_1 = speed_fliter_2;
+    // speed_fliter_2 = speed_fliter_3;
+    // speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (chassis->wheel_motor[3].speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
+    // shoot_control.speed = speed_fliter_3;   //拨弹轮电机速度
 }
 
 uint8_t pre_left_flag=0;
@@ -231,7 +225,7 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 ////						+LQR_K[9]*(0.4f*chassis->v_set-chassis->v_filter2)
 //						+LQR_K[10]*(chassis->myPithL-(-0.01025f))
 //						+LQR_K[11]*(chassis->myPithGyroL-0.01f));	
-   
+
     // chassis->wheel_motor[0].wheel_T =   0;
 	chassis->wheel_motor[1].wheel_T=   ( LQR_K[0]*(vmcl->theta+theat_set)
 	                                    +LQR_K[1]*(vmcl->d_theta-0.0f)
@@ -266,24 +260,25 @@ void chassisL_control_loop(chassis_t *chassis,vmc_leg_t *vmcl,INS_t *ins,float *
 		mySaturate(&chassis->wheel_motor[1].wheel_T,-4.2f,4.2f);
 		if(chassis->help_jump_flag ==1)
 		{
-		if(chassis->jump_flag_l==1)
-		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+			if(chassis->jump_flag_l==1)
+			{
+				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+			}
+			else if(chassis->jump_flag_l==3)
+			{
+				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set)*0.8f;
+			}
+			else if(chassis->jump_flag_l==0)
+			{
+				vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc_1(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
+			}		
+			else
+			{
+				vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set);
+			}
 		}
-		else if(chassis->jump_flag_l==3)
-		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set)*0.8f;
-		}
-		else if(chassis->jump_flag_l==0)
-		{
-			vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc_1(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;
-		}		
 		else
 		{
-			vmcl->F0=jumpF0_L/arm_cos_f32(vmcl->theta)+PID_calc_1(&jump_pid_L,vmcl->L0,chassis->leg_set);
-		}
-		}
-		else{
 			vmcl->F0=17.2f/arm_cos_f32(vmcl->theta)+PID_calc_1(leg,vmcl->L0,chassis->leg_set)+chassis->roll_f0;//前馈+pd	
 		}
 		

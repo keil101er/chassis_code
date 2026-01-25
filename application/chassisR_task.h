@@ -24,7 +24,12 @@
 
 #define CHASSIS_FRONT_KEY KEY_PRESSED_OFFSET_W
 #define CHASSIS_BACK_KEY KEY_PRESSED_OFFSET_S
-
+#define CHASSIS_LEFT_KEY KEY_PRESSED_OFFSET_A
+#define CHASSIS_RIGHT_KEY KEY_PRESSED_OFFSET_D
+#define CHASSIS_SPIN_KEY KEY_PRESSED_OFFSET_R
+#define CHASSIS_LEG_UP_KEY KEY_PRESSED_OFFSET_Z
+#define CHASSIS_LEG_DOWN_KEY KEY_PRESSED_OFFSET_X
+#define CHASSIS_JUMP_KEY KEY_PRESSED_OFFSET_SHIFT
 #define CHASSIS_LEG_KEY KEY_PRESSED_OFFSET_CTRL 
 
 //reducation of 3508 motor
@@ -279,7 +284,7 @@ extern void chassisR_control_loop(chassis_t *chassis,vmc_leg_t *vmcr,INS_t *ins,
 extern void chassis_recover(chassis_t *chassis,vmc_leg_t *vmc,INS_t *ins,float *LQR_K,pid_type_def *leg);
 extern uint8_t recover_detect(chassis_t *chassis);
 extern void control_motor(chassis_t *chassis );
-
+extern uint8_t key_press_r(uint16_t key);
 #endif
 
 

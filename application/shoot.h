@@ -41,9 +41,9 @@
 //射击完成后 子弹弹出去后，判断时间，以防误触发
 #define SHOOT_DONE_KEY_OFF_TIME     15
 //鼠标长按判断
-#define PRESS_LONG_TIME             1
+#define PRESS_LONG_TIME             100
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
-#define RC_S_LONG_TIME              2000
+#define RC_S_LONG_TIME              150
 //摩擦轮高速 加速 时间
 #define UP_ADD_TIME                 80
 //电机反馈码盘值范围
@@ -56,7 +56,7 @@
 // m/s  diameter 60mm
 #define FRIC_RPM_TO_SPEED           0.00314159265358793f
 //拨弹速度
-#define TRIGGER_SPEED               (15.0f)
+#define TRIGGER_SPEED               (-20.0f)
 #define CONTINUE_TRIGGER_SPEED      (10.0f)
 #define READY_TRIGGER_SPEED         (20.0f)
 
@@ -71,23 +71,31 @@
 
 //卡弹时间 以及反转时间
 #define BLOCK_TRIGGER_SPEED         1.5f
-#define BLOCK_TIME                  200
-#define REVERSE_TIME                300
+#define BLOCK_TIME                  300
+#define REVERSE_TIME                400
 #define REVERSE_SPEED_LIMIT         13.0f
 
 #define PI_FOUR                     0.78539816339744830961566084581988f
-#define PI_TEN                      0.314f
+#define PI_TEN                      0.6f
 
-//拨弹轮电机PID
-#define TRIGGER_ANGLE_PID_KP        1000.0f
-#define TRIGGER_ANGLE_PID_KI        0.10f
-#define TRIGGER_ANGLE_PID_KD        0.0f
+//拨弹轮电机角度PID
+#define TRIGGER_ANGLE_PID_KP        10.0f
+#define TRIGGER_ANGLE_PID_KI        0.0f
+#define TRIGGER_ANGLE_PID_KD        1.0f
 
-#define TRIGGER_BULLET_PID_MAX_OUT  10000.0f
-#define TRIGGER_BULLET_PID_MAX_IOUT 500.0f
+//拨弹轮电机速度PID
+#define TRIGGER_SPEED_PID_KP        60.0f
+#define TRIGGER_SPEED_PID_KI        0.3f
+#define TRIGGER_SPEED_PID_KD        0.0f
 
-#define TRIGGER_READY_PID_MAX_OUT   16000.0f
-#define TRIGGER_READY_PID_MAX_IOUT  400.0f
+#define TRIGGER_BULLET_PID_MAX_OUT  9000.0f
+#define TRIGGER_BULLET_PID_MAX_IOUT 2000.0f
+
+#define TRIGGER_READY_PID_MAX_OUT   9000.0f
+#define TRIGGER_READY_PID_MAX_IOUT  2000.0f
+
+#define TRIGGER_ANGLE_PID_MAX_OUT  10.0f
+#define TRIGGER_ANGLE_PID_MAX_IOUT 1.0f
 
 #define FRIC_SPEED_PID_KP        6000.0f
 #define FRIC_SPEED_PID_KI        18.0f
@@ -137,6 +145,7 @@ typedef struct
 //    uint16_t fric_pwm1;
 //    ramp_function_source_t fric2_ramp;
 //    uint16_t fric_pwm2;
+    pid_type_def trigger_Angle_pid;
     pid_type_def trigger_motor_pid;
 	pid_type_def fric_motor_L_pid;
     pid_type_def fric_motor_R_pid;
@@ -148,6 +157,7 @@ typedef struct
     fp32 fricR_speed;
 	fp32 fric_set;
     fp32 angle;
+    fp32 pre_filter_angle;
     fp32 set_angle;
     int16_t given_current;
 	int16_t fric_l_current;

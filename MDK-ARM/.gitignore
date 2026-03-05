@@ -1,0 +1,35 @@
+# dot files
+/.vscode/launch.json
+/.settings
+/.eide/log
+/.eide.usr.ctx.json
+
+# project out
+/build
+/bin
+/obj
+/out
+
+# eide template
+*.ept
+*.eide-template
+*.svd
+
+# Keil & Pack files
+.pack/
+RTE_Components.h
+
+# Log files
+.vscode/*.log
+.vscode/*.log.lock
+
+# Object and temp files
+*.o
+*.d
+*.crf
+*.lst
+*.map
+*.dep
+
+# Agent temp files
+tmpclaude-*

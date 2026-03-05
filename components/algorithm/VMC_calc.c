@@ -52,7 +52,7 @@ void VMC_calc_1_right(vmc_leg_t *vmc,INS_t *ins,float dt)//计算theta和d_theta
 		vmc->last_phi0=vmc->phi0 ;
     
 		vmc->d_L0=(vmc->L0-vmc->last_L0)/dt;//腿长L0的一阶导数
-    vmc->dd_L0=(vmc->d_L0-vmc->last_d_L0)/dt;//腿长L0的二阶导数
+    	vmc->dd_L0=(vmc->d_L0-vmc->last_d_L0)/dt;//腿长L0的二阶导数
 		
 		vmc->last_d_L0=vmc->d_L0;
 		vmc->last_L0=vmc->L0;
@@ -131,15 +131,19 @@ void VMC_calc_2(vmc_leg_t *vmc)//计算期望的关节输出力矩
 //右腿离地检测
 float averr[4]={0.0f};
 float aver_fnr=0.0f;
-float dd_zw=0.0f;
+float dd_zwR=0.0f;
 float fn[4]={0.0f};
 float aver_fn=0.0f;
+float  W_aR=0.0f;
+
 uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins)
 {
 //	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0
 //+4.842f*(ins->MotionAccel_n[2]-vmc->dd_L0*arm_cos_f32(vmc->theta)+2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta));
-	//dd_zw=ins->MotionAccel_n[2]-vmc->dd_L0*arm_cos_f32(vmc->theta)+2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta);
- 	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0+4.745f;
+	 dd_zwR=ins->MotionAccel_n[2] - vmc->dd_L0*arm_cos_f32(vmc->theta) + 2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta);
+ 	 W_aR=0.4842f*dd_zwR;
+	//vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0+4.745f;
+	vmc->FN=5.4f*(vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0)+4.745f+W_aR;
 	// fn[0]=fn[1];
 	// fn[1]=fn[2];
 	// fn[2]=fn[3];
@@ -153,7 +157,7 @@ uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins)
 	averr[3]=vmc->FN;
 	aver_fnr=0.25f*averr[0]+0.25f*averr[1]+0.25f*averr[2]+0.25f*averr[3];//对支持力进行均值滤波
 	
-	if(aver_fnr<9.0f)
+	if(aver_fnr<17.0f)
 	{
 
 	  return 1;  //离地了
@@ -167,6 +171,8 @@ uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins)
 //左腿离地检测
 float averl[4]={0.0f};
 float aver_fnl=0.0f;
+float dd_zwL=0.0f;
+float  W_aL=0.0f;
 uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins)
 {
 //	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0
@@ -174,8 +180,9 @@ uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins)
 //	+2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta)
 //	+vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta)
 //	+vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta));
-	
-	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0+4.842f;
+	dd_zwL=ins->MotionAccel_n[2] - vmc->dd_L0*arm_cos_f32(vmc->theta) + 2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta);
+ 	W_aL=0.4842f*dd_zwL;
+	vmc->FN=5.4f*(vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0)+4.745f+W_aL;
 	averl[0]=averl[1];
 	averl[1]=averl[2];
 	averl[2]=averl[3];
@@ -183,7 +190,7 @@ uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins)
 	
 	aver_fnl=0.25f*averl[0]+0.25f*averl[1]+0.25f*averl[2]+0.25f*averl[3];//对支持力进行均值滤波
 	
-	if(aver_fnl<9.0f)
+	if(aver_fnl<17.0f)
 	{//离地了
 	  return 1;
 	}

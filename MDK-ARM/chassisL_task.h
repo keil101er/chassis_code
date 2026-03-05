@@ -12,7 +12,10 @@
 //电机编码值转化成角度值
 #ifndef MOTOR_ECD_TO_RAD
 #define MOTOR_ECD_TO_RAD 0.000766990394f //      2*  PI  /8192
-#endif
+
+#define  CHASSIS_X_LEFT_COMPENSATION 0.22f  //左边底盘x轴位置补偿
+
+
 //reducation of 3508 motor
 //m3508电机的减速比
 #define M3508_MOTOR_REDUCATION 15.764705882f
@@ -35,7 +38,7 @@
 //#define TRIGGER_ANGLE_PID_KP        500.0f
 //#define TRIGGER_ANGLE_PID_KI        0.03f
 //#define TRIGGER_ANGLE_PID_KD        0.0f
-
+#endif
 
 
 

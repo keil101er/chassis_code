@@ -79,3 +79,5 @@ chassis_task\test_task.o: ../bsp/boards/bsp_rc.h
 chassis_task\test_task.o: ..\application\CAN_receive.h
 chassis_task\test_task.o: ../components/algorithm/user_lib.h
 chassis_task\test_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+chassis_task\test_task.o: ..\application\shoot.h
+chassis_task\test_task.o: ..\application\gimbal_task.h

@@ -84,3 +84,4 @@ chassis_task\shoot.o: ../components/algorithm/kalman_filter.h
 chassis_task\shoot.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 chassis_task\shoot.o: ../MDK-ARM/chassisL_task.h
 chassis_task\shoot.o: ../MDK-ARM/dm_8009_drv.h
+chassis_task\shoot.o: ../bsp/boards/CANdata_analysis.h

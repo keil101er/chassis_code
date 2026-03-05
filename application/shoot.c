@@ -28,6 +28,7 @@
 #include "pid.h"
 #include "chassisR_task.h"
 #include "chassisL_task.h"
+#include "CANdata_analysis.h"
 
 #define shoot_fric_off()    fric_off()      //关闭两个摩擦轮
 #define shoot_laser_on()    laser_on()      //激光开启宏定义
@@ -46,8 +47,9 @@ shoot_control_t shoot_control;          //射击数据
 extern power_heat_data_t power_heat_data_t1;
 //**************裁判系统数据获取*****************************************
 extern robot_status_t robot_state;
-
-
+//云台数据获取
+extern c_fbpara_t C_data;
+extern float gimbal_mode;
 
 
 extern chassis_t chassis_move_balance;
@@ -85,6 +87,8 @@ void shoot_init(void)
     shoot_control.key = 0;
 
     SHOOT_ON_KEYBOARD;
+    shoot_control.fire_mode = FIRE_STOP;
+    shoot_control.shoot_send_flag = 0;
 }
 
 // 射击数据更新
@@ -239,31 +243,9 @@ static void shoot_set_mode(void)
 		        shoot_control.shoot_mode = 2;//单发 Single shot
                 shoot_control.rc_s_time=0;
             } 
-		    last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL];//存储遥控器上一次的状态
         }
 				
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//q键按下一下开启
-    if(RC_KEY_flag)
-    {
-	    if ((shoot_control.shoot_rc->key.v & SHOOT_ON_KEYBOARD) && 
-            !(shoot_control.last_key & SHOOT_ON_KEYBOARD)) 
-        {
-        
-	    	shoot_control.fire_mode = FIREING;  //射击 //开摩擦轮
-	    	shoot_control.shoot_send_flag = 1;
-        
-        }
-        //e键按下一下关闭
-        if ((shoot_control.shoot_rc->key.v & SHOOT_OFF_KEYBOARD) && 
-            !(shoot_control.last_key & SHOOT_OFF_KEYBOARD)) 
-        {
-	        shoot_control.fire_mode = FIRE_STOP; //停止射击
-	    	shoot_control.shoot_send_flag = 0;   
-	    }
-    }
-    else
-    {
     //上拨判断， 一次开启，再次关闭
 	//波上去一次
         if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.fire_mode == FIRE_STOP) )
@@ -278,9 +260,27 @@ static void shoot_set_mode(void)
         //shoot_control.shoot_mode = SHOOT_STOP;
 	        shoot_control.fire_mode = FIRE_STOP; //停止射击
 	    	shoot_control.shoot_send_flag = 0;
-        }   
-    }
+        } 
+        if(RC_KEY_flag)
+        {
+        //q键按下一下开启
+	    if ((shoot_control.shoot_rc->key.v & SHOOT_ON_KEYBOARD) && 
+            !(shoot_control.last_key & SHOOT_ON_KEYBOARD)) 
+            {
+	    	    shoot_control.fire_mode = FIREING;  //射击 //开摩擦轮
+	    	    shoot_control.shoot_send_flag = 1;
+        
+            }
+        //e键按下一下关闭
+        if ((shoot_control.shoot_rc->key.v & SHOOT_OFF_KEYBOARD) && 
+            !(shoot_control.last_key & SHOOT_OFF_KEYBOARD)) 
+            {
+	            shoot_control.fire_mode = FIRE_STOP; //停止射击
+	    	    shoot_control.shoot_send_flag = 0;   
+	        }
+        }
 	 // 保存按键状态
+    last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL];//存储遥控器上一次的状态
     shoot_control.last_key = shoot_control.shoot_rc->key.v; 		
 				
 	/////////////////////////////////////////////////////////////////////////////////
@@ -343,6 +343,7 @@ int16_t shoot_control_loop(void)
     {
         shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
 	    shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
+        //键鼠模式
         if(RC_KEY_flag)
         {
             if(shoot_control.press_l)
@@ -387,7 +388,8 @@ int16_t shoot_control_loop(void)
         }
         if( shoot_single_flag==1)
         {
-            if (((fabs(rad_format(shoot_control.set_angle-shoot_control.angle))>0.05f)||fabs(shoot_control.speed)>0.5f)&& shoot_single_cnt<1500)
+           // if (((fabs(rad_format(shoot_control.set_angle-shoot_control.angle))>0.05f)||fabs(shoot_control.speed)>0.5f)&& shoot_single_cnt<1500)
+           if (fabs(rad_format(shoot_control.set_angle-shoot_control.angle))>0.05f&& shoot_single_cnt<1500)
             {
                 shoot_single_cnt++;
                 //没到达一直设置旋转角度
@@ -408,8 +410,22 @@ int16_t shoot_control_loop(void)
             }
         }
     }
-	
-	   get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
+    //自瞄模式控制开火
+	// if(C_data.MODE==1&&gimbal_mode==2)
+    // {
+    //     shoot_control.speed_set = -20;  //拨弹盘准备速度
+	//     trigger_motor_turn_back();
+    //     //计算拨弹轮电机PID
+    //     PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+    //     shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+    // }
+    // else if(C_data.MODE==0&&gimbal_mode==2)
+    // {
+    //     shoot_control.shoot_mode=0;
+    //     shoot_control.given_current = 0;
+    //     shoot_control.speed_set =0.0f;
+    // }
+	get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
 
 	//暂时注释
 	//     if ((power_heat_data_t1.shooter_17mm_1_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit)) 

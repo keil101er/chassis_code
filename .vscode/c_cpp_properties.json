@@ -8,7 +8,12 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "USE_HAL_DRIVER",
+                "STM32F407xx",
+                "__CC_ARM",
+                "__weak=__attribute__((weak))",
+                "__packed=__attribute__((__packed__))"
             ],
             "compilerPath": "E:\\LLVM\\bin\\clang.exe",
             "cStandard": "c17",

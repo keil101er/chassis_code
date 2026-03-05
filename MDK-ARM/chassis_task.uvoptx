@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>4</nTsel>
+        <nTsel>3</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -114,7 +114,7 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>Segger\JL2CM3.dll</pMon>
+        <pMon>BIN\CMSIS_AGDI.dll</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
@@ -158,329 +158,276 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>INS</ItemText>
+          <ItemText>chassis_move_balance.wheel_motor[1].wheel_T</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right</ItemText>
+          <ItemText>chassis_move_balance.wheel_motor[0].wheel_T</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left</ItemText>
+          <ItemText>chassis_move_balance.roll_set</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.torque_set</ItemText>
+          <ItemText>TP_PID_KP</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.torque_set</ItemText>
+          <ItemText>right.FN</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance,0x0A</ItemText>
+          <ItemText>left.FN</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.x</ItemText>
+          <ItemText>aver_fnl</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.v</ItemText>
+          <ItemText>chassis_move_balance.roll_f0</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.wheel_motor[1].wheel_T</ItemText>
+          <ItemText>chassis_move_balance.roll</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.wheel_motor[0].wheel_T</ItemText>
+          <ItemText>chassis_move_balance.roll_set</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.roll_set</ItemText>
+          <ItemText>right.F0</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TP_PID_KP</ItemText>
+          <ItemText>left.F0</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.FN</ItemText>
+          <ItemText>LegR_Pid.fdb</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.FN</ItemText>
+          <ItemText>LegL_Pid.fdb</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>aver_fnl</ItemText>
+          <ItemText>right.L0</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.roll_f0</ItemText>
+          <ItemText>left.L0</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.roll</ItemText>
+          <ItemText>chassis_move_balance.leg_set</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.roll_set</ItemText>
+          <ItemText>yaw_sen</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.F0</ItemText>
+          <ItemText>pitch_sen</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.F0</ItemText>
+          <ItemText>mode_rc</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LegR_Pid.fdb</ItemText>
+          <ItemText>yaw_value,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LegL_Pid.fdb</ItemText>
+          <ItemText>chassis_move_balance.yaw_motor_angle</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.L0</ItemText>
+          <ItemText>INS.Yaw</ItemText>
         </Ww>
         <Ww>
           <count>23</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.L0</ItemText>
+          <ItemText>chassis_move_balance.turn_T</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.leg_set</ItemText>
+          <ItemText>chassis_move_balance.relative_angle</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>1</WinNumber>
-          <ItemText>error_list,0x0A</ItemText>
+          <ItemText>right.theta</ItemText>
         </Ww>
         <Ww>
           <count>26</count>
           <WinNumber>1</WinNumber>
-          <ItemText>robot_state,0x0A</ItemText>
+          <ItemText>right.d_theta</ItemText>
         </Ww>
         <Ww>
           <count>27</count>
           <WinNumber>1</WinNumber>
-          <ItemText>yaw_sen</ItemText>
+          <ItemText>chassis_move_balance.x_filter</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pitch_sen</ItemText>
+          <ItemText>chassis_move_balance.x_set</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mode_rc</ItemText>
+          <ItemText>chassis_move_balance.v_set</ItemText>
         </Ww>
         <Ww>
           <count>30</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_send_data,0x0A</ItemText>
+          <ItemText>chassis_move_balance.v_filter2</ItemText>
         </Ww>
         <Ww>
           <count>31</count>
           <WinNumber>1</WinNumber>
-          <ItemText>yaw_value,0x0A</ItemText>
+          <ItemText>left.theta</ItemText>
         </Ww>
         <Ww>
           <count>32</count>
           <WinNumber>1</WinNumber>
-          <ItemText>\\chassis_task\../application/dm_8009_drv.c\chassis_send_data</ItemText>
+          <ItemText>left.d_theta</ItemText>
         </Ww>
         <Ww>
           <count>33</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.yaw_motor_angle</ItemText>
+          <ItemText>INS.Pitch</ItemText>
         </Ww>
         <Ww>
           <count>34</count>
           <WinNumber>1</WinNumber>
-          <ItemText>INS.Yaw</ItemText>
+          <ItemText>chassis_move_balance.v_filter</ItemText>
         </Ww>
         <Ww>
           <count>35</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.turn_T</ItemText>
+          <ItemText>Qz</ItemText>
         </Ww>
         <Ww>
           <count>36</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.relative_angle</ItemText>
+          <ItemText>chassis_move_balance.x</ItemText>
         </Ww>
         <Ww>
           <count>37</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Turn_Pid</ItemText>
+          <ItemText>chassis_move_balance.v</ItemText>
         </Ww>
         <Ww>
           <count>38</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Tp_Pid</ItemText>
+          <ItemText>LQR_K_R</ItemText>
         </Ww>
         <Ww>
           <count>39</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LegR_Pid</ItemText>
+          <ItemText>LQR_K_L</ItemText>
         </Ww>
         <Ww>
           <count>40</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LegL_Pid</ItemText>
+          <ItemText>motor_chassis</ItemText>
         </Ww>
         <Ww>
           <count>41</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.theta</ItemText>
+          <ItemText>shoot_can_set_current,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>42</count>
           <WinNumber>1</WinNumber>
-          <ItemText>right.d_theta</ItemText>
+          <ItemText>shoot_control,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>43</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.x_filter</ItemText>
+          <ItemText>motor_chassis</ItemText>
         </Ww>
         <Ww>
           <count>44</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.x_set</ItemText>
+          <ItemText>shoot_can_set_current,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>45</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.v_set</ItemText>
+          <ItemText>Wz_Pid</ItemText>
         </Ww>
         <Ww>
           <count>46</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.v_filter2</ItemText>
+          <ItemText>chassis_move_balance.Wz_set</ItemText>
         </Ww>
         <Ww>
           <count>47</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.theta</ItemText>
+          <ItemText>chassis_move_balance.relative_angle</ItemText>
         </Ww>
         <Ww>
           <count>48</count>
           <WinNumber>1</WinNumber>
-          <ItemText>left.d_theta</ItemText>
-        </Ww>
-        <Ww>
-          <count>49</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>INS.Pitch</ItemText>
-        </Ww>
-        <Ww>
-          <count>50</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.v_filter</ItemText>
-        </Ww>
-        <Ww>
-          <count>51</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Qz</ItemText>
-        </Ww>
-        <Ww>
-          <count>52</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.x</ItemText>
-        </Ww>
-        <Ww>
-          <count>53</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.v</ItemText>
-        </Ww>
-        <Ww>
-          <count>54</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LQR_K_R</ItemText>
-        </Ww>
-        <Ww>
-          <count>55</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LQR_K_L</ItemText>
-        </Ww>
-        <Ww>
-          <count>56</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>motor_chassis</ItemText>
-        </Ww>
-        <Ww>
-          <count>57</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>shoot_can_set_current,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>58</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>shoot_control,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>59</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>motor_chassis</ItemText>
-        </Ww>
-        <Ww>
-          <count>60</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>shoot_can_set_current,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>61</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Wz_Pid</ItemText>
-        </Ww>
-        <Ww>
-          <count>62</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.Wz_set</ItemText>
-        </Ww>
-        <Ww>
-          <count>63</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>chassis_move_balance.relative_angle</ItemText>
-        </Ww>
-        <Ww>
-          <count>64</count>
-          <WinNumber>1</WinNumber>
           <ItemText>\\chassis_task\../application/chassisR_task.c\chassis_move_balance.roll_f0</ItemText>
         </Ww>
       </WatchWindow1>
+      <WatchWindow2>
+        <Ww>
+          <count>0</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>chassis_move_balance</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>INS</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>a_x[4]</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>a_x[0]</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>C_data</ItemText>
+        </Ww>
+      </WatchWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
@@ -987,7 +934,7 @@
 
   <Group>
     <GroupName>application</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1151,7 +1098,7 @@
 
   <Group>
     <GroupName>devices</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

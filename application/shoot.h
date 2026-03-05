@@ -76,23 +76,23 @@
 #define REVERSE_SPEED_LIMIT         13.0f
 
 #define PI_FOUR                     0.78539816339744830961566084581988f
-#define PI_TEN                      0.6f
+#define PI_TEN                      0.4f
 
 //拨弹轮电机角度PID
-#define TRIGGER_ANGLE_PID_KP        10.0f
+#define TRIGGER_ANGLE_PID_KP        15.0f
 #define TRIGGER_ANGLE_PID_KI        0.0f
 #define TRIGGER_ANGLE_PID_KD        1.0f
 
 //拨弹轮电机速度PID
-#define TRIGGER_SPEED_PID_KP        60.0f
-#define TRIGGER_SPEED_PID_KI        0.3f
+#define TRIGGER_SPEED_PID_KP        100.0f
+#define TRIGGER_SPEED_PID_KI        0.5f
 #define TRIGGER_SPEED_PID_KD        0.0f
 
 #define TRIGGER_BULLET_PID_MAX_OUT  9000.0f
-#define TRIGGER_BULLET_PID_MAX_IOUT 2000.0f
+#define TRIGGER_BULLET_PID_MAX_IOUT 6000.0f
 
 #define TRIGGER_READY_PID_MAX_OUT   9000.0f
-#define TRIGGER_READY_PID_MAX_IOUT  2000.0f
+#define TRIGGER_READY_PID_MAX_IOUT  6000.0f
 
 #define TRIGGER_ANGLE_PID_MAX_OUT  10.0f
 #define TRIGGER_ANGLE_PID_MAX_IOUT 1.0f

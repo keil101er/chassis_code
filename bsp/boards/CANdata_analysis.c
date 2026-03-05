@@ -22,14 +22,19 @@ void C_fbdata(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len)
 	}
 }
 
-
 void C_fbdata1(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len)
 { 
 	if(data_len==8)
 	{
-
-	  int16_t compressed_data = (int16_t)((rx_data[0] << 8) | rx_data[1]);
-	  motor->received_upyaw = ((float)compressed_data / 32767.0f) * FLOAT_MAX;	
+		int16_t compressed_data = (int16_t)((rx_data[0] << 8) | rx_data[1]);
+		motor->received_upyaw = ((float)compressed_data / 32767.0f) * FLOAT_MAX;	
 		
+	}
+}
+void C_fbdata2(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len)
+{ 
+	if(data_len==8)
+	{	
+		motor->MODE=rx_data[0];
 	}
 }

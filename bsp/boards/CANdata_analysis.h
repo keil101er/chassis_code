@@ -15,8 +15,13 @@ typedef struct
 	uint8_t  received_v;
 }c_fbpara_t;
 
+
+
+
+
 extern c_fbpara_t  C_data;
 
 extern void C_fbdata(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len);
 extern void C_fbdata1(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len);
+extern void C_fbdata2(c_fbpara_t *motor, uint8_t *rx_data,uint32_t data_len);
 #endif

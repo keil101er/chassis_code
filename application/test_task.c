@@ -37,13 +37,13 @@ extern vmc_leg_t left;
 extern uint8_t jump_status;
 extern uint8_t land_flag;
 extern float aver_fnr;
-extern float aver_fn;
+extern float aver_fnl;
 float F_r=0,F_l=0;
 extern float theat_set;
 extern int16_t shoot_can_set_current;
 extern shoot_control_t shoot_control;  
 extern float relative_angle;
-
+extern float  W_a;
 
 // STP-23激光测距传感器接收相关变量 / STP-23 Laser Sensor Receive Variables
 uint8_t STP23_Receive_buf[1];                    // USART1接收中断数据缓冲区 / USART1 Receive Buffer
@@ -70,6 +70,7 @@ uint16_t stp23_timestamp = 0;                    // 时间戳(ms) / Timestamp
  //蓝牙调试信息输出任务 Bluetooth debugging information output task
  void Buletooth_debug_task(void)
 {
+    // sprintf(debug_info,"%.2f,%.2f\n",aver_fnr,aver_fnl);
     sprintf(debug_info,"%d,%.2f,%.2f,%.2f,%.2f,%.2f\n",shoot_can_set_current,shoot_control.speed,shoot_control.speed_set,shoot_control.angle,shoot_control.set_angle,relative_angle);
     //sprintf(debug_info,"%.2f,%.2f\n",left.theta,right.theta);
     //  sprintf(debug_info,"%.2f,%.2f,%.2f,%.2f\n",chassis_move_balance.v_filter2,chassis_move_balance.x_set,chassis_move_balance.x_filter,theat_set);
@@ -91,7 +92,7 @@ void test_task(void const * argument)
     static uint8_t error, last_error;
     static uint8_t error_num;
     error_list_test_local = get_error_list_point();
-//    HAL_UART_Receive_IT(&huart1,STP23_Receive_buf,sizeof(STP23_Receive_buf));
+    HAL_UART_Receive_IT(&huart1,STP23_Receive_buf,sizeof(STP23_Receive_buf));
     while(1)
     {
         error = 0;
@@ -120,7 +121,7 @@ void test_task(void const * argument)
         }
 
         last_error = error;
-        Buletooth_debug_task();
+       // Buletooth_debug_task();
         osDelay(10);
     }
 }
@@ -170,13 +171,13 @@ static void buzzer_warn_error(uint8_t num)
     }
 }
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-    //发送完成置标志位
-    if (huart==&huart1){ // 检查是否是我们关心的UART
-        Txcplt_flag=1;
-    }
-}
+// void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+// {
+//     //发送完成置标志位
+//     if (huart==&huart1){ // 检查是否是我们关心的UART
+//         Txcplt_flag=1;
+//     }
+// }
 
 // CRC8校验表 / CRC8 Checksum Table
 static const uint8_t CrcTable[256] = {
@@ -220,152 +221,152 @@ uint8_t CalCRC8(uint8_t *p, uint8_t len)
   * @param[in]      huart: UART句柄 / UART Handle
   * @retval         none
   */
-// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-// {
-//     static uint8_t state = 0;       // 状态位 / State
-//     static uint8_t crc = 0;         // CRC校验值 / CRC Value
-//     static uint8_t cnt = 0;         // 统计一帧12个点的计数 / Count for 12 points in one frame
-//     uint8_t temp_data;
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    static uint8_t state = 0;       // 状态位 / State
+    static uint8_t crc = 0;         // CRC校验值 / CRC Value
+    static uint8_t cnt = 0;         // 统计一帧12个点的计数 / Count for 12 points in one frame
+    uint8_t temp_data;
 
-//     // USART1 - STP-23激光测距传感器数据接收 / STP-23 Laser Sensor Data Reception
-//     if(huart->Instance == USART1)
-//     {
-//         temp_data = STP23_Receive_buf[0];
+    // USART1 - STP-23激光测距传感器数据接收 / STP-23 Laser Sensor Data Reception
+    if(huart->Instance == USART1)
+    {
+        temp_data = STP23_Receive_buf[0];
 
-//         // 解析状态机 / State Machine for Parsing
-//         if(state > 5)  // 数据点解析(state 6-41) / Parse measurement points
-//         {
-//             if(state < 42)  // 12个点,每个点3字节 / 12 points, 3 bytes each
-//             {
-//                 if(state % 3 == 0)  // 距离值低字节 / Distance LSB
-//                 {
-//                     STP23_Pack_Data.point[cnt].distance = (uint16_t)temp_data;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                 }
-//                 else if(state % 3 == 1)  // 距离值高字节 / Distance MSB
-//                 {
-//                     STP23_Pack_Data.point[cnt].distance = ((uint16_t)temp_data << 8) + STP23_Pack_Data.point[cnt].distance;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                 }
-//                 else  // 信号强度 / Intensity
-//                 {
-//                     STP23_Pack_Data.point[cnt].intensity = temp_data;
-//                     cnt++;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                 }
-//             }
-//             else  // 结束角度、时间戳、CRC校验 / End Angle, Timestamp, CRC
-//             {
-//                 switch(state)
-//                 {
-//                     case 42:  // 结束角度低字节 / End Angle LSB
-//                         STP23_Pack_Data.end_angle = (uint16_t)temp_data;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                         break;
+        // 解析状态机 / State Machine for Parsing
+        if(state > 5)  // 数据点解析(state 6-41) / Parse measurement points
+        {
+            if(state < 42)  // 12个点,每个点3字节 / 12 points, 3 bytes each
+            {
+                if(state % 3 == 0)  // 距离值低字节 / Distance LSB
+                {
+                    STP23_Pack_Data.point[cnt].distance = (uint16_t)temp_data;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                }
+                else if(state % 3 == 1)  // 距离值高字节 / Distance MSB
+                {
+                    STP23_Pack_Data.point[cnt].distance = ((uint16_t)temp_data << 8) + STP23_Pack_Data.point[cnt].distance;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                }
+                else  // 信号强度 / Intensity
+                {
+                    STP23_Pack_Data.point[cnt].intensity = temp_data;
+                    cnt++;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                }
+            }
+            else  // 结束角度、时间戳、CRC校验 / End Angle, Timestamp, CRC
+            {
+                switch(state)
+                {
+                    case 42:  // 结束角度低字节 / End Angle LSB
+                        STP23_Pack_Data.end_angle = (uint16_t)temp_data;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                        break;
 
-//                     case 43:  // 结束角度高字节 / End Angle MSB
-//                         STP23_Pack_Data.end_angle = ((uint16_t)temp_data << 8) + STP23_Pack_Data.end_angle;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                         break;
+                    case 43:  // 结束角度高字节 / End Angle MSB
+                        STP23_Pack_Data.end_angle = ((uint16_t)temp_data << 8) + STP23_Pack_Data.end_angle;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                        break;
 
-//                     case 44:  // 时间戳低字节 / Timestamp LSB
-//                         STP23_Pack_Data.timestamp = (uint16_t)temp_data;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                         break;
+                    case 44:  // 时间戳低字节 / Timestamp LSB
+                        STP23_Pack_Data.timestamp = (uint16_t)temp_data;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                        break;
 
-//                     case 45:  // 时间戳高字节 / Timestamp MSB
-//                         STP23_Pack_Data.timestamp = ((uint16_t)temp_data << 8) + STP23_Pack_Data.timestamp;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                         break;
+                    case 45:  // 时间戳高字节 / Timestamp MSB
+                        STP23_Pack_Data.timestamp = ((uint16_t)temp_data << 8) + STP23_Pack_Data.timestamp;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                        break;
 
-//                     case 46:  // CRC8校验 / CRC8 Checksum
-//                         STP23_Pack_Data.crc8 = temp_data;
-//                         if(STP23_Pack_Data.crc8 == crc)  // 校验成功 / CRC OK
-//                         {
-//                             STP23_Data_Process();  // 数据处理 / Data Processing
-//                             stp23_receive_cnt++;   // 成功接收计数 / Success Count
-//                         }
-//                         // 复位状态 / Reset State
-//                         crc = 0;
-//                         state = 0;
-//                         cnt = 0;
-//                         break;
+                    case 46:  // CRC8校验 / CRC8 Checksum
+                        STP23_Pack_Data.crc8 = temp_data;
+                        if(STP23_Pack_Data.crc8 == crc)  // 校验成功 / CRC OK
+                        {
+                            STP23_Data_Process();  // 数据处理 / Data Processing
+                            stp23_receive_cnt++;   // 成功接收计数 / Success Count
+                        }
+                        // 复位状态 / Reset State
+                        crc = 0;
+                        state = 0;
+                        cnt = 0;
+                        break;
 
-//                     default: break;
-//                 }
-//             }
-//         }
-//         else  // 协议头解析(state 0-5) / Parse header
-//         {
-//             switch(state)
-//             {
-//                 case 0:  // 起始符 0x54 / Header
-//                     if(temp_data == HEADER)
-//                     {
-//                         STP23_Pack_Data.header = temp_data;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     }
-//                     else
-//                     {
-//                         state = 0;
-//                         crc = 0;
-//                     }
-//                     break;
+                    default: break;
+                }
+            }
+        }
+        else  // 协议头解析(state 0-5) / Parse header
+        {
+            switch(state)
+            {
+                case 0:  // 起始符 0x54 / Header
+                    if(temp_data == HEADER)
+                    {
+                        STP23_Pack_Data.header = temp_data;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    }
+                    else
+                    {
+                        state = 0;
+                        crc = 0;
+                    }
+                    break;
 
-//                 case 1:  // 版本长度 0x2C / VerLen
-//                     if(temp_data == VERLEN)
-//                     {
-//                         STP23_Pack_Data.ver_len = temp_data;
-//                         state++;
-//                         crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     }
-//                     else
-//                     {
-//                         state = 0;
-//                         crc = 0;
-//                     }
-//                     break;
+                case 1:  // 版本长度 0x2C / VerLen
+                    if(temp_data == VERLEN)
+                    {
+                        STP23_Pack_Data.ver_len = temp_data;
+                        state++;
+                        crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    }
+                    else
+                    {
+                        state = 0;
+                        crc = 0;
+                    }
+                    break;
 
-//                 case 2:  // 温度值低字节 / Temperature LSB
-//                     STP23_Pack_Data.temperature = (uint16_t)temp_data;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     break;
+                case 2:  // 温度值低字节 / Temperature LSB
+                    STP23_Pack_Data.temperature = (uint16_t)temp_data;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    break;
 
-//                 case 3:  // 温度值高字节 / Temperature MSB
-//                     STP23_Pack_Data.temperature = ((uint16_t)temp_data << 8) + STP23_Pack_Data.temperature;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     break;
+                case 3:  // 温度值高字节 / Temperature MSB
+                    STP23_Pack_Data.temperature = ((uint16_t)temp_data << 8) + STP23_Pack_Data.temperature;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    break;
 
-//                 case 4:  // 起始角度低字节 / Start Angle LSB
-//                     STP23_Pack_Data.start_angle = (uint16_t)temp_data;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     break;
+                case 4:  // 起始角度低字节 / Start Angle LSB
+                    STP23_Pack_Data.start_angle = (uint16_t)temp_data;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    break;
 
-//                 case 5:  // 起始角度高字节 / Start Angle MSB
-//                     STP23_Pack_Data.start_angle = ((uint16_t)temp_data << 8) + STP23_Pack_Data.start_angle;
-//                     state++;
-//                     crc = CrcTable[(crc ^ temp_data) & 0xff];
-//                     break;
+                case 5:  // 起始角度高字节 / Start Angle MSB
+                    STP23_Pack_Data.start_angle = ((uint16_t)temp_data << 8) + STP23_Pack_Data.start_angle;
+                    state++;
+                    crc = CrcTable[(crc ^ temp_data) & 0xff];
+                    break;
 
-//                 default: break;
-//             }
-//         }
+                default: break;
+            }
+        }
 
-//         // 重新开启USART1接收中断 / Restart USART1 receive interrupt
-//         HAL_UART_Receive_IT(&huart1, STP23_Receive_buf, sizeof(STP23_Receive_buf));
-//     }
-// }
+        // 重新开启USART1接收中断 / Restart USART1 receive interrupt
+        HAL_UART_Receive_IT(&huart1, STP23_Receive_buf, sizeof(STP23_Receive_buf));
+    }
+}
 
 /**
   * @brief          STP-23数据处理函数(对12个点求平均) / STP-23 Data Processing (Average of 12 points)

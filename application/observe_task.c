@@ -47,8 +47,10 @@ extern INS_t INS;
 extern chassis_t chassis_move_balance;																 															 
 extern uint8_t Rc_flag;																 
 extern vmc_leg_t right;			
-extern vmc_leg_t left;	
+extern vmc_leg_t left;
 
+float v_l=0.0f;
+float v_r=0.0f;
 float vel_acc[2]; 
 uint32_t OBSERVE_TIME=3;//任务周期是3ms	
 																 
@@ -82,7 +84,9 @@ void observe_task(void)
 		pre_v=chassis_move_balance.v_filter2;
 		chassis_move_balance.v_filter = 
 		                                // aver_v;
-		                               ((chassis_move_balance.wheel_motor[0].vel) - (chassis_move_balance.wheel_motor[1].vel))*(0.0755f)/2 ;			
+		                               ((chassis_move_balance.wheel_motor[0].vel) - (chassis_move_balance.wheel_motor[1].vel))*(0.0755f)/2 ;
+		v_r=chassis_move_balance.wheel_motor[0].vel*0.0755f;
+		v_l=-chassis_move_balance.wheel_motor[1].vel*0.0755f;			
 		xvEstimateKF_Update(&vaEstimateKF,-INS.MotionAccel_b[0],chassis_move_balance.v_filter);
 			chassis_move_balance.v_filter2=vel_acc[0];//得到卡尔曼滤波后的速度
 			// if(chassis_move_balance.v_filter2<0.010f&&chassis_move_balance.v_filter2>-0.010f)

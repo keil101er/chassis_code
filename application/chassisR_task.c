@@ -437,16 +437,16 @@ void ChassisR_task(void)
 			RC_KEY_flag = 0;
 		}
 
-		if (chassis_move_balance.chassis_RC->rc.s[1] == 1)
-		{
+		// if (chassis_move_balance.chassis_RC->rc.s[1] == 1)
+		// {
 
-			fire_mode = 1;
-		}
-		if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
-		{
+		// 	fire_mode = 1;
+		// }
+		// if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		// {
 
-			fire_mode = 0;
-		}
+		// 	fire_mode = 0;
+		// }
 
 		// 板间通信
 		// if(chassis_move_balance.chassis_RC->rc.s[1] == 3)
@@ -469,7 +469,7 @@ void ChassisR_task(void)
 		{
 			gimbal_mode = 0;
 		}
-		else if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		else if (chassis_move_balance.chassis_RC->rc.s[1] == 3||chassis_move_balance.chassis_RC->mouse.press_r)
 		{
 			gimbal_mode = 2;
 		}

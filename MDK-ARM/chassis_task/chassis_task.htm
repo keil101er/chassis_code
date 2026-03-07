@@ -3,7 +3,7 @@
 <title>Static Call Graph - [chassis_task\chassis_task.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image chassis_task\chassis_task.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Mar 05 16:26:24 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Mar 07 13:29:21 2026
 <BR><P>
 <H3>Maximum Stack Usage =        384 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1013,7 +1013,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisL_task
 </UL>
 
-<P><STRONG><a name="[bd]"></a>ChassisL_task</STRONG> (Thumb, 356 bytes, Stack size 8 bytes, chassisl_task.o(i.ChassisL_task))
+<P><STRONG><a name="[bd]"></a>ChassisL_task</STRONG> (Thumb, 394 bytes, Stack size 8 bytes, chassisl_task.o(i.ChassisL_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 296<LI>Call Chain = ChassisL_task &rArr; chassisL_control_loop &rArr; VMC_calc_1_left &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -1049,7 +1049,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
-<P><STRONG><a name="[c9]"></a>ChassisR_task</STRONG> (Thumb, 2560 bytes, Stack size 16 bytes, chassisr_task.o(i.ChassisR_task))
+<P><STRONG><a name="[c9]"></a>ChassisR_task</STRONG> (Thumb, 2520 bytes, Stack size 16 bytes, chassisr_task.o(i.ChassisR_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 384<LI>Call Chain = ChassisR_task &rArr; chassisR_control_loop &rArr; chassis_power_control &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -3203,7 +3203,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[c6]"></a>shoot_control_loop</STRONG> (Thumb, 520 bytes, Stack size 24 bytes, shoot.o(i.shoot_control_loop))
+<P><STRONG><a name="[c6]"></a>shoot_control_loop</STRONG> (Thumb, 554 bytes, Stack size 24 bytes, shoot.o(i.shoot_control_loop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = shoot_control_loop &rArr; trigger_motor_turn_back &rArr; __aeabi_cdcmple
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PID_calc
@@ -4010,7 +4010,7 @@ Local Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shoot_control_loop
 </UL>
 
-<P><STRONG><a name="[210]"></a>shoot_feedback_update</STRONG> (Thumb, 408 bytes, Stack size 8 bytes, shoot.o(i.shoot_feedback_update))
+<P><STRONG><a name="[210]"></a>shoot_feedback_update</STRONG> (Thumb, 406 bytes, Stack size 8 bytes, shoot.o(i.shoot_feedback_update))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = shoot_feedback_update
 </UL>
 <BR>[Calls]<UL><LI><a href="#[19c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;loop_float_constrain
@@ -4018,7 +4018,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shoot_control_loop
 </UL>
 
-<P><STRONG><a name="[20f]"></a>shoot_set_mode</STRONG> (Thumb, 312 bytes, Stack size 0 bytes, shoot.o(i.shoot_set_mode))
+<P><STRONG><a name="[20f]"></a>shoot_set_mode</STRONG> (Thumb, 218 bytes, Stack size 0 bytes, shoot.o(i.shoot_set_mode))
 <BR><BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;shoot_control_loop
 </UL>
 

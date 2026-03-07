@@ -52,7 +52,7 @@ uint32_t CHASSL_TIME = 1;
 int16_t shoot_can_set_current;
 
 extern uint16_t k_shift;
-
+extern float gimbal_mode;
 
 
 void ChassisL_task(void)
@@ -76,9 +76,14 @@ void ChassisL_task(void)
 
 		shoot_can_set_current = shoot_control_loop();								   // 拨弹轮电机控制循环，返回shoot_can_set_current拨弹轮电机电流,暂时关闭
 		chassisL_control_loop(&chassis_move_balance, &left, &INS, LQR_K_L, &LegL_Pid); // 控制计算
-		//		shoot_can_set_current = shoot_control_loop();        //射击任务控制循环，fire_key有
 		//
 		//
+		if(gimbal_mode==2)
+		{
+			CAN_cmd_gimbal(0, 0, shoot_can_set_current, 0);
+		}
+		else
+		{
 		if (chassis_move_balance.start_flag == 1)
 		{
 
@@ -114,6 +119,7 @@ void ChassisL_task(void)
 			CAN_cmd_gimbal(0, 0, 0, 0);
 			osDelay(CHASSL_TIME);
 		}
+	 }
 
 		//		if(chassis_move_balance.start_flag==1)	{
 		////测试
@@ -125,7 +131,7 @@ void ChassisL_task(void)
 		//	   osDelay(CHASSL_TIME);
 		//		}
 	}
-}
+ }
 
 void ChassisL_init(chassis_t *chassis, vmc_leg_t *vmc, pid_type_def *legl)
 {

@@ -52,7 +52,7 @@ extern chassis_t chassis_move_balance;
 extern 	shoot_control_t shoot_control;
 CAN_RxHeaderTypeDef RxHeader1;
 uint8_t g_Can1RxData[64];
-
+uint16_t auto_cnt=0;
 	
 extern chassis_t  chassis_move_balance;
 static CAN_TxHeaderTypeDef  gimbal_tx_message;
@@ -87,6 +87,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				{
 					// C_fbdata1(&C_data, rx_data,8);
           C_fbdata2(&C_data, rx_data,8);
+          if(C_data.MODE==1)
+          {
+            auto_cnt++;
+          }
 					break;
 				}
 				

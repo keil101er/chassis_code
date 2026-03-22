@@ -53,7 +53,7 @@ extern float gimbal_mode;
 
 extern chassis_t chassis_move_balance;
 extern uint8_t RC_KEY_flag;
-
+float last_trigger_set_speed;
 // *************初始化射击模块****************
 void shoot_init(void)
 {
@@ -114,6 +114,7 @@ static void shoot_feedback_update(void)
         shoot_control.ecd_count++;
     }
     // 防止ecd_count值溢出，当转子旋转18圈后重置为-17；反方向同理，因为电机的范围用的是-pi到pi，
+    //测试
     if (shoot_control.ecd_count == FULL_COUNT)
     {
         shoot_control.ecd_count = -(FULL_COUNT - 1);
@@ -168,14 +169,15 @@ static void shoot_feedback_update(void)
 // 堵转倒转处理
 static void trigger_motor_turn_back(void)
 {
+    last_trigger_set_speed = shoot_control.speed_set;
     if (shoot_control.block_time < BLOCK_TIME)
     {
-        shoot_control.speed_set = -20;
-        //					shoot_control.speed_set = 0.0;
+        shoot_control.speed_set =TRIGGER_SPEED;
+        //shoot_control.speed_set = 0.0;
     }
     else // 如果卡弹时间>700，拨弹开启反转
     {
-        shoot_control.speed_set = 20; // 开启反转
+        shoot_control.speed_set = -TRIGGER_SPEED; // 开启反转
         // shoot_control.speed_set = 0.0;
     }
 
@@ -192,19 +194,28 @@ static void trigger_motor_turn_back(void)
     {
         shoot_control.block_time = 0;
     }
+    
+    if(last_trigger_set_speed == -shoot_control.speed_set)
+    {
+        PID_clear(&shoot_control.trigger_motor_pid);
+    }
 }
 
 // 射击控制，控制拨弹电机角度，完成一次发射
 static void shoot_bullet_control(void)
 {
     // 每次拨动 1/10PI的角度
-    shoot_control.set_angle = shoot_control.angle + PI_TEN;
+    shoot_control.set_angle = rad_format(shoot_control.angle + PI_TEN);
     shoot_control.move_flag = 1;
+    shoot_single_cnt = 0;
+    auto_shoot_cnt = 0;
+    PID_clear(&shoot_control.trigger_Angle_pid);
+    PID_clear(&shoot_control.trigger_motor_pid);
 
     //    if(shoot_control.key == SWITCH_TRIGGER_ON)
     //    {
 
-    //        shoot_control.shoot_mode = SHOOT_DONE;
+    //        shoot_control.shoot_mode = SHOOT_DONE; 
     //    }
 }
 
@@ -215,13 +226,16 @@ static void shoot_set_mode(void)
     static int8_t last_s = RC_SW_UP;
     // if(RC_KEY_flag)
     // {
-    if (shoot_control.press_l_time >= PRESS_LONG_TIME)
+    if(shoot_control.shoot_mode != 2)
     {
-        shoot_control.shoot_mode = 1; // 连发
-    }
-    else if (shoot_control.press_l_time == 0 && shoot_control.last_press_l == 1)
-    {
-        shoot_control.shoot_mode = 2; // 单发
+        if (shoot_control.press_l_time >= PRESS_LONG_TIME)
+        {
+            shoot_control.shoot_mode = 1; // 连发
+        }
+        else if (shoot_control.press_l_time == 0 && shoot_control.last_press_l == 1)
+        {
+            shoot_control.shoot_mode = 2; // 单发
+        }
     }
     // 上位机自动开火：仅在空闲时接受新的开火命令
     // if (C_data.MODE == 1 && gimbal_mode == 2 && auto_shoot_busy == 0)
@@ -235,48 +249,61 @@ static void shoot_set_mode(void)
     //     shoot_control.given_current = 0;
     //     shoot_control.speed_set = 0.0f;
     // }
-
+    // if (C_data.MODE == 1 && gimbal_mode == 2 )
+    // {
+    //     shoot_control.shoot_mode = 1; // 触发单发
+    //     auto_shoot_busy = 1;          // 锁定，拒绝后续重复命令
+    // }
+    // else if (C_data.MODE == 0 && gimbal_mode == 2 )
+    // {
+    //     shoot_control.shoot_mode = 0;
+    //     shoot_control.given_current = 0;
+    //     shoot_control.speed_set = 0.0f;
+    // }
     // }
     // 下拨进入射击状态
     // else
     // {
     //     //if (switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL])&&shoot_control.fire_mode == FIREING )
-    //     if (shoot_control.rc_s_time>=RC_S_LONG_TIME)
-    //     {
-    //       shoot_control.shoot_mode = 1;//连发
-    //       shoot_control.rc_s_time=0;
-    //     }
-    //     else if((shoot_control.rc_s_time > 0 ) && (shoot_control.rc_s_time < RC_S_LONG_TIME)
-    //             && (shoot_control.shoot_rc->rc.ch[4] <= 600) )
-    //     {
-    //         shoot_control.shoot_mode = 2;//单发 Single shot
-    //         shoot_control.rc_s_time=0;
-    //     }
+        // if(shoot_control.shoot_mode != 2)
+        // {
+        //     if (shoot_control.rc_s_time>=RC_S_LONG_TIME)
+        //     {
+        //       shoot_control.shoot_mode = 1;//连发
+        //       shoot_control.rc_s_time=0;
+        //     }
+        //     else if((shoot_control.rc_s_time > 0 ) && (shoot_control.rc_s_time < RC_S_LONG_TIME)
+        //             && (shoot_control.shoot_rc->rc.ch[4] <= 600) )
+        //     {
+        //         shoot_control.shoot_mode = 2;//单发 Single shot
+        //         shoot_control.rc_s_time=0;
+        //     }
+        // }
     // }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 上拨判断， 一次开启，再次关闭
     // 波上去一次
-    if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.fire_mode == FIRE_STOP))
-    {
-        // shoot_control.shoot_mode = SHOOT_READY_BULLET;
-        shoot_control.fire_mode = FIREING; // 射击 //开摩擦轮
-        shoot_control.shoot_send_flag = 1;
-    }
-    else if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.fire_mode != FIRE_STOP))
-    {
-        // shoot_control.shoot_mode = SHOOT_STOP;
-        shoot_control.fire_mode = FIRE_STOP; // 停止射击
-        shoot_control.shoot_send_flag = 0;
-    }
+    // if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.fire_mode == FIRE_STOP))
+    // {
+    //     // shoot_control.shoot_mode = SHOOT_READY_BULLET;
+    //     shoot_control.fire_mode = FIREING; // 射击q //开摩擦轮
+    //     shoot_control.shoot_send_flag = 1;
+    // }
+    // else if ((switch_is_up(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_up(last_s) && shoot_control.fire_mode != FIRE_STOP))
+    // {
+    //     // shoot_control.shoot_mode = SHOOT_STOP;
+    //     shoot_control.fire_mode = FIRE_STOP; // 停止射击
+    //     shoot_control.shoot_send_flag = 0;
+    // }
     // if(RC_KEY_flag)
-    if (shoot_control.shoot_rc->rc.s[1] == 3)
-    {
+    // if (shoot_control.shoot_rc->rc.s[1] == 3)
+    // {
         // q键按下一下开启
         if ((shoot_control.shoot_rc->key.v & SHOOT_ON_KEYBOARD) &&
             !(shoot_control.last_key & SHOOT_ON_KEYBOARD))
         {
-            shoot_control.fire_mode = FIREING; // 射击 //开摩擦轮
+            shoot_control.fire_mode = FIREING; // 射击开摩擦轮
             shoot_control.shoot_send_flag = 1;
         }
         // e键按下一下关闭
@@ -286,7 +313,7 @@ static void shoot_set_mode(void)
             shoot_control.fire_mode = FIRE_STOP; // 停止射击
             shoot_control.shoot_send_flag = 0;
         }
-    }
+    // }
     // 保存按键状态
     last_s = shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]; // 存储遥控器上一次的状态
     shoot_control.last_key = shoot_control.shoot_rc->key.v;
@@ -349,7 +376,7 @@ int16_t shoot_control_loop(void)
         //  {
         if (shoot_control.press_l)
         {
-            shoot_control.speed_set = -20; // 拨弹盘准备速度
+            shoot_control.speed_set = TRIGGER_SPEED; // 拨弹盘准备速度
             trigger_motor_turn_back();
             // 计算拨弹轮电机PID
             PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
@@ -364,20 +391,20 @@ int16_t shoot_control_loop(void)
         // }
         // else
         // {
-        //     if(shoot_control.shoot_rc->rc.ch[4] >500)
-        //     {
-        //         shoot_control.speed_set = -20;  //拨弹盘准备速度
-        //         trigger_motor_turn_back();
-        //         //计算拨弹轮电机PID
-        //         PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-        //         shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-        //     }
-        //     else
-        //     {
-        //         shoot_control.shoot_mode=0;
-        //         shoot_control.given_current = 0;
-        //         shoot_control.speed_set =0.0f;
-        //     }
+            // if(shoot_control.shoot_rc->rc.ch[4] >500)
+            // {
+            //     shoot_control.speed_set = TRIGGER_SPEED;  //拨弹盘准备速度
+            //     trigger_motor_turn_back();
+            //     //计算拨弹轮电机PID
+            //     PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+            //     shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+            // }
+            // else
+            // {
+            //     shoot_control.shoot_mode=0;
+            //     shoot_control.given_current = 0;
+            //     shoot_control.speed_set =0.0f;
+            // }
         // }
     }
     else if (shoot_control.shoot_mode == 2)
@@ -390,7 +417,7 @@ int16_t shoot_control_loop(void)
         if (shoot_single_flag == 1)
         {
             // if (((fabs(rad_format(shoot_control.set_angle-shoot_control.angle))>0.05f)||fabs(shoot_control.speed)>0.5f)&& shoot_single_cnt<1500)
-            if (fabs(rad_format(shoot_control.set_angle - shoot_control.angle)) > 0.05f && shoot_single_cnt < 1500)
+            if (fabs(rad_format(shoot_control.set_angle - shoot_control.angle)) > 0.05f && shoot_single_cnt < 200)
             {
                 shoot_single_cnt++;
                 // 没到达一直设置旋转角度
@@ -405,16 +432,17 @@ int16_t shoot_control_loop(void)
             {
                 // shoot_control.given_current = 0;
                 auto_shoot_cnt++;
-                if (fabs(shoot_control.speed) > 0.5f)
-                {
-                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, 0);
-                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-                }
-                else
-                {
-                    shoot_control.given_current = 0;
-                }
-                if (auto_shoot_cnt > 200)
+                shoot_control.given_current = 0;
+                // if (fabs(shoot_control.speed) > 0.5f)
+                // {
+                //     PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, 0);
+                //     shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                // }
+                // else
+                // {
+                //     shoot_control.given_current = 0;
+                // }
+                if (auto_shoot_cnt >=0)
                 {
                     shoot_control.given_current = 0;
                     auto_shoot_cnt = 0;

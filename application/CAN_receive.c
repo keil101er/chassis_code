@@ -129,7 +129,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
                chassis_move_balance.motor_chassis[4].ecd=chassis_move_balance.joint_motor[4].para.pos*8192/6.25;
 
            break; 
-        }		
+    }		
 				
 		
 		  //DJ

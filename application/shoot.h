@@ -56,7 +56,7 @@
 // m/s  diameter 60mm
 #define FRIC_RPM_TO_SPEED           0.00314159265358793f
 //拨弹速度
-#define TRIGGER_SPEED               (-8.0f)
+#define TRIGGER_SPEED               (-15.0f)
 #define CONTINUE_TRIGGER_SPEED      (10.0f)
 #define READY_TRIGGER_SPEED         (20.0f)
 

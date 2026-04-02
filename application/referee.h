@@ -52,22 +52,14 @@ typedef __packed struct //0x0002
 
 typedef __packed struct //0x0003
 {
-    uint16_t red_1_robot_HP;
-    uint16_t red_2_robot_HP;
-    uint16_t red_3_robot_HP;
-    uint16_t red_4_robot_HP;
-    uint16_t red_5_robot_HP;
-    uint16_t red_7_robot_HP;
-	uint16_t red_outpost_HP;
-    uint16_t red_base_HP;
-    uint16_t blue_1_robot_HP;
-    uint16_t blue_2_robot_HP;
-    uint16_t blue_3_robot_HP;
-    uint16_t blue_4_robot_HP;
-    uint16_t blue_5_robot_HP;
-    uint16_t blue_7_robot_HP;
-	uint16_t blue_outpost_HP;
-    uint16_t blue_base_HP;
+    uint16_t ally_1_robot_HP;
+    uint16_t ally_2_robot_HP;
+    uint16_t ally_3_robot_HP;
+    uint16_t ally_4_robot_HP;
+    uint16_t reserved;
+    uint16_t ally_7_robot_HP;
+    uint16_t ally_outpost_HP;
+    uint16_t ally_base_HP;
 } game_robot_HP_t;
 
 typedef __packed struct //0x0101
@@ -75,28 +67,18 @@ typedef __packed struct //0x0101
      uint32_t event_data;
 } event_data_t;
 
-typedef __packed struct //0x0102
-{
-	uint8_t reserved; 
-    uint8_t supply_robot_id; 
-    uint8_t supply_projectile_step; 
-    uint8_t supply_projectile_num; 
-} ext_supply_projectile_action_t; 
-
-
-typedef __packed struct //0x0103
-{
-    uint8_t supply_projectile_id;
-    uint8_t supply_robot_id;
-    uint8_t supply_num;
-} ext_supply_projectile_booking_t;
-
 typedef __packed struct //0x0104
 {
     uint8_t level; 
     uint8_t offending_robot_id; 
     uint8_t count; 
 } referee_warning_t;
+
+typedef __packed struct //0x0105
+{
+    uint8_t dart_remaining_time;
+    uint16_t dart_info;
+} dart_info_t;
 
 typedef __packed struct //0x0201
 {
@@ -114,12 +96,11 @@ typedef __packed struct //0x0201
 
 typedef __packed struct //0x0202
 {
-	uint16_t chassis_voltage; 
-    uint16_t chassis_current; 
-    float chassis_power; 
+	uint16_t reserved_1;
+    uint16_t reserved_2;
+    float reserved_3;
     uint16_t buffer_energy; 
-    uint16_t shooter_17mm_1_barrel_heat; 
-    uint16_t shooter_17mm_2_barrel_heat; 
+    uint16_t shooter_17mm_barrel_heat;
     uint16_t shooter_42mm_barrel_heat;
 } power_heat_data_t; 
 
@@ -133,17 +114,12 @@ typedef __packed struct //0x0203
 typedef __packed struct //0x0204
 {
 	uint8_t recovery_buff;  
-    uint8_t cooling_buff;  
+    uint16_t cooling_buff;
     uint8_t defence_buff;  
     uint8_t vulnerability_buff; 
     uint16_t attack_buff; 
+    uint8_t remaining_energy;
 } buff_t; 
-
-typedef __packed struct //0x0205
-{ 
-	uint8_t airforce_status; 
-	uint8_t time_remain; 
-} air_support_data_t; 
 
 typedef __packed struct //0x0206
 {
@@ -164,7 +140,52 @@ typedef __packed struct //0x0208
     uint16_t projectile_allowance_17mm; 
     uint16_t projectile_allowance_42mm;  
     uint16_t remaining_gold_coin;
+    uint16_t projectile_allowance_fortress;
 } projectile_allowance_t;
+
+typedef __packed struct //0x0209
+{
+    uint32_t rfid_status;
+    uint8_t rfid_status_2;
+} rfid_status_t;
+
+typedef __packed struct //0x020A
+{
+    uint8_t dart_launch_opening_status;
+    uint8_t reserved;
+    uint16_t target_change_time;
+    uint16_t latest_launch_cmd_time;
+} dart_client_cmd_t;
+
+typedef __packed struct //0x020B
+{
+    float hero_x;
+    float hero_y;
+    float engineer_x;
+    float engineer_y;
+    float standard_3_x;
+    float standard_3_y;
+    float standard_4_x;
+    float standard_4_y;
+    float reserved_1;
+    float reserved_2;
+} ground_robot_position_t;
+
+typedef __packed struct //0x020C
+{
+    uint16_t mark_progress;
+} radar_mark_data_t;
+
+typedef __packed struct //0x020D
+{
+    uint32_t sentry_info;
+    uint16_t sentry_info_2;
+} sentry_info_t;
+
+typedef __packed struct //0x020E
+{
+    uint8_t radar_info;
+} radar_info_t;
 
 typedef __packed struct //0x0301
 {

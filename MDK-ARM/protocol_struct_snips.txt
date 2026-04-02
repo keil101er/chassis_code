@@ -1,0 +1,1107 @@
+=== referee_warning_t; idx=5694 ===
+ ally 7 robot_HP; uint16_t ally_outpost_HP;
+uint16_t ally_base_HP; } game_robot_HP_t;
+表 1-8 0x0101
+字节偏移量
+大小
+说明
+0
+4
+0：未占领/未激活 1：已占领/已激活 l bit 0-2：
+ bit 0： 己方与资源区区不重叠的补给区占领状态， 1 为已占领
+ bit 1： 己方与资源区重叠的补给区占领状态， 1 为已占领
+ bit 2： 己方补给区的占领状态， 1 为已占领（仅 RMUL 适用）
+l bit 3-6：己方能量机关状态
+ bit 3-4：己方小能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+ bit 5-6：己方大能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+l bit 7-8： 己方中央高地的占领状态， 1 为被己方占领， 2 为被对方占领
+l bit 9-10：己方梯形高地的占领状态， 1 为已占领
+l bit 11-19：对方飞镖最后一次击中己方前哨站或基地的时间（0-420，开 局默认为 0）
+l bit 20-22：对方飞镖最后一次击中己方前哨站或基地的具体目标，开局 默认为 0， 1 为击中前哨站，2 为击中基地固定目标， 3 为击中基地随 机固定目标， 4 为击中基地随机移动目标， 5 为击中基地末端移动目标
+字节偏移量
+大小
+说明
+l
+l
+l
+l l
+bit 23-24： 中心增益点的占领状态， 0 为未被占领， 1 为被己方占领，
+2 为被对方占领， 3 为被双方占领。（仅 RMUL 适用）
+bit 25-26： 己方堡垒增益点的占领状态，0 为未被占领， 1 为被己方占 领， 2 为被对方占领， 3 为被双方占领
+bit 27-28： 己方前哨站增益点的占领状态，0 为未被占领， 1 为被己方 占领， 2 为被对方占领
+bit 29：己方基地增益点的占领状态， 1 为已占领 bit 30-31： 保留位
+typedef _packed struct {
+uint32_t event_data; }event_data_t;
+表 1-9 0x0104
+字节偏移量
+大小
+说明
+0
+1
+己方最后一次受到判罚的等级：
+l 1 ：双方黄牌
+l 2： 黄牌
+l 3：红牌
+l 4：判负
+1
+1
+l 己方最后一次受到判罚的违规机器人 ID。（如红 1 机器人 ID 为 1，蓝
+1 机器人 ID 为 101）
+l 判负和双方黄牌时，该值为 0
+2
+1
+己方最后一次受到判罚的违规机器人对应判罚等级的违规次数。（开局默认 为 0。）
+typedef _packed struct {
+uint8_t level;
+uint8_t offending_robot_id;
+uint8_t count;
+}referee_warning_t;
+表 1-10 0x0105
+字节偏移量
+大小
+说明
+0
+1
+己方飞镖发射剩余时间，单位：秒
+1
+2
+l bit 0-2：
+最近一次己方飞镖击中的目标，开局默认为 0， 1 为击中前哨站， 2 为击 中基地固定目标， 3 为击中基地随机固定目标， 4 为击中基地随机移动目 标， 5 为击中基地末端移动目标
+l bit 3-5:
+对方最近被击中的目标累计被击中计次数， 开局默认为 0，至多为 4
+l bit 6-8：
+飞镖此时选定的击打目标， 开局默认或未选定/选定前哨站时为 0，选中基 地固定目标为 1，选中基地随机固定目标为 2，选中基地随机移动目标为 3
+
+=== robot_status_t; idx=6727 ===
+为 1，蓝
+1 机器人 ID 为 101）
+l 判负和双方黄牌时，该值为 0
+2
+1
+己方最后一次受到判罚的违规机器人对应判罚等级的违规次数。（开局默认 为 0。）
+typedef _packed struct {
+uint8_t level;
+uint8_t offending_robot_id;
+uint8_t count;
+}referee_warning_t;
+表 1-10 0x0105
+字节偏移量
+大小
+说明
+0
+1
+己方飞镖发射剩余时间，单位：秒
+1
+2
+l bit 0-2：
+最近一次己方飞镖击中的目标，开局默认为 0， 1 为击中前哨站， 2 为击 中基地固定目标， 3 为击中基地随机固定目标， 4 为击中基地随机移动目 标， 5 为击中基地末端移动目标
+l bit 3-5:
+对方最近被击中的目标累计被击中计次数， 开局默认为 0，至多为 4
+l bit 6-8：
+飞镖此时选定的击打目标， 开局默认或未选定/选定前哨站时为 0，选中基 地固定目标为 1，选中基地随机固定目标为 2，选中基地随机移动目标为 3，选中基地末端移动目标为 4
+l bit 9-15：保留
+typedef _packed struct {
+uint8_t dart_remaining_time;
+uint16_t dart_info; }dart_info_t;
+表 1-11 0x0201
+字节偏移量
+大小
+说明
+0
+1
+本机器人 ID
+1
+1
+机器人等级
+字节偏移量
+大小
+说明
+2
+2
+机器人当前血量
+4
+2
+机器人血量上限
+6
+2
+机器人射击热量每秒冷却值
+8
+2
+机器人射击热量上限
+10
+2
+机器人底盘功率上限
+12
+1
+电源管理模块的输出情况：
+l bit 0： gimbal 口输出， 0 为无输出， 1 为 24V 输出
+l bit 1： chassis 口输出， 0 为无输出， 1 为 24V 输出
+l bit 2： shooter 口输出， 0 为无输出， 1 为 24V 输出
+typedef _packed struct {
+uint8_t robot_id;
+uint8_t robot_level;
+uint16_t current_HP;
+uint16_t maximum_HP;
+uint16_t shooter_barrel_cooling_value; uint16_t shooter_barrel_heat_limit;
+uint16_t chassis_power_limit;
+uint8_t power_management_gimbal_output : 1; uint8_t power_management_chassis_output : 1;
+uint8_t power_management_shooter_output : 1; }robot_status_t;
+表 1-12 0x0202
+字节偏移量
+大小
+说明
+0
+2
+保留位
+2
+2
+保留位
+4
+4
+保留位
+8
+2
+缓冲能量（单位：J）
+10
+2
+17mm 发射机构的射击热量
+12
+2
+42mm 发射机构的射击热量
+typedef _packed struct {
+uint16_t reserved; uint16_t reserved; float reserved;
+uint16_t buffer_energy;
+uint16_t shooter_17mm_barrel_heat;
+uint16_t shooter_42mm_barrel_heat; }power
+
+=== power_heat_data_t; idx=7022 ===
+ 为击中基地随机固定目标， 4 为击中基地随机移动目 标， 5 为击中基地末端移动目标
+l bit 3-5:
+对方最近被击中的目标累计被击中计次数， 开局默认为 0，至多为 4
+l bit 6-8：
+飞镖此时选定的击打目标， 开局默认或未选定/选定前哨站时为 0，选中基 地固定目标为 1，选中基地随机固定目标为 2，选中基地随机移动目标为 3，选中基地末端移动目标为 4
+l bit 9-15：保留
+typedef _packed struct {
+uint8_t dart_remaining_time;
+uint16_t dart_info; }dart_info_t;
+表 1-11 0x0201
+字节偏移量
+大小
+说明
+0
+1
+本机器人 ID
+1
+1
+机器人等级
+字节偏移量
+大小
+说明
+2
+2
+机器人当前血量
+4
+2
+机器人血量上限
+6
+2
+机器人射击热量每秒冷却值
+8
+2
+机器人射击热量上限
+10
+2
+机器人底盘功率上限
+12
+1
+电源管理模块的输出情况：
+l bit 0： gimbal 口输出， 0 为无输出， 1 为 24V 输出
+l bit 1： chassis 口输出， 0 为无输出， 1 为 24V 输出
+l bit 2： shooter 口输出， 0 为无输出， 1 为 24V 输出
+typedef _packed struct {
+uint8_t robot_id;
+uint8_t robot_level;
+uint16_t current_HP;
+uint16_t maximum_HP;
+uint16_t shooter_barrel_cooling_value; uint16_t shooter_barrel_heat_limit;
+uint16_t chassis_power_limit;
+uint8_t power_management_gimbal_output : 1; uint8_t power_management_chassis_output : 1;
+uint8_t power_management_shooter_output : 1; }robot_status_t;
+表 1-12 0x0202
+字节偏移量
+大小
+说明
+0
+2
+保留位
+2
+2
+保留位
+4
+4
+保留位
+8
+2
+缓冲能量（单位：J）
+10
+2
+17mm 发射机构的射击热量
+12
+2
+42mm 发射机构的射击热量
+typedef _packed struct {
+uint16_t reserved; uint16_t reserved; float reserved;
+uint16_t buffer_energy;
+uint16_t shooter_17mm_barrel_heat;
+uint16_t shooter_42mm_barrel_heat; }power_heat_data_t;
+表 1-13 0x0203
+字节偏移量
+大小
+说明
+0
+4
+本机器人位置 x 坐标，单位： m
+4
+4
+本机器人位置 y 坐标，单位： m
+8
+4
+本机器人测速模块的朝向， 单位：度。正北为 0 度
+063177typedef _packed struct {
+float float float
+x;
+y;
+angle;
+}robot_pos_t;
+表 1-14 0x0204
+字节偏移量
+大小
+说明
+0
+1
+机器人回血增益（百分比， 值为 10 表示每秒恢复血量上限的 10%）
+字节偏移量
+大小
+说明
+1
+2
+机器人射击热量冷却增益具体值（直接值， 值为 
+
+=== robot_pos_t; idx=7204 ===
+标为 4
+l bit 9-15：保留
+typedef _packed struct {
+uint8_t dart_remaining_time;
+uint16_t dart_info; }dart_info_t;
+表 1-11 0x0201
+字节偏移量
+大小
+说明
+0
+1
+本机器人 ID
+1
+1
+机器人等级
+字节偏移量
+大小
+说明
+2
+2
+机器人当前血量
+4
+2
+机器人血量上限
+6
+2
+机器人射击热量每秒冷却值
+8
+2
+机器人射击热量上限
+10
+2
+机器人底盘功率上限
+12
+1
+电源管理模块的输出情况：
+l bit 0： gimbal 口输出， 0 为无输出， 1 为 24V 输出
+l bit 1： chassis 口输出， 0 为无输出， 1 为 24V 输出
+l bit 2： shooter 口输出， 0 为无输出， 1 为 24V 输出
+typedef _packed struct {
+uint8_t robot_id;
+uint8_t robot_level;
+uint16_t current_HP;
+uint16_t maximum_HP;
+uint16_t shooter_barrel_cooling_value; uint16_t shooter_barrel_heat_limit;
+uint16_t chassis_power_limit;
+uint8_t power_management_gimbal_output : 1; uint8_t power_management_chassis_output : 1;
+uint8_t power_management_shooter_output : 1; }robot_status_t;
+表 1-12 0x0202
+字节偏移量
+大小
+说明
+0
+2
+保留位
+2
+2
+保留位
+4
+4
+保留位
+8
+2
+缓冲能量（单位：J）
+10
+2
+17mm 发射机构的射击热量
+12
+2
+42mm 发射机构的射击热量
+typedef _packed struct {
+uint16_t reserved; uint16_t reserved; float reserved;
+uint16_t buffer_energy;
+uint16_t shooter_17mm_barrel_heat;
+uint16_t shooter_42mm_barrel_heat; }power_heat_data_t;
+表 1-13 0x0203
+字节偏移量
+大小
+说明
+0
+4
+本机器人位置 x 坐标，单位： m
+4
+4
+本机器人位置 y 坐标，单位： m
+8
+4
+本机器人测速模块的朝向， 单位：度。正北为 0 度
+063177typedef _packed struct {
+float float float
+x;
+y;
+angle;
+}robot_pos_t;
+表 1-14 0x0204
+字节偏移量
+大小
+说明
+0
+1
+机器人回血增益（百分比， 值为 10 表示每秒恢复血量上限的 10%）
+字节偏移量
+大小
+说明
+1
+2
+机器人射击热量冷却增益具体值（直接值， 值为 x 表示热量冷却增加 x/s）
+3
+1
+机器人防御增益（百分比， 值为 50 表示 50%防御增益）
+4
+1
+机器人负防御增益（百分比，值为 30 表示-30%防御增益）
+5
+2
+机器人攻击增益（百分比， 值为 50 表示 50%攻击增益）
+7
+1
+bit 0-6：机器人剩余能量值反馈，以 16 进制标识机器人剩余能量值比例， 仅在机器人剩余能量小于 50%时反
+
+=== buff_t; idx=7926 ===
+}robot_status_t;
+表 1-12 0x0202
+字节偏移量
+大小
+说明
+0
+2
+保留位
+2
+2
+保留位
+4
+4
+保留位
+8
+2
+缓冲能量（单位：J）
+10
+2
+17mm 发射机构的射击热量
+12
+2
+42mm 发射机构的射击热量
+typedef _packed struct {
+uint16_t reserved; uint16_t reserved; float reserved;
+uint16_t buffer_energy;
+uint16_t shooter_17mm_barrel_heat;
+uint16_t shooter_42mm_barrel_heat; }power_heat_data_t;
+表 1-13 0x0203
+字节偏移量
+大小
+说明
+0
+4
+本机器人位置 x 坐标，单位： m
+4
+4
+本机器人位置 y 坐标，单位： m
+8
+4
+本机器人测速模块的朝向， 单位：度。正北为 0 度
+063177typedef _packed struct {
+float float float
+x;
+y;
+angle;
+}robot_pos_t;
+表 1-14 0x0204
+字节偏移量
+大小
+说明
+0
+1
+机器人回血增益（百分比， 值为 10 表示每秒恢复血量上限的 10%）
+字节偏移量
+大小
+说明
+1
+2
+机器人射击热量冷却增益具体值（直接值， 值为 x 表示热量冷却增加 x/s）
+3
+1
+机器人防御增益（百分比， 值为 50 表示 50%防御增益）
+4
+1
+机器人负防御增益（百分比，值为 30 表示-30%防御增益）
+5
+2
+机器人攻击增益（百分比， 值为 50 表示 50%攻击增益）
+7
+1
+bit 0-6：机器人剩余能量值反馈，以 16 进制标识机器人剩余能量值比例， 仅在机器人剩余能量小于 50%时反馈，其余默认反馈 0x80。机器人初始能 量视为 100%
+l bit 0： 在剩余能量≥125%时为 1，其余情况为 0
+l bit 1： 在剩余能量≥100%时为 1，其余情况为 0
+l bit 2： 在剩余能量≥50%时为 1， 其余情况为 0
+l bit 3： 在剩余能量≥30%时为 1， 其余情况为 0
+l bit 4： 在剩余能量≥15%时为 1， 其余情况为 0
+l bit 5： 在剩余能量≥5%时为 1， 其余情况为 0
+l bit 6： 在剩余能量≥1%时为 1， 其余情况为 0
+typedef _packed struct {
+uint8_t recovery_buff;
+uint16_t cooling_buff;
+uint8_t defence_buff;
+uint8_t vulnerability_buff; uint16_t attack_buff;
+uint8_t remaining_energy; }buff_t;
+表 1-15 0x0206
+字节偏移量
+大小
+说明
+0
+1
+bit 0-3：当扣血原因为装甲模块被弹丸攻击、受撞击或离线时， 该 4 bit 组 成的数值为装甲模块或测速模块的 ID 编号； 当其他原因导致扣血时， 该数 值为 0
+bit 4-7：血量变化类型
+l 0： 装甲模块被弹丸攻击导致扣血
+l 1：装甲模块或超级电容管理模块离线导致扣血
+l 5：装甲模块受到撞击导致扣血
+typedef _packed struct {
+uint8_t armor_id : 4;
+uint8_t HP_deduction_reason : 4; }hurt_data_t;
+1828761
+
+=== hurt_data_t; idx=8206 ===
+m_barrel_heat; }power_heat_data_t;
+表 1-13 0x0203
+字节偏移量
+大小
+说明
+0
+4
+本机器人位置 x 坐标，单位： m
+4
+4
+本机器人位置 y 坐标，单位： m
+8
+4
+本机器人测速模块的朝向， 单位：度。正北为 0 度
+063177typedef _packed struct {
+float float float
+x;
+y;
+angle;
+}robot_pos_t;
+表 1-14 0x0204
+字节偏移量
+大小
+说明
+0
+1
+机器人回血增益（百分比， 值为 10 表示每秒恢复血量上限的 10%）
+字节偏移量
+大小
+说明
+1
+2
+机器人射击热量冷却增益具体值（直接值， 值为 x 表示热量冷却增加 x/s）
+3
+1
+机器人防御增益（百分比， 值为 50 表示 50%防御增益）
+4
+1
+机器人负防御增益（百分比，值为 30 表示-30%防御增益）
+5
+2
+机器人攻击增益（百分比， 值为 50 表示 50%攻击增益）
+7
+1
+bit 0-6：机器人剩余能量值反馈，以 16 进制标识机器人剩余能量值比例， 仅在机器人剩余能量小于 50%时反馈，其余默认反馈 0x80。机器人初始能 量视为 100%
+l bit 0： 在剩余能量≥125%时为 1，其余情况为 0
+l bit 1： 在剩余能量≥100%时为 1，其余情况为 0
+l bit 2： 在剩余能量≥50%时为 1， 其余情况为 0
+l bit 3： 在剩余能量≥30%时为 1， 其余情况为 0
+l bit 4： 在剩余能量≥15%时为 1， 其余情况为 0
+l bit 5： 在剩余能量≥5%时为 1， 其余情况为 0
+l bit 6： 在剩余能量≥1%时为 1， 其余情况为 0
+typedef _packed struct {
+uint8_t recovery_buff;
+uint16_t cooling_buff;
+uint8_t defence_buff;
+uint8_t vulnerability_buff; uint16_t attack_buff;
+uint8_t remaining_energy; }buff_t;
+表 1-15 0x0206
+字节偏移量
+大小
+说明
+0
+1
+bit 0-3：当扣血原因为装甲模块被弹丸攻击、受撞击或离线时， 该 4 bit 组 成的数值为装甲模块或测速模块的 ID 编号； 当其他原因导致扣血时， 该数 值为 0
+bit 4-7：血量变化类型
+l 0： 装甲模块被弹丸攻击导致扣血
+l 1：装甲模块或超级电容管理模块离线导致扣血
+l 5：装甲模块受到撞击导致扣血
+typedef _packed struct {
+uint8_t armor_id : 4;
+uint8_t HP_deduction_reason : 4; }hurt_data_t;
+1828761723
+87629689610x0206 的受伤害情况为机器人裁判系统本地判定，即时发送，但实际是否受到对应伤害受规 则条例影响，请以服务器最终判定为准。
+表 1-16 0x0207
+字节偏移量
+大小
+说明
+0
+1
+弹丸类型：
+l bit 1： 17mm 弹丸
+l bit 2： 42mm 弹丸
+1
+1
+发射机构 ID：
+l 1： 17mm 发射机构
+l 2：保留位
+l 3： 42mm 发射机构
+2
+1
+弹丸射速（单位： Hz）
+字节偏移量
+大小
+说明
+3
+4
+弹丸初速度（单位： m/s）
+typedef _packed struct {
+uint8_t 
+
+=== shoot_data_t; idx=8594 ===
+0 表示-30%防御增益）
+5
+2
+机器人攻击增益（百分比， 值为 50 表示 50%攻击增益）
+7
+1
+bit 0-6：机器人剩余能量值反馈，以 16 进制标识机器人剩余能量值比例， 仅在机器人剩余能量小于 50%时反馈，其余默认反馈 0x80。机器人初始能 量视为 100%
+l bit 0： 在剩余能量≥125%时为 1，其余情况为 0
+l bit 1： 在剩余能量≥100%时为 1，其余情况为 0
+l bit 2： 在剩余能量≥50%时为 1， 其余情况为 0
+l bit 3： 在剩余能量≥30%时为 1， 其余情况为 0
+l bit 4： 在剩余能量≥15%时为 1， 其余情况为 0
+l bit 5： 在剩余能量≥5%时为 1， 其余情况为 0
+l bit 6： 在剩余能量≥1%时为 1， 其余情况为 0
+typedef _packed struct {
+uint8_t recovery_buff;
+uint16_t cooling_buff;
+uint8_t defence_buff;
+uint8_t vulnerability_buff; uint16_t attack_buff;
+uint8_t remaining_energy; }buff_t;
+表 1-15 0x0206
+字节偏移量
+大小
+说明
+0
+1
+bit 0-3：当扣血原因为装甲模块被弹丸攻击、受撞击或离线时， 该 4 bit 组 成的数值为装甲模块或测速模块的 ID 编号； 当其他原因导致扣血时， 该数 值为 0
+bit 4-7：血量变化类型
+l 0： 装甲模块被弹丸攻击导致扣血
+l 1：装甲模块或超级电容管理模块离线导致扣血
+l 5：装甲模块受到撞击导致扣血
+typedef _packed struct {
+uint8_t armor_id : 4;
+uint8_t HP_deduction_reason : 4; }hurt_data_t;
+1828761723
+87629689610x0206 的受伤害情况为机器人裁判系统本地判定，即时发送，但实际是否受到对应伤害受规 则条例影响，请以服务器最终判定为准。
+表 1-16 0x0207
+字节偏移量
+大小
+说明
+0
+1
+弹丸类型：
+l bit 1： 17mm 弹丸
+l bit 2： 42mm 弹丸
+1
+1
+发射机构 ID：
+l 1： 17mm 发射机构
+l 2：保留位
+l 3： 42mm 发射机构
+2
+1
+弹丸射速（单位： Hz）
+字节偏移量
+大小
+说明
+3
+4
+弹丸初速度（单位： m/s）
+typedef _packed struct {
+uint8_t bullet_type;
+uint8_t shooter_number;
+uint8_t launching_frequency;
+float initial_speed; }shoot_data_t;
+表 1-17 0x0208
+字节偏移量
+大小
+说明
+0
+2
+机器人自身拥有的 17mm 弹丸允许发弹量
+2
+2
+42mm 弹丸允许发弹量
+4
+2
+剩余金币数量
+6
+2
+堡垒增益点提供的储备 17mm 弹丸允许发弹量； 该值与机器人是否实际占领堡垒无关
+typedef _packed struct {
+uint16_t projectile_allowance_17mm; uint16_t projectile_allowance_42mm; uint16_t remaining_gold_coin;
+uint16_t projectile_allowance_for
+
+=== projectile_allowance_t; idx=8902 ===
+ 在剩余能量≥5%时为 1， 其余情况为 0
+l bit 6： 在剩余能量≥1%时为 1， 其余情况为 0
+typedef _packed struct {
+uint8_t recovery_buff;
+uint16_t cooling_buff;
+uint8_t defence_buff;
+uint8_t vulnerability_buff; uint16_t attack_buff;
+uint8_t remaining_energy; }buff_t;
+表 1-15 0x0206
+字节偏移量
+大小
+说明
+0
+1
+bit 0-3：当扣血原因为装甲模块被弹丸攻击、受撞击或离线时， 该 4 bit 组 成的数值为装甲模块或测速模块的 ID 编号； 当其他原因导致扣血时， 该数 值为 0
+bit 4-7：血量变化类型
+l 0： 装甲模块被弹丸攻击导致扣血
+l 1：装甲模块或超级电容管理模块离线导致扣血
+l 5：装甲模块受到撞击导致扣血
+typedef _packed struct {
+uint8_t armor_id : 4;
+uint8_t HP_deduction_reason : 4; }hurt_data_t;
+1828761723
+87629689610x0206 的受伤害情况为机器人裁判系统本地判定，即时发送，但实际是否受到对应伤害受规 则条例影响，请以服务器最终判定为准。
+表 1-16 0x0207
+字节偏移量
+大小
+说明
+0
+1
+弹丸类型：
+l bit 1： 17mm 弹丸
+l bit 2： 42mm 弹丸
+1
+1
+发射机构 ID：
+l 1： 17mm 发射机构
+l 2：保留位
+l 3： 42mm 发射机构
+2
+1
+弹丸射速（单位： Hz）
+字节偏移量
+大小
+说明
+3
+4
+弹丸初速度（单位： m/s）
+typedef _packed struct {
+uint8_t bullet_type;
+uint8_t shooter_number;
+uint8_t launching_frequency;
+float initial_speed; }shoot_data_t;
+表 1-17 0x0208
+字节偏移量
+大小
+说明
+0
+2
+机器人自身拥有的 17mm 弹丸允许发弹量
+2
+2
+42mm 弹丸允许发弹量
+4
+2
+剩余金币数量
+6
+2
+堡垒增益点提供的储备 17mm 弹丸允许发弹量； 该值与机器人是否实际占领堡垒无关
+typedef _packed struct {
+uint16_t projectile_allowance_17mm; uint16_t projectile_allowance_42mm; uint16_t remaining_gold_coin;
+uint16_t projectile_allowance_fortress; }projectile_allowance_t;
+表 1-18 0x0209
+字节偏移量
+大小
+说明
+0
+4
+bit 位值为 1/0 的含义：是否已检测到该增益点 RFID 卡
+l bit 0： 己方基地增益点
+字节偏移量
+大小
+说明
+l bit 1： 己方中央高地增益点
+l bit 2： 对方中央高地增益点
+l bit 3： 己方梯形高地增益点
+l bit 4： 对方梯形高地增益点
+l bit 5： 己方地形跨越增益点（飞坡） （靠近己方一侧飞坡前）
+l bit 6： 己方地形跨越增益点（飞坡） （靠近己方一侧飞坡后）
+l bit 7： 对方地形跨越增益点（飞坡） （靠近对方一侧飞坡前）
+l 
+
+=== robot_interaction_data_t; idx=13238 ===
+为 0
+bit 21-30： 哨兵机器人当前若兑换立即复活需要花费的金币数。 bit 31：保留
+4
+2
+l
+bit 0： 哨兵当前是否处于脱战状态， 处于脱战状态时为 1，否则为 0
+字节偏移量
+大小
+说明
+l l l l
+bit 1-11：队伍 17mm 允许发弹量的剩余可兑换数
+bit 12-13：哨兵当前姿态， 1 为进攻姿态， 2 为防御姿态，3 为移动姿态 bit 14：己方能量机关是否能够进入正在激活状态， 1 为当前可激活
+bit 15：保留位
+typedef _packed struct {
+uint32_t sentry_info;
+uint16_t sentry_info_2; } sentry_info_t;
+表 1-23 0x020E
+字节偏移量
+大小
+说明
+0
+1
+l
+l
+l l l
+bit 0-1：雷达是否拥有触发双倍易伤的机会，开局为 0，数值为雷达拥有触 发双倍易伤的机会，至多为 2
+bit 2： 对方是否正在被触发双倍易伤
+ 0 ：对方未被触发双倍易伤
+ 1 ：对方正在被触发双倍易伤
+bit 3-4：己方加密等级（即对方干扰波难度等级） ，开局为 1，最高为 3 bit 5： 当前是否可以修改密钥， 1 为可修改
+bit 6-7：保留位
+typedef _packed struct {
+uint8_t radar_info; } radar_info_t;
+机器人交互数据通过常规链路发送，其数据段包含一个统一的数据段头结构。数据段头结构包括内容 ID、 发送者和接收者的 ID、内容数据段。机器人交互数据包的总长不超过 127 个字节，减去 frame_header、 cmd_id 和 frame_tail 的 9 个字节以及数据段头结构的 6 个字节， 故机器人交互数据的内容数据段最大 为 112 个字节。
+每 1000 毫秒，英雄、工程、步兵、空中机器人、飞镖能够接收数据的上限为 3720 字节，雷达和哨兵机器 人能够接收数据的上限为 5120 字节。
+由于存在多个内容 ID，但整个 cmd_id 上行频率最大为 30Hz， 请合理安排带宽。
+表 1-24 0x0301
+字节偏移量
+大小
+说明
+备注
+0
+2
+子内容 ID
+需为开放的子内容 ID
+2
+2
+发送者 ID
+需与自身 ID 匹配， ID 编号详见附录
+4
+2
+接收者 ID
+l 仅限己方通信
+l 需为规则允许的多机通讯接收者
+l 若接收者为选手端，则仅可发送至发送者对应的选 手端
+l ID 编号详见附录
+6
+x
+内容数据段
+x 最大为 112
+typedef _packed struct {
+uint16_t data_cmd_id; uint16_t sender_id;
+uint16_t receiver_id;
+uint8_t user_data[x];
+}robot_interaction_data_t;
+子内容 ID
+内容数据段长度
+功能说明
+0x0200~0x02FF
+x≤112
+机器人之间通信
+0x0100
+2
+选手端删除图层
+0x0101
+15
+选手端绘制一个图形
+0x0102
+30
+选手端绘制两个图形
+0x0103
+75
+选手端绘制五个图形
+子内容 ID
+内容数据段长度
+功能说明
+0x0104
+105
+选手端绘制七个图形
+0x0110
+45
+选手端绘制字符图形
+0x0120
+4
+哨兵自主决策指令
+0x0121
+1
+雷达自主决策指令
+表 1-25 子内容 ID ：0x0100
+字节偏移量
+大小
+说明
+备注
+0
+1
+删除操作
+l 0 ：空
+
+=== game_robot_HP_t; idx=4563 ===
+
+10
+对方机器人的剩余发弹量信息， 频率上限为 10Hz
+信号发射源→雷达
+雷达无线链路
+0x0A04
+8
+对方队伍的宏观状态信息， 频率 上限为 10Hz
+信号发射源→雷达
+雷达无线链路
+0x0A05
+36
+对方各机器人当前增益效果，频 率上限为 10Hz
+信号发射源→雷达
+雷达无线链路
+命令码
+数据段长度
+说明
+发送方/接收方
+所属数据链 路
+0x0A06
+6
+对方干扰波密钥，频率上限为 10Hz
+信号发射源→雷达
+雷达无线链路
+表 1-5 0x0001
+字节偏移量
+大小
+说明
+0
+1
+bit 0-3：比赛类型
+• 1： RoboMaster 机甲大师超级对抗赛
+• 2： RoboMaster 机甲大师高校单项赛
+• 3： ICRA RoboMaster 高校人工智能挑战赛
+• 4： RoboMaster 机甲大师高校联盟赛 3V3 对抗
+• 5： RoboMaster 机甲大师高校联盟赛步兵对抗
+bit 4-7：当前比赛阶段
+• 0：未开始比赛
+• 1：准备阶段
+• 2：十五秒裁判系统自检阶段
+• 3：五秒倒计时
+• 4： 比赛中
+• 5：比赛结算中
+1
+2
+当前阶段剩余时间， 单位：秒
+3
+8
+UNIX 时间，当机器人正确连接到裁判系统的 NTP 服务器后生效
+typedef _packed struct {
+uint8_t game_type : 4;
+uint8_t game_progress : 4;
+uint16_t stage_remain_time;
+uint64_t SyncTimeStamp; }game_status_t;
+表 1-6 0x0002
+字节偏移量
+大小
+说明
+0
+1
+l 0： 平局
+l 1：红方胜利
+l 2：蓝方胜利
+typedef _packed struct {
+uint8_t winner; }game_result_t;
+表 1-7 0x0003
+字节偏移量
+大小
+说明
+0
+2
+己方 1 号英雄机器人血量， 若该机器人未上场或者被罚下，则血量为 0，下文同理
+2
+2
+己方 2 号工程机器人血量
+4
+2
+己方 3 号步兵机器人血量
+6
+2
+己方 4 号步兵机器人血量
+8
+2
+保留位
+10
+2
+己方 7 号哨兵机器人血量
+12
+2
+己方前哨站血量
+14
+2
+己方基地血量
+typedef _packed struct {
+uint16_t ally 1 robot_HP; uint16_t ally 2 robot_HP; uint16_t ally 3 robot_HP;
+uint16_t ally 4 robot_HP; uint16_t reserved;
+uint16_t ally 7 robot_HP; uint16_t ally_outpost_HP;
+uint16_t ally_base_HP; } game_robot_HP_t;
+表 1-8 0x0101
+字节偏移量
+大小
+说明
+0
+4
+0：未占领/未激活 1：已占领/已激活 l bit 0-2：
+ bit 0： 己方与资源区区不重叠的补给区占领状态， 1 为已占领
+ bit 1： 己方与资源区重叠的补给区占领状态， 1 为已占领
+ bit 2： 己方补给区的占领状态， 1 为已占领（仅 RMUL 适用）
+l bit 3-6：己方能量机关状态
+ bit 3-4：己方小能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+ bit 5-6：己方大能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+l bi
+
+=== event_data_t; idx=5398 ===
+雄机器人血量， 若该机器人未上场或者被罚下，则血量为 0，下文同理
+2
+2
+己方 2 号工程机器人血量
+4
+2
+己方 3 号步兵机器人血量
+6
+2
+己方 4 号步兵机器人血量
+8
+2
+保留位
+10
+2
+己方 7 号哨兵机器人血量
+12
+2
+己方前哨站血量
+14
+2
+己方基地血量
+typedef _packed struct {
+uint16_t ally 1 robot_HP; uint16_t ally 2 robot_HP; uint16_t ally 3 robot_HP;
+uint16_t ally 4 robot_HP; uint16_t reserved;
+uint16_t ally 7 robot_HP; uint16_t ally_outpost_HP;
+uint16_t ally_base_HP; } game_robot_HP_t;
+表 1-8 0x0101
+字节偏移量
+大小
+说明
+0
+4
+0：未占领/未激活 1：已占领/已激活 l bit 0-2：
+ bit 0： 己方与资源区区不重叠的补给区占领状态， 1 为已占领
+ bit 1： 己方与资源区重叠的补给区占领状态， 1 为已占领
+ bit 2： 己方补给区的占领状态， 1 为已占领（仅 RMUL 适用）
+l bit 3-6：己方能量机关状态
+ bit 3-4：己方小能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+ bit 5-6：己方大能量机关的激活状态， 0 为未激活， 1 为已激活，
+2 为正在激活
+l bit 7-8： 己方中央高地的占领状态， 1 为被己方占领， 2 为被对方占领
+l bit 9-10：己方梯形高地的占领状态， 1 为已占领
+l bit 11-19：对方飞镖最后一次击中己方前哨站或基地的时间（0-420，开 局默认为 0）
+l bit 20-22：对方飞镖最后一次击中己方前哨站或基地的具体目标，开局 默认为 0， 1 为击中前哨站，2 为击中基地固定目标， 3 为击中基地随 机固定目标， 4 为击中基地随机移动目标， 5 为击中基地末端移动目标
+字节偏移量
+大小
+说明
+l
+l
+l
+l l
+bit 23-24： 中心增益点的占领状态， 0 为未被占领， 1 为被己方占领，
+2 为被对方占领， 3 为被双方占领。（仅 RMUL 适用）
+bit 25-26： 己方堡垒增益点的占领状态，0 为未被占领， 1 为被己方占 领， 2 为被对方占领， 3 为被双方占领
+bit 27-28： 己方前哨站增益点的占领状态，0 为未被占领， 1 为被己方 占领， 2 为被对方占领
+bit 29：己方基地增益点的占领状态， 1 为已占领 bit 30-31： 保留位
+typedef _packed struct {
+uint32_t event_data; }event_data_t;
+表 1-9 0x0104
+字节偏移量
+大小
+说明
+0
+1
+己方最后一次受到判罚的等级：
+l 1 ：双方黄牌
+l 2： 黄牌
+l 3：红牌
+l 4：判负
+1
+1
+l 己方最后一次受到判罚的违规机器人 ID。（如红 1 机器人 ID 为 1，蓝
+1 机器人 ID 为 101）
+l 判负和双方黄牌时，该值为 0
+2
+1
+己方最后一次受到判罚的违规机器人对应判罚等级的违规次数。（开局默认 为 0。）
+typedef _packed struct {
+uint8_t level;
+uint8_t offending_robot_id;
+uint8_t count;
+}refe
+

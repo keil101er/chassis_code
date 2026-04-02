@@ -80,3 +80,5 @@ chassis_task\chassisl_task.o: ../Inc/can.h
 chassis_task\chassisl_task.o: ..\application\shoot.h
 chassis_task\chassisl_task.o: ..\application\gimbal_task.h
 chassis_task\chassisl_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+chassis_task\chassisl_task.o: ..\application\referee.h
+chassis_task\chassisl_task.o: ../application/protocol/protocol.h

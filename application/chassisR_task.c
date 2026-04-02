@@ -15,6 +15,7 @@
 #include "shoot.h"
 #include "VMC_calc.h"
 #include "test_task.h"
+#include "referee.h"
 #define YAW_MOUSE_SEN 0.00007f	  // 0.00005f
 #define PITCH_MOUSE_SEN -0.00005f // 0.00015f
 #define VELOCITY_EPSILON 1e-4f
@@ -38,7 +39,7 @@
 // rocker value (max 660) change to vertial speed (m/s)
 // 遥控器前进摇杆（max 660）转化成车体前进速度（m/s）的比例
 #define CHASSIS_VX_RC_SEN 0.0100f
-
+extern robot_status_t robot_state;
 // 右边
 float LQR_K_R[12] = {
 	-11.0224, -2.664, -11.6436, -20.2754, 30.2361, 3.3863, //      ??????????????????????
@@ -205,6 +206,9 @@ uint8_t filter_flag = 0;
 float heng_target = -1.5707963f;
 float w_time = 0; // 小陀螺持续时间
 float heng_angle = 0;
+uint16_t w_cnt=0;
+int16_t wheel_motor_current[2]={0,0};
+
 
 uint16_t key_v = 0;
 uint16_t k_w = 0;
@@ -358,8 +362,8 @@ void ChassisR_task(void)
 	chassis_move_balance.v_set = 0;
 	chassis_move_balance.recover_flag = 0;
 	chassis_move_balance.roll_set =
-		// 0.0005;
-		0.000f;
+		 0.0005;
+		// 0.000f;
 	shoot_control.shoot_send_flag = 0;
 	chassis_move_balance.target_x = 0;
 	while (INS.ins_flag == 0)
@@ -385,6 +389,19 @@ void ChassisR_task(void)
 		// {
 		// 	Buletooth_debug_task();
 		// }
+
+		// 周期性重新使能关节电机（防止断电复活后电机未使能）
+		static uint16_t R_re_enable_cnt = 0;
+		R_re_enable_cnt++;
+		if (R_re_enable_cnt >= 200)
+		{
+			R_re_enable_cnt = 0;
+			enable_motor_mode(&hcan1, chassis_move_balance.joint_motor[1].para.id, chassis_move_balance.joint_motor[1].mode);
+			osDelay(1);
+			enable_motor_mode(&hcan1, chassis_move_balance.joint_motor[0].para.id, chassis_move_balance.joint_motor[0].mode);
+			osDelay(1);
+		}
+		
 
 		// 等待电机使能
 		chassis_move_balance.DUBS_ON = toe_is_error(DBUS_TOE); // 0:正常 1:异常
@@ -429,14 +446,14 @@ void ChassisR_task(void)
 		}
 
 		// 遥控器和键鼠控制切换逻辑(左右拨杆都处于中间时键鼠控制)
-		// if (chassis_move_balance.chassis_RC->rc.s[0] == 3 && chassis_move_balance.chassis_RC->rc.s[1] == 3)
-		// {
-		// 	RC_KEY_flag = 1;
-		// }
-		// else
-		// {
-		// 	RC_KEY_flag = 0;
-		// }
+		if (chassis_move_balance.chassis_RC->rc.s[0] == 3 && chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		{
+			RC_KEY_flag = 1;
+		}
+		else
+		{
+			RC_KEY_flag = 0;
+		}
 
 		// if (chassis_move_balance.chassis_RC->rc.s[1] == 1)
 		// {
@@ -728,19 +745,34 @@ void ChassisR_task(void)
 			// 小陀螺
 			if (chassis_move_balance.w_flag == 1)
 			{
-				w_time += 0.003f;
-				if (w_time >= 6.283f) // 约4秒钟
+				// w_time += 0.003f;
+				// if (w_time >= 6.283f) // 约4秒钟
+				// {
+				// 	w_time = 0;
+				// }
+				w_cnt++;
+				if(w_cnt<1500)
 				{
-					w_time = 0;
+					chassis_move_balance.Wz_target=2.0f;
 				}
-				chassis_move_balance.Wz_target = 1.1f + arm_sin_f32(w_time) * 0.2f; // 变速小陀螺目标角速度
+				else if(w_cnt>=1500&&w_cnt<2500)
+				{
+					chassis_move_balance.Wz_target=1.5f;
+				}
+				else
+				{
+					w_cnt=0;
+				}
+				// chassis_move_balance.Wz_target = 1.1f + arm_sin_f32(w_time) * 0.2f; // 变速小陀螺目标角速度
 				chassis_move_balance.v_set = 0;
 				chassis_move_balance.x_set = 0;
 				chassis_move_balance.target_x = 0;
+				chassis_move_balance.v_filter2 = 0;
 			}
 			else
 			{
 				w_time = 0;
+				w_cnt=0;
 				chassis_move_balance.Wz_target = 0;
 			}
 		}
@@ -748,8 +780,8 @@ void ChassisR_task(void)
 		chassisR_feedback_update(&chassis_move_balance, &right, &INS);
 
 		//测试
-		yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.00003f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
-		pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.00003f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
+		// yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.00003f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
+		// pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.00003f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
 		
 		//	 chassis_move_balance.turn_set = 0;
 		//	 chassis_set_mode(&chassis_move_balance);
@@ -759,6 +791,7 @@ void ChassisR_task(void)
 		//		mit_ctrl(&hcan1,0X06,0,1,0,1,0);
 
 		// 关节电机和足电机控制
+		// if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1)
 		if (chassis_move_balance.start_flag == 1)
 		{
 			mit_ctrl(&hcan1, 0x08, 0.0f, 0.0f, 0.0f, 0.8f, right.torque_set[1]); // right.torque_set[1]
@@ -776,8 +809,10 @@ void ChassisR_task(void)
 		//			mit_ctrl(&hcan1,0x06, 0.0f, 0.0f,0.0f, 0.0f,0.0f);//right.torque_set[0]
 		//			osDelay(CHASSR_TIME);
 		//			CAN_cmd_chassis(0);
-		else if (chassis_move_balance.start_flag == 0)
+		// else if (chassis_move_balance.start_flag == 0)
+		else
 		{
+			chassis_move_balance.wheel_motor[0].given_current=0;
 			mit_ctrl(&hcan1, 0x08, 0.0f, 0.0f, 0.0f, 0.8f, 0.0f); // right.torque_set[1]
 			osDelay(CHASSR_TIME);
 			mit_ctrl(&hcan1, 0x06, 0.0f, 0.0f, 0.0f, 0.8f, 0.0f); // right.torque_set[0]
@@ -887,7 +922,7 @@ void chassisR_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
 	vmc->phi4 = pi / 2.0f + chassis->joint_motor[1].para.pos;
 
 	chassis->myPithR = ins->Pitch;
-	chassis->myPithGyroR = ins->Gyro[1];
+	chassis->myPithGyroR = ins->Gyro[0];
 
 	chassis->relative_angle = chassis->yaw_motor_angle;
 
@@ -962,14 +997,16 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 退出小陀螺减速状态
 	else if (W_cplt_flag == 1 && chassis->w_flag != 1)
 	{
-		chassis_move_balance.Wz_target = 0.2f;
+		chassis_move_balance.Wz_target = 0.8f;
 		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.005f); // 斜坡函数
 		chassis->turn_T = Turn_Pid.Kp * (chassis->Wz_set - 0) - Turn_Pid.Kd * ins->Gyro[2];
 		chassis_move_balance.v_set = 0;
-		chassis_move_balance.x_set = 0;
 		chassis_move_balance.target_x = 0;
-		if ((chassis->relative_angle < 0.8f) && (chassis->relative_angle > -0.8f)) // 当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
+		chassis_move_balance.v_filter2 = 0;
+		if ((chassis->relative_angle < 0.8f) && (chassis->relative_angle > -0.8f) && chassis_move_balance.Wz_set<1.0f) // 当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
 		{
+			chassis_move_balance.x_filter=0;
+			chassis_move_balance.x_set = chassis_move_balance.x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 			chassis_move_balance.Wz_target = 0.0f;
 			chassis_move_balance.Wz_set = 0.0f;
 			W_cplt_flag = 0;
@@ -1058,6 +1095,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		{
 			vmcr->F0 = 17.2f / arm_cos_f32(vmcr->theta) + PID_calc_1(leg, vmcr->L0, chassis->leg_set) - chassis->roll_f0 + turn_R_compensation; // f0=前馈(抵消重力)+腿长pd+roll轴补偿
 		}
+		else
 		{
 			vmcr->F0 = 17.2f / arm_cos_f32(vmcr->theta) + PID_calc_1(leg, vmcr->L0, chassis->leg_set) - chassis->roll_f0; // f0=前馈(抵消重力)+腿长pd+roll轴补偿
 		}
@@ -1270,7 +1308,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		}
 	}
 
-	// 功率控制
+	// 功率控制，测试
 	chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅

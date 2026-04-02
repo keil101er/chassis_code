@@ -13,19 +13,23 @@ game_result_t game_result;//
 game_robot_HP_t robot_HP_t;//血量
 
 event_data_t field_event;
-ext_supply_projectile_action_t supply_projectile_action_t;
-ext_supply_projectile_booking_t supply_projectile_booking_t;
 referee_warning_t referee_warning_t1;
+dart_info_t dart_info_t1;
 
 
 robot_status_t robot_state;
 power_heat_data_t power_heat_data_t1;
 robot_pos_t game_robot_pos_t;
 buff_t buff_musk_t;
-air_support_data_t robot_energy_t;
 hurt_data_t robot_hurt_t;
 shoot_data_t shoot_data_t1;
 projectile_allowance_t bullet_remaining_t;
+rfid_status_t rfid_status_t1;
+dart_client_cmd_t dart_client_cmd_t1;
+ground_robot_position_t ground_robot_position_t1;
+radar_mark_data_t radar_mark_data_t1;
+sentry_info_t sentry_info_t1;
+radar_info_t radar_info_t1;
 robot_interaction_data_t student_interactive_data_t;
 ext_robot_command_t ext_robot_command;
 
@@ -41,19 +45,23 @@ void init_referee_struct_data(void)
 
 
     memset(&field_event, 0, sizeof(event_data_t));
-    memset(&supply_projectile_action_t, 0, sizeof(ext_supply_projectile_action_t));
-    memset(&supply_projectile_booking_t, 0, sizeof(ext_supply_projectile_booking_t));
     memset(&referee_warning_t1, 0, sizeof(referee_warning_t));
+    memset(&dart_info_t1, 0, sizeof(dart_info_t));
 
 
     memset(&robot_state, 0, sizeof(robot_status_t));
     memset(&power_heat_data_t1, 0, sizeof(power_heat_data_t));
     memset(&game_robot_pos_t, 0, sizeof(robot_pos_t));
     memset(&buff_musk_t, 0, sizeof(buff_t));
-    memset(&robot_energy_t, 0, sizeof(air_support_data_t));
     memset(&robot_hurt_t, 0, sizeof(hurt_data_t));
     memset(&shoot_data_t1, 0, sizeof(shoot_data_t));
     memset(&bullet_remaining_t, 0, sizeof(projectile_allowance_t));
+    memset(&rfid_status_t1, 0, sizeof(rfid_status_t));
+    memset(&dart_client_cmd_t1, 0, sizeof(dart_client_cmd_t));
+    memset(&ground_robot_position_t1, 0, sizeof(ground_robot_position_t));
+    memset(&radar_mark_data_t1, 0, sizeof(radar_mark_data_t));
+    memset(&sentry_info_t1, 0, sizeof(sentry_info_t));
+    memset(&radar_info_t1, 0, sizeof(radar_info_t));
     memset(&ext_robot_command, 0, sizeof(ext_robot_command));
 
     memset(&student_interactive_data_t, 0, sizeof(robot_interaction_data_t));
@@ -99,19 +107,14 @@ void referee_data_solve(uint8_t *frame)
             memcpy(&field_event, frame + index, sizeof(field_event));
         }
         break;
-        case SUPPLY_PROJECTILE_ACTION_CMD_ID:
-        {
-            memcpy(&supply_projectile_action_t, frame + index, sizeof(supply_projectile_action_t));
-        }
-        break;
-        case SUPPLY_PROJECTILE_BOOKING_CMD_ID:
-        {
-            memcpy(&supply_projectile_booking_t, frame + index, sizeof(supply_projectile_booking_t));
-        }
-        break;
         case REFEREE_WARNING_CMD_ID:
         {
             memcpy(&referee_warning_t1, frame + index, sizeof(referee_warning_t));
+        }
+        break;
+        case DART_INFO_CMD_ID:
+        {
+            memcpy(&dart_info_t1, frame + index, sizeof(dart_info_t));
         }
         break;
 
@@ -135,11 +138,6 @@ void referee_data_solve(uint8_t *frame)
             memcpy(&buff_musk_t, frame + index, sizeof(buff_musk_t));
         }
         break;
-        case AERIAL_ROBOT_ENERGY_CMD_ID:
-        {
-            memcpy(&robot_energy_t, frame + index, sizeof(robot_energy_t));
-        }
-        break;
         case ROBOT_HURT_CMD_ID:
         {
             memcpy(&robot_hurt_t, frame + index, sizeof(robot_hurt_t));
@@ -153,6 +151,36 @@ void referee_data_solve(uint8_t *frame)
         case BULLET_REMAINING_CMD_ID:
         {
             memcpy(&bullet_remaining_t, frame + index, sizeof(projectile_allowance_t));
+        }
+        break;
+        case RFID_STATUS_CMD_ID:
+        {
+            memcpy(&rfid_status_t1, frame + index, sizeof(rfid_status_t));
+        }
+        break;
+        case DART_CLIENT_CMD_ID:
+        {
+            memcpy(&dart_client_cmd_t1, frame + index, sizeof(dart_client_cmd_t));
+        }
+        break;
+        case GROUND_ROBOT_POSITION_CMD_ID:
+        {
+            memcpy(&ground_robot_position_t1, frame + index, sizeof(ground_robot_position_t));
+        }
+        break;
+        case RADAR_MARK_DATA_CMD_ID:
+        {
+            memcpy(&radar_mark_data_t1, frame + index, sizeof(radar_mark_data_t));
+        }
+        break;
+        case SENTRY_INFO_CMD_ID:
+        {
+            memcpy(&sentry_info_t1, frame + index, sizeof(sentry_info_t));
+        }
+        break;
+        case RADAR_INFO_CMD_ID:
+        {
+            memcpy(&radar_info_t1, frame + index, sizeof(radar_info_t));
         }
         break;
         case STUDENT_INTERACTIVE_DATA_CMD_ID:
@@ -180,7 +208,8 @@ void get_chassis_max_power(uint16_t *max_power_limit)
 
 void get_chassis_power_and_buffer(fp32 *power, fp32 *buffer)
 {
-    *power = power_heat_data_t1.chassis_power;
+    // The 0x0202 payload keeps chassis power in the float field at offset 4.
+    *power = power_heat_data_t1.reserved_3;
     *buffer = power_heat_data_t1.buffer_energy;
     //*buffer =70;*power=20;
 }
@@ -194,7 +223,7 @@ uint8_t get_robot_id(void)
 void get_shoot_heat0_limit_and_heat0(uint16_t *heat0_limit, uint16_t *heat0)
 {
     *heat0_limit = robot_state.shooter_barrel_cooling_value;
-    *heat0 = power_heat_data_t1.shooter_17mm_2_barrel_heat;
+    *heat0 = power_heat_data_t1.shooter_17mm_barrel_heat;
 }
 
 
@@ -219,11 +248,10 @@ void get_ext_robot_command_date(float *coordinate_x, float  *coordinate_y,uint8_
 void get_shoot_heat1_limit_and_heat1(uint16_t *heat1_limit, uint16_t *heat1)
 {
     *heat1_limit = robot_state.shooter_barrel_cooling_value;
-    *heat1 = power_heat_data_t1.shooter_17mm_2_barrel_heat;
+    *heat1 = power_heat_data_t1.shooter_17mm_barrel_heat;
 }
  void get_game_state(uint8_t *game_progress, uint16_t *stage_remain_time)
 {
     *game_progress =game_state.game_progress ;
     *stage_remain_time = game_state.stage_remain_time;
 }
-

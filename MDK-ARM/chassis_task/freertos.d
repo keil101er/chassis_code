@@ -81,4 +81,5 @@ chassis_task\freertos.o: ../MDK-ARM/dm_8009_drv.h
 chassis_task\freertos.o: ../application/observe_task.h
 chassis_task\freertos.o: ../application/detect_task.h
 chassis_task\freertos.o: ../application/led_flow_task.h
+chassis_task\freertos.o: ../application/test_task.h
 chassis_task\freertos.o: ../application/referee_usart_task.h

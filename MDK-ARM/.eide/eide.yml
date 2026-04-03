@@ -1,4 +1,4 @@
-version: "4.1"
+﻿version: "4.1"
 name: chassis_task
 type: ARM
 deviceName: null
@@ -97,7 +97,7 @@ virtualFolder:
         - path: ../application/detect_task.c
         - path: ../application/led_flow_task.c
         - path: ../application/remote_control.c
-        - path: ../application/test_task.c
+        - path: test_task.c
         - path: ../application/chassisR_task.c
         - path: ../application/dm_8009_drv.c
         - path: chassisL_task.c
@@ -105,7 +105,10 @@ virtualFolder:
         - path: ../application/observe_task.c
         - path: ../application/referee.c
         - path: ../application/referee_usart_task.c
-        - path: ../application/shoot.c
+    - name: ui
+      files:
+        - path: ui_interface.c
+        - path: ui_g.c
       folders: []
     - name: devices
       files:
@@ -312,3 +315,4 @@ targets:
         proType: 1
         speed: 8000
     uploader: JLink
+

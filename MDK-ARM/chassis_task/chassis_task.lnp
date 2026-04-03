@@ -47,6 +47,8 @@
 "chassis_task\referee.o"
 "chassis_task\referee_usart_task.o"
 "chassis_task\shoot.o"
+"chassis_task\ui_interface.o"
+"chassis_task\ui_g.o"
 "chassis_task\bmi088driver.o"
 "chassis_task\bmi088middleware.o"
 "chassis_task\ist8310driver.o"

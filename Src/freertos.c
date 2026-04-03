@@ -37,7 +37,7 @@
 #include "detect_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
-
+#include "test_task.h"
 
 #include "referee_usart_task.h"
 

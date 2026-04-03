@@ -823,7 +823,7 @@
             <File>
               <FileName>test_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\application\test_task.c</FilePath>
+              <FilePath>.\test_task.c</FilePath>
             </File>
             <File>
               <FileName>chassisR_task.c</FileName>
@@ -864,6 +864,21 @@
               <FileName>shoot.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\shoot.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ui</GroupName>
+          <Files>
+            <File>
+              <FileName>ui_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ui_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_g.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ui_g.c</FilePath>
             </File>
           </Files>
         </Group>

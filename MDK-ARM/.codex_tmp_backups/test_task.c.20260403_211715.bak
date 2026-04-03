@@ -30,7 +30,6 @@ static void buzzer_warn_error(uint8_t num);
 static void ui_update_text(ui_interface_string_t *obj, const char *text);
 static void ui_update_overlay(void);
 static void ui_refresh_static_text(void);
-static float ui_clamp_f32(float value, float min_value, float max_value);
 static int32_t ui_clamp_i32(int32_t value, int32_t min_value, int32_t max_value);
 const error_t *error_list_test_local;
 static void ui_reinit_overlay(void);
@@ -139,32 +138,19 @@ void test_task(void const *argument)
             last_key_v = key_v;
         }
 
-        osDelay(40);
+        osDelay(100);
     }
 }
 
 static void ui_update_overlay(void)
 {
-    const float body_center_x = 1654.0f;
-    const float body_center_y = 442.0f;
-    const float body_half_length = 74.5f;
-    const float wheel_radius = 24.0f;
-    const float leg_visual_length_min = wheel_radius;
-    const float leg_visual_length_max = 100.0f;
-    const float leg_length_min_m = 0.12f;
-    const float leg_length_max_m = 0.32f;
-
     float chassis_power = 0.0f;
     float buffer_energy = 0.0f;
-    float leg_length = chassis_move_balance.leg_set;
-    float body_angle = -chassis_move_balance.myPithR;
-    float leg_angle = -right.theta;
-    float leg_length_ratio;
-    float leg_visual_length;
-    float body_dx;
-    float body_dy;
-    float wheel_center_x;
-    float wheel_center_y;
+     float leg_length = chassis_move_balance.leg_set;
+    
+    float leg_angle = right.theta;
+    int32_t leg_height;
+    int32_t angle_offset;
     uint8_t show_fire;
     uint8_t show_gyro;
     uint8_t show_follow;
@@ -176,37 +162,18 @@ static void ui_update_overlay(void)
     {
         leg_length = right.L0;
     }
-
     ui_g_Ungroup_leg_value->number = (int32_t)lroundf(leg_length * 1000.0f);
     ui_g_Ungroup_power_value->number = (int32_t)lroundf(chassis_power);
 
-    body_angle = ui_clamp_f32(body_angle, -0.6f, 0.6f);
-    leg_angle = ui_clamp_f32(leg_angle, -0.8f, 0.8f);
-    leg_length_ratio = (leg_length - leg_length_min_m) / (leg_length_max_m - leg_length_min_m);
-    leg_length_ratio = ui_clamp_f32(leg_length_ratio, 0.0f, 1.0f);
-    leg_visual_length = leg_visual_length_min +
-                        leg_length_ratio * (leg_visual_length_max - leg_visual_length_min);
+    leg_height = (int32_t)lroundf(40.0f + (leg_length - 0.13f) * 350.0f);
+    leg_height = ui_clamp_i32(leg_height, 30, 110);
+    angle_offset = (int32_t)lroundf(leg_angle * 40.0f);
+    angle_offset = ui_clamp_i32(angle_offset, -30, 30);
 
-    body_dx = cosf(body_angle) * body_half_length;
-    body_dy = sinf(body_angle) * body_half_length;
-
-    ui_g_Ungroup_car_body_line->start_x = (uint32_t)lroundf(body_center_x - body_dx);
-    ui_g_Ungroup_car_body_line->start_y = (uint32_t)lroundf(body_center_y - body_dy);
-    ui_g_Ungroup_car_body_line->details_d = (uint32_t)lroundf(body_center_x + body_dx);
-    ui_g_Ungroup_car_body_line->details_e = (uint32_t)lroundf(body_center_y + body_dy);
-
-    ui_g_Ungroup_leg_line->start_x = (uint32_t)lroundf(body_center_x);
-    ui_g_Ungroup_leg_line->start_y = (uint32_t)lroundf(body_center_y);
-
-    wheel_center_x = body_center_x - sinf(leg_angle) * leg_visual_length;
-    wheel_center_y = body_center_y - cosf(leg_angle) * leg_visual_length;
-
-    ui_g_Ungroup_leg_line->details_d = (uint32_t)lroundf(wheel_center_x);
-    ui_g_Ungroup_leg_line->details_e = (uint32_t)lroundf(wheel_center_y);
-
-    ui_g_Ungroup_wheel_round->start_x = (uint32_t)lroundf(wheel_center_x);
-    ui_g_Ungroup_wheel_round->start_y = (uint32_t)lroundf(wheel_center_y);
-    ui_g_Ungroup_wheel_round->details_c = (uint32_t)lroundf(wheel_radius);
+    ui_g_Ungroup_leg_state->start_x = (uint32_t)(1633 + angle_offset);
+    ui_g_Ungroup_leg_state->details_d = (uint32_t)(1637 + angle_offset);
+    ui_g_Ungroup_leg_state->details_e = 382;
+    ui_g_Ungroup_leg_state->start_y = (uint32_t)(382 - leg_height);
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);
@@ -235,21 +202,6 @@ static void ui_update_text(ui_interface_string_t *obj, const char *text)
 static void ui_refresh_static_text(void)
 {
     ui_refresh_string_create_g();
-}
-
-static float ui_clamp_f32(float value, float min_value, float max_value)
-{
-    if (value < min_value)
-    {
-        return min_value;
-    }
-
-    if (value > max_value)
-    {
-        return max_value;
-    }
-
-    return value;
 }
 
 static int32_t ui_clamp_i32(int32_t value, int32_t min_value, int32_t max_value)

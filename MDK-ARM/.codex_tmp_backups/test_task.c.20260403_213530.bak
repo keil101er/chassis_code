@@ -139,7 +139,7 @@ void test_task(void const *argument)
             last_key_v = key_v;
         }
 
-        osDelay(40);
+        osDelay(100);
     }
 }
 
@@ -157,8 +157,8 @@ static void ui_update_overlay(void)
     float chassis_power = 0.0f;
     float buffer_energy = 0.0f;
     float leg_length = chassis_move_balance.leg_set;
-    float body_angle = -chassis_move_balance.myPithR;
-    float leg_angle = -right.theta;
+    float body_angle = chassis_move_balance.myPithR;
+    float leg_angle = right.theta;
     float leg_length_ratio;
     float leg_visual_length;
     float body_dx;
@@ -206,7 +206,7 @@ static void ui_update_overlay(void)
 
     ui_g_Ungroup_wheel_round->start_x = (uint32_t)lroundf(wheel_center_x);
     ui_g_Ungroup_wheel_round->start_y = (uint32_t)lroundf(wheel_center_y);
-    ui_g_Ungroup_wheel_round->details_c = (uint32_t)lroundf(wheel_radius);
+    ui_g_Ungroup_wheel_round->details_a = (uint32_t)lroundf(wheel_radius);
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);

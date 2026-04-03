@@ -139,7 +139,7 @@ void test_task(void const *argument)
             last_key_v = key_v;
         }
 
-        osDelay(40);
+        osDelay(100);
     }
 }
 
@@ -157,8 +157,8 @@ static void ui_update_overlay(void)
     float chassis_power = 0.0f;
     float buffer_energy = 0.0f;
     float leg_length = chassis_move_balance.leg_set;
-    float body_angle = -chassis_move_balance.myPithR;
-    float leg_angle = -right.theta;
+    float body_angle = chassis_move_balance.roll;
+    float leg_angle = right.theta;
     float leg_length_ratio;
     float leg_visual_length;
     float body_dx;
@@ -198,15 +198,15 @@ static void ui_update_overlay(void)
     ui_g_Ungroup_leg_line->start_x = (uint32_t)lroundf(body_center_x);
     ui_g_Ungroup_leg_line->start_y = (uint32_t)lroundf(body_center_y);
 
-    wheel_center_x = body_center_x - sinf(leg_angle) * leg_visual_length;
-    wheel_center_y = body_center_y - cosf(leg_angle) * leg_visual_length;
+    wheel_center_x = body_center_x + sinf(leg_angle) * leg_visual_length;
+    wheel_center_y = body_center_y + cosf(leg_angle) * leg_visual_length;
 
     ui_g_Ungroup_leg_line->details_d = (uint32_t)lroundf(wheel_center_x);
     ui_g_Ungroup_leg_line->details_e = (uint32_t)lroundf(wheel_center_y);
 
     ui_g_Ungroup_wheel_round->start_x = (uint32_t)lroundf(wheel_center_x);
     ui_g_Ungroup_wheel_round->start_y = (uint32_t)lroundf(wheel_center_y);
-    ui_g_Ungroup_wheel_round->details_c = (uint32_t)lroundf(wheel_radius);
+    ui_g_Ungroup_wheel_round->details_a = (uint32_t)lroundf(wheel_radius);
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);
@@ -252,8 +252,7 @@ static float ui_clamp_f32(float value, float min_value, float max_value)
     return value;
 }
 
-static int32_t ui_clamp_i32(int32_t value, int32_t min_value, int32_t max_value)
-{
+
     if (value < min_value)
     {
         return min_value;

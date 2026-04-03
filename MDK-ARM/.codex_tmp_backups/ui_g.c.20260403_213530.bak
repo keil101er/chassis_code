@@ -95,7 +95,7 @@ void ui_init_g(void)
     ui_g_Ungroup_wheel_round->start_x = 1654;
     ui_g_Ungroup_wheel_round->start_y = 466;
     ui_g_Ungroup_wheel_round->width = 5;
-    ui_g_Ungroup_wheel_round->details_c = 24;
+    ui_g_Ungroup_wheel_round->details_a = 24;
 
     ui_g_Ungroup_power_value->figure_type = UI_FIGURE_TYPE_NUMBER;
     ui_g_Ungroup_power_value->operate_type = 1;

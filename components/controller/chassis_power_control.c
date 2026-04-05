@@ -143,6 +143,7 @@ fp32 total_current_limit = 0.0f;
 extern RC_ctrl_t rc_ctrl;
 float initial_give_power[4]; // initial power from PID calculation
 float initial_total_power = 0;
+float total_power = 0;
 
 void chassis_power_control(chassis_t *chassis_power_control)
 {
@@ -214,7 +215,8 @@ void chassis_power_control(chassis_t *chassis_power_control)
 			continue;
 		initial_total_power += initial_give_power[i]; // 总功率
 	}
-
+	total_power=initial_total_power;
+	
 	if (initial_total_power > chassis_max_power) // 判断是否大于最大功率
 	{
 		fp32 direct_power_scale = chassis_max_power / initial_total_power;

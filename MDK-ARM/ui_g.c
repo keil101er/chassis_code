@@ -138,6 +138,21 @@ static void ui_refresh_dirty_figures(const uint8_t *indices, int count)
     }
 }
 
+static uint8_t ui_has_dirty_figures(const uint8_t *indices, int count)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        if (ui_g_dirty_figure[indices[i]] > 0U)
+        {
+            return 1U;
+        }
+    }
+
+    return 0U;
+}
+
 static void ui_send_dirty_figures(const uint8_t *indices, int count)
 {
     ui_interface_figure_t figures[7];
@@ -380,14 +395,102 @@ uint8_t ui_init_step_g(void)
 
 void ui_update_g(void)
 {
+    static uint8_t runtime_slot = 0U;
+    uint8_t has_state = 0U;
+    uint8_t has_move = 0U;
+    uint8_t has_data = 0U;
+
     ui_refresh_dirty_figures(ui_g_runtime_state_indices, 3);
-    ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
-
     ui_refresh_dirty_figures(ui_g_runtime_move_indices, 4);
-    ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
-
     ui_refresh_dirty_figures(ui_g_runtime_data_indices, 3);
-    ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+
+    has_state = ui_has_dirty_figures(ui_g_runtime_state_indices, 3);
+    has_move = ui_has_dirty_figures(ui_g_runtime_move_indices, 4);
+    has_data = ui_has_dirty_figures(ui_g_runtime_data_indices, 3);
+
+    switch (runtime_slot)
+    {
+    case 0:
+        if (has_data != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+        }
+        else if (has_move != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
+        }
+        else if (has_state != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
+        }
+        break;
+
+    case 1:
+        if (has_move != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
+        }
+        else if (has_data != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+        }
+        else if (has_state != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
+        }
+        break;
+
+    case 2:
+        if (has_data != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+        }
+        else if (has_move != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
+        }
+        else if (has_state != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
+        }
+        break;
+
+    case 3:
+        if (has_move != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
+        }
+        else if (has_data != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+        }
+        else if (has_state != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
+        }
+        break;
+
+    default:
+        if (has_state != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_state_indices, 3);
+        }
+        else if (has_data != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_data_indices, 3);
+        }
+        else if (has_move != 0U)
+        {
+            ui_send_dirty_figures(ui_g_runtime_move_indices, 4);
+        }
+        break;
+    }
+
+    runtime_slot++;
+    if (runtime_slot >= 5U)
+    {
+        runtime_slot = 0U;
+    }
 }
 
 void ui_force_refresh_g(void)

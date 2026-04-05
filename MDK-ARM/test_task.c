@@ -40,7 +40,7 @@ uint16_t stp23_temperature = 0;
 uint16_t stp23_start_angle = 0;
 uint16_t stp23_end_angle = 0;
 uint16_t stp23_timestamp = 0;
-extern float initial_total_power;
+extern float total_power;
 void Buletooth_debug_task(void)
 {
     snprintf(debug_info, sizeof(debug_info), "%d,%.2f,%.2f\n",
@@ -128,7 +128,7 @@ void test_task(void const *argument)
                 ui_update_g();
 
                 ui_fragile_refresh_tick++;
-                if (ui_fragile_refresh_tick >= 5U)
+                if (ui_fragile_refresh_tick >= 20U)
                 {
                     ui_refresh_fragile_create_g();
                     ui_fragile_refresh_tick = 0U;
@@ -138,12 +138,15 @@ void test_task(void const *argument)
             last_key_v = key_v;
         }
 
-        osDelay(100);
+        osDelay(40);
     }
 }
 
 static void ui_update_overlay(void)
 {
+    static float display_leg_length = 0.0f;
+    static float display_power = 0.0f;
+    static uint8_t display_value_initialized = 0U;
     const float body_center_x = 1769.5f;
     const float body_center_y = 450.0f;
     const float body_half_length = 74.5f;
@@ -178,19 +181,34 @@ static void ui_update_overlay(void)
     uint8_t show_enable;
 
     get_chassis_power_and_buffer(&chassis_power, &buffer_energy);
-    chassis_power=initial_total_power;
+    chassis_power = total_power;
     if (right.L0 > 0.05f)
     {
         leg_length = right.L0;
     }
 
-    ui_g_Ungroup_leg_value->number = (int32_t)lroundf(leg_length * 1000.0f);
-    ui_g_Ungroup_power_value->number = (int32_t)lroundf(chassis_power);
+    if (display_value_initialized == 0U)
+    {
+        display_leg_length = leg_length;
+        display_power = chassis_power;
+        display_value_initialized = 1U;
+    }
+    else
+    {
+        display_leg_length += 0.28f * (leg_length - display_leg_length);
+        display_power += 0.20f * (chassis_power - display_power);
+    }
+
+    display_leg_length = ui_clamp_f32(display_leg_length, leg_length_min_m, leg_length_max_m);
+    display_power = ui_clamp_f32(display_power, 0.0f, 9999.0f);
+
+    ui_g_Ungroup_leg_value->number = (int32_t)lroundf(display_leg_length * 1000.0f);
+    ui_g_Ungroup_power_value->number = (int32_t)lroundf(display_power * 1000.0f);
 
     body_angle = ui_clamp_f32(body_angle, -0.6f, 0.6f);
     leg_angle = ui_clamp_f32(leg_angle, -0.8f, 0.8f);
     relative_angle = ui_clamp_f32(relative_angle, -1.2f, 1.2f);
-    leg_length_ratio = (leg_length - leg_length_min_m) / (leg_length_max_m - leg_length_min_m);
+    leg_length_ratio = (display_leg_length - leg_length_min_m) / (leg_length_max_m - leg_length_min_m);
     leg_length_ratio = ui_clamp_f32(leg_length_ratio, 0.0f, 1.0f);
     leg_visual_length = leg_visual_length_min +
                         leg_length_ratio * (leg_visual_length_max - leg_visual_length_min);

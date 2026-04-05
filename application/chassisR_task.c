@@ -1039,13 +1039,15 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		chassis->turn_T = Turn_Pid.Kp * (angle - 0) - Turn_Pid.Kd * ins->Gyro[2];
 		// chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
 	}
+
 	// 自瞄模式：底盘保持当前朝向不动，只用角速度阻尼防止外力扰动 (测试)
-	if (gimbal_mode == 2)
-	{
-		heng_angle = 0.0f;
-		chassis->turn_T = 0; //不跟随不旋转
-		angle = 0;
-	}
+	// if (gimbal_mode == 2)
+	// {
+	// 	heng_angle = 0.0f;
+	// 	chassis->turn_T = 0; //不跟随不旋转
+	// 	angle = 0;
+	// }
+
 	// Roll轴补偿
 	chassis->roll_f0 = Roll_Pid.Kp * (chassis->roll_set - chassis->roll) - Roll_Pid.Kd * ins->Gyro[0];
 	// Roll轴补偿的pid限幅
@@ -1123,7 +1125,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 	}
 	// 跳跃逻辑
-	if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
+	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
+	if (k_shift)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;
@@ -1211,6 +1214,9 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		debug_flag = 1;
 		jump_module_R = 0;
 	}
+
+
+
 	if (jump_status == 2)
 	{
 		jump_cd++;
@@ -1309,7 +1315,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 功率控制，测试
-	chassis_power_control(chassis);
+	// chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅
 

@@ -182,7 +182,7 @@ void chassisL_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
     chassis->wheel_motor[1].speed   = 0.0004998609952f * chassis->wheel_motor[1].speed_rpm;             // 速度
     chassis->wheel_motor[1].wheel_T = CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN * chassis->wheel_motor[1].given_current;
     // chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
-    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 297); // 获取相对角度值，零点ecd=2865
+    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 7957); // 获取相对角度值，零点ecd=2865
                                                                                                //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 
     // static fp32 speed_fliter_1 = 0.0f;
@@ -261,89 +261,91 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     //		vmcl->F0=11.2f/arm_cos_f32(vmcl->theta)+PID_calc(leg,vmcl->L0,chassis->leg_set);//前馈+pd
 
     // 起跳阶段
-    // if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) {
-    //     chassis->leg_set = 0.15f;
-    //     if (chassis->chassis_RC->rc.ch[4] < -500 || AUTO_jump_flag == 1) {
-    //         chassis->help_jump_flag = 1;
-    //     }
-    //     // 压缩阶段
-    //     if (chassis->jump_flag_l == 0 && chassis->help_jump_flag == 1) {
-    //         // chassis->leg_set = 0.12f;
-    //         // jumpF0_L=17.2f;
-    //         if (vmcl->L0 < 0.16f) {
-    //             AUTO_jump_flag = 0;
-    //             jump_time_l++;
-    //             jump_time_l          = 0;
-    //             jump_time_r          = 0;
-    //             chassis->jump_flag_l = 1;
-    //             chassis->jump_flag_r = 1;
-    //         }
-    //         //  if(jump_time_l>=25&&jump_time_l>=25)
-    //         //  {
-    //         // 	 jump_time_l=0;
-    //         // 	 jump_time_r=0;
-    //         // 	 chassis->jump_flag_l=1;
-    //         // 	 chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
-    //         //  }
-    //     }
-    //     // 上升加速阶段
-    //     else if (chassis->jump_flag_l == 1 && chassis->help_jump_flag == 1) {
-    //         chassis->leg_set = 0.3f;
-    //         jumpF0_L         = 20.0f;
-    //         //  if(vmcl->L0>0.13f)
-    //         //  {
-    //         // 	jump_time_l++;
-    //         //  }
-    //         jump_time_l++;
-    //         if (jump_time_l >= 30 && jump_time_r >= 30) {
-    //             jump_time_l          = 0;
-    //             jump_time_r          = 0;
-    //             chassis->jump_flag_l = 2;
-    //             chassis->jump_flag_r = 2; // 上升完毕进入缩腿阶段
-    //         }
-    //     }
-    //     // 缩腿阶段
-    //     else if (chassis->jump_flag_l == 2 && chassis->help_jump_flag == 1) {
-    //         chassis->leg_set   = 0.2f;
-    //         jumpF0_L           = 15.0f;
-    //         chassis->theta_set = 0.0f;
-    //         chassis->x_filter  = 0.0f;
-    //         chassis->x_set     = chassis->x_filter;
-    //         //   if(vmcl->L0<0.22f)
-    //         //   {
-    //         // 	 jump_time_l++;
-    //         //   }
-    //         jump_time_l++;
-    //         if (jump_time_l >= 35 && jump_time_r >= 35) {
-    //             jump_time_l = 0;
-    //             jump_time_r = 0;
-    //             //  chassis->leg_set=0.15f;
-    //             //  chassis->last_leg_set=0.15f;
-    //             //  chassis->jump_flag_l=0;
-    //             //  chassis->jump_flag_r=0;
-    //             //  chassis->help_jump_flag = 0;
-    //             chassis->jump_flag_l = 3;
-    //             chassis->jump_flag_r = 3;
-    //         }
-    //     }
-    //     // 落地阶段
-    //     else if (chassis->jump_flag_l == 3 && chassis->help_jump_flag == 1) {
-    //         jumpF0_L         = 11.2f;
-    //         chassis->leg_set = 0.25f;
-    //         jump_time_l++;
-    //         if (jump_time_l >= 85 && jump_time_r >= 85) {
-    //             jump_time_l             = 0;
-    //             jump_time_r             = 0;
-    //             chassis->leg_set        = 0.15f;
-    //             chassis->last_leg_set   = 0.15f;
-    //             chassis->jump_flag_l    = 0; // 缩腿完毕
-    //             chassis->jump_flag_r    = 0;
-    //             chassis->help_jump_flag = 0;
-    //         }
-    //     } else {
-    //         vmcl->F0 = 17.2f / arm_cos_f32(vmcl->theta) + PID_calc(leg, vmcl->L0, chassis->leg_set) + chassis->roll_f0;
-    //     }
-    // }
+    // if (chassis->chassis_RC->rc.s[1] == 1 || k_shift)
+    if (k_shift)
+    {
+        chassis->leg_set = 0.15f;
+        if (chassis->chassis_RC->rc.ch[4] < -500 || AUTO_jump_flag == 1) {
+            chassis->help_jump_flag = 1;
+        }
+        // 压缩阶段
+        if (chassis->jump_flag_l == 0 && chassis->help_jump_flag == 1) {
+            // chassis->leg_set = 0.12f;
+            // jumpF0_L=17.2f;
+            if (vmcl->L0 < 0.16f) {
+                AUTO_jump_flag = 0;
+                jump_time_l++;
+                jump_time_l          = 0;
+                jump_time_r          = 0;
+                chassis->jump_flag_l = 1;
+                chassis->jump_flag_r = 1;
+            }
+            //  if(jump_time_l>=25&&jump_time_l>=25)
+            //  {
+            // 	 jump_time_l=0;
+            // 	 jump_time_r=0;
+            // 	 chassis->jump_flag_l=1;
+            // 	 chassis->jump_flag_r=1;//压缩完毕进入上升加速阶段
+            //  }
+        }
+        // 上升加速阶段
+        else if (chassis->jump_flag_l == 1 && chassis->help_jump_flag == 1) {
+            chassis->leg_set = 0.3f;
+            jumpF0_L         = 20.0f;
+            //  if(vmcl->L0>0.13f)
+            //  {
+            // 	jump_time_l++;
+            //  }
+            jump_time_l++;
+            if (jump_time_l >= 30 && jump_time_r >= 30) {
+                jump_time_l          = 0;
+                jump_time_r          = 0;
+                chassis->jump_flag_l = 2;
+                chassis->jump_flag_r = 2; // 上升完毕进入缩腿阶段
+            }
+        }
+        // 缩腿阶段
+        else if (chassis->jump_flag_l == 2 && chassis->help_jump_flag == 1) {
+            chassis->leg_set   = 0.2f;
+            jumpF0_L           = 15.0f;
+            chassis->theta_set = 0.0f;
+            chassis->x_filter  = 0.0f;
+            chassis->x_set     = chassis->x_filter;
+            //   if(vmcl->L0<0.22f)
+            //   {
+            // 	 jump_time_l++;
+            //   }
+            jump_time_l++;
+            if (jump_time_l >= 35 && jump_time_r >= 35) {
+                jump_time_l = 0;
+                jump_time_r = 0;
+                //  chassis->leg_set=0.15f;
+                //  chassis->last_leg_set=0.15f;
+                //  chassis->jump_flag_l=0;
+                //  chassis->jump_flag_r=0;
+                //  chassis->help_jump_flag = 0;
+                chassis->jump_flag_l = 3;
+                chassis->jump_flag_r = 3;
+            }
+        }
+        // 落地阶段
+        else if (chassis->jump_flag_l == 3 && chassis->help_jump_flag == 1) {
+            jumpF0_L         = 11.2f;
+            chassis->leg_set = 0.25f;
+            jump_time_l++;
+            if (jump_time_l >= 85 && jump_time_r >= 85) {
+                jump_time_l             = 0;
+                jump_time_r             = 0;
+                chassis->leg_set        = 0.15f;
+                chassis->last_leg_set   = 0.15f;
+                chassis->jump_flag_l    = 0; // 缩腿完毕
+                chassis->jump_flag_r    = 0;
+                chassis->help_jump_flag = 0;
+            }
+        } else {
+            vmcl->F0 = 17.2f / arm_cos_f32(vmcl->theta) + PID_calc(leg, vmcl->L0, chassis->leg_set) + chassis->roll_f0;
+        }
+    }
 
 
 

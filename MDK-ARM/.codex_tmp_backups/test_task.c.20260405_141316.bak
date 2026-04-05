@@ -28,6 +28,7 @@ extern robot_status_t robot_state;
 char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
 static void ui_update_overlay(void);
+static void ui_refresh_static_text(void);
 static float ui_clamp_f32(float value, float min_value, float max_value);
 const error_t *error_list_test_local;
 static void ui_reinit_overlay(void);
@@ -40,7 +41,7 @@ uint16_t stp23_temperature = 0;
 uint16_t stp23_start_angle = 0;
 uint16_t stp23_end_angle = 0;
 uint16_t stp23_timestamp = 0;
-extern float initial_total_power;
+
 void Buletooth_debug_task(void)
 {
     snprintf(debug_info, sizeof(debug_info), "%d,%.2f,%.2f\n",
@@ -66,8 +67,8 @@ void test_task(void const *argument)
     static uint8_t last_error;
     static uint8_t error_num;
     static uint8_t ui_initialized = 0;
-    static uint8_t ui_init_in_progress = 0;
-    static uint8_t ui_fragile_refresh_tick = 0;
+    static uint8_t ui_static_refresh_tick = 0;
+    static uint8_t ui_text_repair_cycles = 0;
     static uint16_t last_key_v = 0;
 
     (void)argument;
@@ -110,35 +111,33 @@ void test_task(void const *argument)
             {
                 ui_reinit_overlay();
                 ui_initialized = 1;
-                ui_init_in_progress = 1U;
-                ui_fragile_refresh_tick = 0U;
-            }
-            else if (ui_init_in_progress != 0U)
-            {
-                ui_update_overlay();
-                if (ui_init_step_g() != 0U)
-                {
-                    ui_init_in_progress = 0U;
-                    ui_fragile_refresh_tick = 0U;
-                }
+                ui_static_refresh_tick = 0;
+                ui_text_repair_cycles = 6U;
             }
             else
             {
                 ui_update_overlay();
-                ui_update_g();
-
-                ui_fragile_refresh_tick++;
-                if (ui_fragile_refresh_tick >= 5U)
+                if (ui_text_repair_cycles > 0U)
                 {
-                    ui_refresh_fragile_create_g();
-                    ui_fragile_refresh_tick = 0U;
+                    ui_refresh_static_text();
+                    ui_text_repair_cycles--;
+                    ui_static_refresh_tick = 0;
+                }
+                else
+                {
+                    ui_static_refresh_tick++;
+                    if (ui_static_refresh_tick >= 10U)
+                    {
+                        ui_refresh_static_text();
+                        ui_static_refresh_tick = 0;
+                    }
                 }
             }
 
             last_key_v = key_v;
         }
 
-        osDelay(100);
+        osDelay(40);
     }
 }
 
@@ -178,7 +177,7 @@ static void ui_update_overlay(void)
     uint8_t show_enable;
 
     get_chassis_power_and_buffer(&chassis_power, &buffer_energy);
-    chassis_power=initial_total_power;
+
     if (right.L0 > 0.05f)
     {
         leg_length = right.L0;
@@ -190,6 +189,7 @@ static void ui_update_overlay(void)
     body_angle = ui_clamp_f32(body_angle, -0.6f, 0.6f);
     leg_angle = ui_clamp_f32(leg_angle, -0.8f, 0.8f);
     relative_angle = ui_clamp_f32(relative_angle, -1.2f, 1.2f);
+
     leg_length_ratio = (leg_length - leg_length_min_m) / (leg_length_max_m - leg_length_min_m);
     leg_length_ratio = ui_clamp_f32(leg_length_ratio, 0.0f, 1.0f);
     leg_visual_length = leg_visual_length_min +
@@ -197,7 +197,6 @@ static void ui_update_overlay(void)
 
     body_dx = cosf(body_angle) * body_half_length;
     body_dy = sinf(body_angle) * body_half_length;
-
     ui_g_Ungroup_car_body_line->start_x = (uint32_t)lroundf(body_center_x - body_dx);
     ui_g_Ungroup_car_body_line->start_y = (uint32_t)lroundf(body_center_y - body_dy);
     ui_g_Ungroup_car_body_line->details_d = (uint32_t)lroundf(body_center_x + body_dx);
@@ -205,13 +204,10 @@ static void ui_update_overlay(void)
 
     ui_g_Ungroup_leg_line->start_x = (uint32_t)lroundf(body_center_x);
     ui_g_Ungroup_leg_line->start_y = (uint32_t)lroundf(body_center_y);
-
     wheel_center_x = body_center_x - sinf(leg_angle) * leg_visual_length;
     wheel_center_y = body_center_y - cosf(leg_angle) * leg_visual_length;
-
     ui_g_Ungroup_leg_line->details_d = (uint32_t)lroundf(wheel_center_x);
     ui_g_Ungroup_leg_line->details_e = (uint32_t)lroundf(wheel_center_y);
-
     ui_g_Ungroup_wheel_round->start_x = (uint32_t)lroundf(wheel_center_x);
     ui_g_Ungroup_wheel_round->start_y = (uint32_t)lroundf(wheel_center_y);
     ui_g_Ungroup_wheel_round->details_c = (uint32_t)lroundf(wheel_radius);
@@ -225,16 +221,24 @@ static void ui_update_overlay(void)
 
     buffer_ratio = ui_clamp_f32(buffer_energy / 60.0f, 0.0f, 1.0f);
     ui_g_Ungroup_energe_buffer->details_d =
-        (uint32_t)lroundf(energy_bar_left + (buffer_ratio * energy_bar_width));
+        (uint32_t)lroundf(energy_bar_left + buffer_ratio * energy_bar_width);
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);
     show_enable = (uint8_t)((chassis_move_balance.start_flag != 0U) &&
                             (robot_state.power_management_chassis_output != 0U));
 
-    ui_g_Ungroup_fiic_round->color = show_fire ? 2U : 3U;
-    ui_g_Ungroup_w_round->color = show_gyro ? 2U : 3U;
-    ui_g_Ungroup_enable_round->color = show_enable ? 2U : 3U;
+    ui_g_Ungroup_fiic_round->color = show_fire ? 2U : 0U;
+    ui_g_Ungroup_w_round->color = show_gyro ? 2U : 0U;
+    ui_g_Ungroup_enable_round->color = show_enable ? 2U : 0U;
+
+    ui_update_g();
+}
+
+
+static void ui_refresh_static_text(void)
+{
+    ui_refresh_string_create_g();
 }
 
 static float ui_clamp_f32(float value, float min_value, float max_value)
@@ -251,6 +255,7 @@ static float ui_clamp_f32(float value, float min_value, float max_value)
 
     return value;
 }
+
 
 static void buzzer_warn_error(uint8_t num)
 {

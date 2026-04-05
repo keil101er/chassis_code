@@ -1,0 +1,272 @@
+#include "ui_g.h"
+
+#include <string.h>
+
+#define TOTAL_FIGURE 14
+#define TOTAL_STRING 3
+
+ui_interface_figure_t ui_g_now_figures[TOTAL_FIGURE];
+uint8_t ui_g_dirty_figure[TOTAL_FIGURE];
+ui_interface_string_t ui_g_now_strings[TOTAL_STRING];
+uint8_t ui_g_dirty_string[TOTAL_STRING];
+
+uint8_t ui_g_max_send_count[TOTAL_FIGURE + TOTAL_STRING] = {
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1,
+};
+
+static ui_interface_figure_t ui_g_last_figures[TOTAL_FIGURE];
+static ui_interface_string_t ui_g_last_strings[TOTAL_STRING];
+
+static void ui_init_text(ui_interface_string_t *obj, uint32_t color, uint32_t x, uint32_t y,
+                         uint32_t width, uint32_t font_size, const char *text)
+{
+    memset(obj, 0, sizeof(*obj));
+    obj->figure_type = UI_FIGURE_TYPE_STRING;
+    obj->operate_type = 1;
+    obj->layer = 0;
+    obj->color = color;
+    obj->start_x = x;
+    obj->start_y = y;
+    obj->width = width;
+    obj->font_size = font_size;
+    strncpy(obj->string, text, sizeof(obj->string) - 1U);
+    obj->str_length = (uint32_t)strlen(obj->string);
+}
+
+void ui_init_g(void)
+{
+    memset(ui_g_now_figures, 0, sizeof(ui_g_now_figures));
+    memset(ui_g_now_strings, 0, sizeof(ui_g_now_strings));
+
+    ui_g_Ungroup_leg_value->figure_type = UI_FIGURE_TYPE_NUMBER;
+    ui_g_Ungroup_leg_value->operate_type = 1;
+    ui_g_Ungroup_leg_value->layer = 0;
+    ui_g_Ungroup_leg_value->color = 6;
+    ui_g_Ungroup_leg_value->start_x = 1556;
+    ui_g_Ungroup_leg_value->start_y = 397;
+    ui_g_Ungroup_leg_value->width = 2;
+    ui_g_Ungroup_leg_value->font_size = 20;
+
+    ui_g_Ungroup_car_line_left->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_car_line_left->operate_type = 1;
+    ui_g_Ungroup_car_line_left->layer = 0;
+    ui_g_Ungroup_car_line_left->color = 3;
+    ui_g_Ungroup_car_line_left->start_x = 675;
+    ui_g_Ungroup_car_line_left->start_y = 126;
+    ui_g_Ungroup_car_line_left->width = 2;
+    ui_g_Ungroup_car_line_left->details_d = 835;
+    ui_g_Ungroup_car_line_left->details_e = 602;
+
+    ui_g_Ungroup_car_line_right->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_car_line_right->operate_type = 1;
+    ui_g_Ungroup_car_line_right->layer = 0;
+    ui_g_Ungroup_car_line_right->color = 3;
+    ui_g_Ungroup_car_line_right->start_x = 1238;
+    ui_g_Ungroup_car_line_right->start_y = 109;
+    ui_g_Ungroup_car_line_right->width = 2;
+    ui_g_Ungroup_car_line_right->details_d = 1078;
+    ui_g_Ungroup_car_line_right->details_e = 602;
+
+    ui_g_Ungroup_car_body_line->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_car_body_line->operate_type = 1;
+    ui_g_Ungroup_car_body_line->layer = 0;
+    ui_g_Ungroup_car_body_line->color = 8;
+    ui_g_Ungroup_car_body_line->start_x = 1695;
+    ui_g_Ungroup_car_body_line->start_y = 450;
+    ui_g_Ungroup_car_body_line->width = 3;
+    ui_g_Ungroup_car_body_line->details_d = 1844;
+    ui_g_Ungroup_car_body_line->details_e = 450;
+
+    ui_g_Ungroup_leg_line->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_leg_line->operate_type = 1;
+    ui_g_Ungroup_leg_line->layer = 0;
+    ui_g_Ungroup_leg_line->color = 1;
+    ui_g_Ungroup_leg_line->start_x = 1770;
+    ui_g_Ungroup_leg_line->start_y = 450;
+    ui_g_Ungroup_leg_line->width = 3;
+    ui_g_Ungroup_leg_line->details_d = 1770;
+    ui_g_Ungroup_leg_line->details_e = 474;
+
+    ui_g_Ungroup_wheel_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_wheel_round->operate_type = 1;
+    ui_g_Ungroup_wheel_round->layer = 0;
+    ui_g_Ungroup_wheel_round->color = 7;
+    ui_g_Ungroup_wheel_round->start_x = 1770;
+    ui_g_Ungroup_wheel_round->start_y = 474;
+    ui_g_Ungroup_wheel_round->width = 5;
+    ui_g_Ungroup_wheel_round->details_c = 24;
+
+    ui_g_Ungroup_chassis->figure_type = UI_FIGURE_TYPE_RECT;
+    ui_g_Ungroup_chassis->operate_type = 1;
+    ui_g_Ungroup_chassis->layer = 0;
+    ui_g_Ungroup_chassis->color = 2;
+    ui_g_Ungroup_chassis->start_x = 1737;
+    ui_g_Ungroup_chassis->start_y = 485;
+    ui_g_Ungroup_chassis->width = 3;
+    ui_g_Ungroup_chassis->details_d = 1797;
+    ui_g_Ungroup_chassis->details_e = 565;
+
+    ui_g_Ungroup_car_head->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_car_head->operate_type = 1;
+    ui_g_Ungroup_car_head->layer = 0;
+    ui_g_Ungroup_car_head->color = 0;
+    ui_g_Ungroup_car_head->start_x = 1767;
+    ui_g_Ungroup_car_head->start_y = 525;
+    ui_g_Ungroup_car_head->width = 3;
+    ui_g_Ungroup_car_head->details_d = 1767;
+    ui_g_Ungroup_car_head->details_e = 585;
+
+    ui_g_Ungroup_energe_buffer->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_energe_buffer->operate_type = 1;
+    ui_g_Ungroup_energe_buffer->layer = 0;
+    ui_g_Ungroup_energe_buffer->color = 2;
+    ui_g_Ungroup_energe_buffer->start_x = 710;
+    ui_g_Ungroup_energe_buffer->start_y = 80;
+    ui_g_Ungroup_energe_buffer->width = 15;
+    ui_g_Ungroup_energe_buffer->details_d = 1209;
+    ui_g_Ungroup_energe_buffer->details_e = 80;
+
+    ui_g_Ungroup_energe_buffer_Rect->figure_type = UI_FIGURE_TYPE_RECT;
+    ui_g_Ungroup_energe_buffer_Rect->operate_type = 1;
+    ui_g_Ungroup_energe_buffer_Rect->layer = 0;
+    ui_g_Ungroup_energe_buffer_Rect->color = 0;
+    ui_g_Ungroup_energe_buffer_Rect->start_x = 710;
+    ui_g_Ungroup_energe_buffer_Rect->start_y = 80;
+    ui_g_Ungroup_energe_buffer_Rect->width = 1;
+    ui_g_Ungroup_energe_buffer_Rect->details_d = 1210;
+    ui_g_Ungroup_energe_buffer_Rect->details_e = 95;
+
+    ui_g_Ungroup_w_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_w_round->operate_type = 1;
+    ui_g_Ungroup_w_round->layer = 0;
+    ui_g_Ungroup_w_round->color = 0;
+    ui_g_Ungroup_w_round->start_x = 115;
+    ui_g_Ungroup_w_round->start_y = 759;
+    ui_g_Ungroup_w_round->width = 6;
+    ui_g_Ungroup_w_round->details_c = 30;
+
+    ui_g_Ungroup_enable_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_enable_round->operate_type = 1;
+    ui_g_Ungroup_enable_round->layer = 0;
+    ui_g_Ungroup_enable_round->color = 0;
+    ui_g_Ungroup_enable_round->start_x = 116;
+    ui_g_Ungroup_enable_round->start_y = 682;
+    ui_g_Ungroup_enable_round->width = 6;
+    ui_g_Ungroup_enable_round->details_c = 30;
+
+    ui_g_Ungroup_fiic_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_fiic_round->operate_type = 1;
+    ui_g_Ungroup_fiic_round->layer = 0;
+    ui_g_Ungroup_fiic_round->color = 0;
+    ui_g_Ungroup_fiic_round->start_x = 115;
+    ui_g_Ungroup_fiic_round->start_y = 836;
+    ui_g_Ungroup_fiic_round->width = 6;
+    ui_g_Ungroup_fiic_round->details_c = 30;
+
+    ui_g_Ungroup_power_value->figure_type = UI_FIGURE_TYPE_NUMBER;
+    ui_g_Ungroup_power_value->operate_type = 1;
+    ui_g_Ungroup_power_value->layer = 0;
+    ui_g_Ungroup_power_value->color = 5;
+    ui_g_Ungroup_power_value->start_x = 53;
+    ui_g_Ungroup_power_value->start_y = 616;
+    ui_g_Ungroup_power_value->width = 3;
+    ui_g_Ungroup_power_value->font_size = 25;
+
+    ui_init_text(ui_g_Ungroup_fire_mode, 1, 105, 854, 3, 30, "F");
+    ui_init_text(ui_g_Ungroup_w_flag, 3, 103, 777, 3, 30, "R");
+    ui_init_text(ui_g_Ungroup_enable_flag, 2, 103, 701, 3, 30, "E");
+
+    for (uint32_t idx = 0; idx < TOTAL_FIGURE; idx++)
+    {
+        ui_g_now_figures[idx].figure_name[0] = (uint8_t)((idx >> 16) & 0xFFU);
+        ui_g_now_figures[idx].figure_name[1] = (uint8_t)((idx >> 8) & 0xFFU);
+        ui_g_now_figures[idx].figure_name[2] = (uint8_t)(idx & 0xFFU);
+        ui_g_dirty_figure[idx] = ui_g_max_send_count[idx];
+        ui_g_last_figures[idx] = ui_g_now_figures[idx];
+    }
+
+    for (uint32_t idx = 0; idx < TOTAL_STRING; idx++)
+    {
+        uint32_t name = idx + TOTAL_FIGURE;
+        ui_g_now_strings[idx].figure_name[0] = (uint8_t)((name >> 16) & 0xFFU);
+        ui_g_now_strings[idx].figure_name[1] = (uint8_t)((name >> 8) & 0xFFU);
+        ui_g_now_strings[idx].figure_name[2] = (uint8_t)(name & 0xFFU);
+        ui_g_dirty_string[idx] = ui_g_max_send_count[TOTAL_FIGURE + idx];
+        ui_g_last_strings[idx] = ui_g_now_strings[idx];
+    }
+
+    ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string,
+                     TOTAL_FIGURE, TOTAL_STRING);
+
+    for (int i = 0; i < TOTAL_FIGURE; i++)
+    {
+        ui_g_now_figures[i].operate_type = 2;
+        ui_g_last_figures[i] = ui_g_now_figures[i];
+    }
+
+    for (int i = 0; i < TOTAL_STRING; i++)
+    {
+        ui_g_now_strings[i].operate_type = 2;
+        ui_g_last_strings[i] = ui_g_now_strings[i];
+    }
+}
+
+void ui_update_g(void)
+{
+    for (int i = 0; i < TOTAL_FIGURE; i++)
+    {
+        if (memcmp(&ui_g_now_figures[i], &ui_g_last_figures[i], sizeof(ui_g_now_figures[i])) != 0)
+        {
+            ui_g_dirty_figure[i] = ui_g_max_send_count[i];
+            ui_g_last_figures[i] = ui_g_now_figures[i];
+        }
+    }
+
+    for (int i = 0; i < TOTAL_STRING; i++)
+    {
+        if (memcmp(&ui_g_now_strings[i], &ui_g_last_strings[i], sizeof(ui_g_now_strings[i])) != 0)
+        {
+            ui_g_dirty_string[i] = ui_g_max_send_count[TOTAL_FIGURE + i];
+            ui_g_last_strings[i] = ui_g_now_strings[i];
+        }
+    }
+
+    ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string,
+                     TOTAL_FIGURE, TOTAL_STRING);
+}
+
+void ui_force_refresh_g(void)
+{
+    for (int i = 0; i < TOTAL_FIGURE; i++)
+    {
+        ui_g_dirty_figure[i] = ui_g_max_send_count[i];
+    }
+
+    for (int i = 0; i < TOTAL_STRING; i++)
+    {
+        ui_g_dirty_string[i] = ui_g_max_send_count[TOTAL_FIGURE + i];
+    }
+
+    ui_scan_and_send(ui_g_now_figures, ui_g_dirty_figure, ui_g_now_strings, ui_g_dirty_string,
+                     TOTAL_FIGURE, TOTAL_STRING);
+}
+
+void ui_refresh_string_create_g(void)
+{
+    static uint8_t refresh_cursor = 0;
+    uint32_t saved_operate_type = ui_g_now_strings[refresh_cursor].operate_type;
+
+    ui_g_now_strings[refresh_cursor].operate_type = 1;
+    ui_string_frame.option = ui_g_now_strings[refresh_cursor];
+    ui_proc_string_frame(&ui_string_frame);
+    print_message((const uint8_t *)&ui_string_frame, sizeof(ui_string_frame));
+    ui_g_now_strings[refresh_cursor].operate_type = saved_operate_type;
+
+    refresh_cursor++;
+    if (refresh_cursor >= TOTAL_STRING)
+    {
+        refresh_cursor = 0;
+    }
+}

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "CRC8_CRC16.h"
+#include "cmsis_os.h"
 #include "protocol.h"
 #include "usart.h"
 
@@ -35,7 +36,8 @@ void print_message(const uint8_t *message, uint16_t length)
         return;
     }
 
-    HAL_UART_Transmit(&huart6, (uint8_t *)message, length, 20);
+    HAL_UART_Transmit(&huart6, (uint8_t *)message, length, 100);
+    osDelay(12);
 }
 
 void ui_proc_1_frame(ui_1_frame_t *msg)
@@ -121,6 +123,8 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
     int dirty_figure_count = 0;
     int sent_in_group = 0;
     int pack_size = 0;
+    int remain = 0;
+    int i = 0;
     ui_interface_figure_t figure_pack[7];
 
     if (ui_self_id == 0U)
@@ -128,7 +132,7 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
         return;
     }
 
-    for (int i = 0; i < total_figures; i++)
+    for (i = 0; i < total_figures; i++)
     {
         if (ui_dirty_figure[i] > 0U)
         {
@@ -136,7 +140,7 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
         }
     }
 
-    for (int i = 0; i < total_figures; i++)
+    for (i = 0; i < total_figures; i++)
     {
         if (ui_dirty_figure[i] == 0U)
         {
@@ -145,7 +149,7 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
 
         if (sent_in_group == 0)
         {
-            int remain = dirty_figure_count;
+            remain = dirty_figure_count;
             if (remain > 5)
             {
                 pack_size = 7;
@@ -180,14 +184,14 @@ void ui_scan_and_send(const ui_interface_figure_t *ui_now_figures, uint8_t *ui_d
 
     if (sent_in_group > 0)
     {
-        for (int i = sent_in_group; i < pack_size; i++)
+        for (i = sent_in_group; i < pack_size; i++)
         {
             figure_pack[i].operate_type = 0;
         }
         ui_send_figure_pack(figure_pack, pack_size);
     }
 
-    for (int i = 0; i < total_strings; i++)
+    for (i = 0; i < total_strings; i++)
     {
         if (ui_dirty_string[i] == 0U)
         {

@@ -29,9 +29,8 @@ extern uint8_t ui_g_max_send_count[17];
 #define ui_g_Ungroup_enable_flag (&ui_g_now_strings[2])
 
 void ui_init_g(void);
-uint8_t ui_init_step_g(void);
 void ui_update_g(void);
 void ui_force_refresh_g(void);
-void ui_refresh_fragile_create_g(void);
+void ui_refresh_string_create_g(void);
 
 #endif

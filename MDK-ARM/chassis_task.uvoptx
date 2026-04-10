@@ -178,12 +178,17 @@
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>robot_state</ItemText>
+          <ItemText>robot_state,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
           <ItemText>initial_total_power</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>yaw_sen</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

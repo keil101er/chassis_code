@@ -16,8 +16,8 @@
 #include "VMC_calc.h"
 #include "test_task.h"
 #include "referee.h"
-#define YAW_MOUSE_SEN 0.00007f	  // 0.00005f
-#define PITCH_MOUSE_SEN -0.00005f // 0.00015f
+#define YAW_MOUSE_SEN 0.000015f	  // 0.00005f
+#define PITCH_MOUSE_SEN -0.00002f // 0.00015f
 #define VELOCITY_EPSILON 1e-4f
 ////reducation of 3508 motor
 ////m3508电机的减速比
@@ -49,6 +49,7 @@ volatile float pre_rc = 0.0f; // 上一次右摇杆前后值
 volatile uint8_t Rc_flag = 0; // 遥控器状态标志位
 float a_x[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 float theat_set = 0.0f;
+float turn_speed_compensation=1.0f;
 
 // 遛弯
 // float Poly_Coefficient[12][4] = {{-611.59342, 639.61534, -247.78576, 7.63222],
@@ -352,6 +353,9 @@ float mode_rc;
 float gimbal_mode;
 float fire_mode;
 uint8_t jump_status = 0;
+float key_speed=0.9f;
+float w_speed=1.5f;
+
 // 大约4ms执行一次
 void ChassisR_task(void)
 {
@@ -381,6 +385,11 @@ void ChassisR_task(void)
 	// chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while (1)
 	{
+		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
+		{
+			key_speed=1.0f + robot_state.robot_level * 0.1f;
+			w_speed=1.5f + robot_state.robot_level * 0.1f;
+		}
 		// if(debug_flag==0&&debug_count<=51)
 		// {
 		// 	debug_count++;
@@ -477,33 +486,32 @@ void ChassisR_task(void)
 		// }
 
 		//正常
-		// if (chassis_move_balance.chassis_RC->rc.s[0] == 2)
-		// {
-		// 	gimbal_mode = 0;
-		// }
-		// else if (chassis_move_balance.chassis_RC->rc.s[1] == 3 || chassis_move_balance.chassis_RC->mouse.press_r)
-		// {
-		// 	gimbal_mode = 2;
-		// }
-		// else
-		// {
-		// 	gimbal_mode = 1;
-		// }
-
-
-		//打弹测试
-		if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
-		{
-			gimbal_mode = 1;
-		}
-		else
+		if (chassis_move_balance.chassis_RC->rc.s[0] == 2)
 		{
 			gimbal_mode = 0;
 		}
+		else if (chassis_move_balance.chassis_RC->rc.s[1] == 2 || chassis_move_balance.chassis_RC->mouse.press_r)
+		{
+			gimbal_mode = 2;
+		}
+		else
+		{
+			gimbal_mode = 1;
+		}
+
+		//打弹测试
+		// if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		// {
+		// 	gimbal_mode = 1;
+		// }
+		// else
+		// {
+		// 	gimbal_mode = 0;
+		// }
 		// gimbal_mode=mode_rc;
 		//测试
 		// shoot_control.shoot_send_flag=0;
-		c_transmit_date(yaw_sen, pitch_sen,mode_rc, shoot_control.shoot_send_flag, 11);
+		c_transmit_date(yaw_sen, pitch_sen,gimbal_mode, shoot_control.shoot_send_flag, 11);
 		osDelay(1);
 
 		float dt = (float)CHASSR_TIME / 1000.0f; // 1/1000
@@ -563,18 +571,18 @@ void ChassisR_task(void)
 						{ // W + A: 45 deg Left
 							chassis_move_balance.w_flag = 2;
 							heng_target = -0.7854f; // -PI/4
-							chassis_move_balance.target_v = 2.0f;
+							chassis_move_balance.target_v = key_speed;
 						}
 						else if (k_d)
 						{ // W + D: 45 deg Right
 							chassis_move_balance.w_flag = 2;
 							heng_target = 0.7854f; // PI/4
-							chassis_move_balance.target_v = 2.0f;
+							chassis_move_balance.target_v = key_speed;
 						}
 						else
 						{ // W Only: Forward
 							chassis_move_balance.w_flag = 0;
-							chassis_move_balance.target_v = 2.0f;
+							chassis_move_balance.target_v = key_speed;
 						}
 					}
 					else if (k_s)
@@ -583,31 +591,31 @@ void ChassisR_task(void)
 						{ // S + A: Back-Left (Face Right 45 + Back)
 							chassis_move_balance.w_flag = 2;
 							heng_target = 0.7854f; // PI/4
-							chassis_move_balance.target_v = -2.0f;
+							chassis_move_balance.target_v = -key_speed;
 						}
 						else if (k_d)
 						{ // S + D: Back-Right (Face Left 45 + Back)
 							chassis_move_balance.w_flag = 2;
 							heng_target = -0.7854f; // -PI/4
-							chassis_move_balance.target_v = -2.0f;
+							chassis_move_balance.target_v = -key_speed;
 						}
 						else
 						{ // S Only: Backward
 							chassis_move_balance.w_flag = 0;
-							chassis_move_balance.target_v = -2.0f;
+							chassis_move_balance.target_v = -key_speed;
 						}
 					}
 					else if (k_a) // A Only: 90 deg Left
 					{
 						chassis_move_balance.w_flag = 2;
 						heng_target = 1.5708f; // PI/2
-						chassis_move_balance.target_v = -2.0f;
+						chassis_move_balance.target_v = -key_speed;
 					}
 					else if (k_d) // D Only: 90 deg Right
 					{
 						chassis_move_balance.w_flag = 2;
 						heng_target = 1.5708f; // PI/2
-						chassis_move_balance.target_v = 2.0f;
+						chassis_move_balance.target_v = key_speed;
 					}
 					else
 					{
@@ -621,12 +629,15 @@ void ChassisR_task(void)
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
 				 chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.004f);//速度上限
 			}
-
+			turn_speed_compensation=1.0f - fabs(yaw_sen * 70);
+			mySaturate(&turn_speed_compensation,0.5f,1.0f);
+			chassis_move_balance.target_v= chassis_move_balance.target_v * turn_speed_compensation;
+			
 			if (RC_KEY_flag)
 			{
 				if (chassis_move_balance.target_v == 0)
 				{
-					slope_following(&chassis_move_balance.target_v, &chassis_move_balance.v_set, 0.005f); // 斜坡函数
+					slope_following(&chassis_move_balance.target_v, &chassis_move_balance.v_set, 0.003f); // 斜坡函数
 				}
 				else
 				{
@@ -697,9 +708,9 @@ void ChassisR_task(void)
 			//      // filter_flag = 1;
 			//  }
 
-			yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.00003f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
+			yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.000007f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
 
-			pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.00003f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
+			pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.000007f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
 
 			//       chassis_move_balance.turn_set = chassis_move_balance.turn_set+(float)chassis_move_balance.chassis_RC->rc.ch[2]*(-0.00006f);
 
@@ -753,11 +764,11 @@ void ChassisR_task(void)
 				w_cnt++;
 				if(w_cnt<1500)
 				{
-					chassis_move_balance.Wz_target=2.0f;
+					chassis_move_balance.Wz_target=w_speed;
 				}
 				else if(w_cnt>=1500&&w_cnt<2500)
 				{
-					chassis_move_balance.Wz_target=1.5f;
+					chassis_move_balance.Wz_target=w_speed * 0.8f;
 				}
 				else
 				{
@@ -1315,7 +1326,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 功率控制，测试
-	 chassis_power_control(chassis);
+	chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅
 

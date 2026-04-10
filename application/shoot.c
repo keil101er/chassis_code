@@ -237,18 +237,7 @@ static void shoot_set_mode(void)
             shoot_control.shoot_mode = 2; // 单发
         }
         }
-    // 上位机自动开火：仅在空闲时接受新的开火命令
-    // if (C_data.MODE == 1 && gimbal_mode == 2 && auto_shoot_busy == 0)
-    // {
-    //     shoot_control.shoot_mode = 2; // 触发单发
-    //     auto_shoot_busy = 1;          // 锁定，拒绝后续重复命令
-    // }
-    // else if (C_data.MODE == 0 && gimbal_mode == 2 && auto_shoot_busy == 0)
-    // {                               
-    //     shoot_control.shoot_mode = 0;
-    //     shoot_control.given_current = 0;
-    //     shoot_control.speed_set = 0.0f;
-    // }
+
     // if (C_data.MODE == 1 && gimbal_mode == 2 )
     // {
     //     shoot_control.shoot_mode = 1; // 触发单发
@@ -280,7 +269,18 @@ static void shoot_set_mode(void)
             }
         }
     }
-
+        // 上位机自动开火：仅在空闲时接受新的开火命令
+    if (C_data.MODE == 1 && gimbal_mode == 2 && auto_shoot_busy == 0)
+    {
+        shoot_control.shoot_mode = 2; // 触发单发
+        auto_shoot_busy = 1;          // 锁定，拒绝后续重复命令
+    }
+    else if (C_data.MODE == 0 && gimbal_mode == 2 && auto_shoot_busy == 0)
+    {                               
+        shoot_control.shoot_mode = 0;
+        shoot_control.given_current = 0;
+        shoot_control.speed_set = 0.0f;
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 上拨判断， 一次开启，再次关闭
     // 波上去一次
@@ -442,7 +442,7 @@ int16_t shoot_control_loop(void)
                 // {
                 //     shoot_control.given_current = 0;
                 // }
-                if (auto_shoot_cnt >=0)
+                if (auto_shoot_cnt >=10)
                 {
                     shoot_control.given_current = 0;
                     auto_shoot_cnt = 0;
@@ -484,11 +484,11 @@ int16_t shoot_control_loop(void)
     get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
 
     //暂时注释
-    if ((power_heat_data_t1.shooter_17mm_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit))
-    {
-        shoot_control.shoot_mode = 0;
-    	shoot_control.given_current = 0;
-    }
+    // if ((power_heat_data_t1.shooter_17mm_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit))
+    // {
+    //     shoot_control.shoot_mode = 0;
+    // 	shoot_control.given_current = 0;
+    // }
 
     return shoot_control.given_current;
 }

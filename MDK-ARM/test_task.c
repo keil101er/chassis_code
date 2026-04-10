@@ -29,6 +29,7 @@ char debug_info[50];
 static void buzzer_warn_error(uint8_t num);
 static void ui_update_overlay(void);
 static float ui_clamp_f32(float value, float min_value, float max_value);
+static uint32_t ui_wrap_angle_u32(int32_t angle_deg);
 const error_t *error_list_test_local;
 static void ui_reinit_overlay(void);
 
@@ -147,19 +148,20 @@ static void ui_update_overlay(void)
     static float display_leg_length = 0.0f;
     static float display_power = 0.0f;
     static uint8_t display_value_initialized = 0U;
-    const float body_center_x = 1769.5f;
-    const float body_center_y = 450.0f;
+    const float body_center_x = 1571.5f;
+    const float body_center_y = 441.0f;
     const float body_half_length = 74.5f;
     const float wheel_radius = 24.0f;
     const float leg_visual_length_min = wheel_radius;
     const float leg_visual_length_max = 100.0f;
     const float leg_length_min_m = 0.12f;
     const float leg_length_max_m = 0.32f;
-    const float chassis_center_x = 1767.0f;
-    const float chassis_center_y = 525.0f;
-    const float chassis_head_length = 60.0f;
+    const float chassis_arc_center_x = 960.0f;
+    const float chassis_arc_center_y = 540.0f;
     const float energy_bar_left = 710.0f;
     const float energy_bar_width = 499.0f;
+    const float rad_to_deg = 57.2957795f;
+    const int32_t chassis_arc_half_span_deg = 30;
 
     float chassis_power = 0.0f;
     float buffer_energy = 0.0f;
@@ -173,9 +175,8 @@ static void ui_update_overlay(void)
     float body_dy;
     float wheel_center_x;
     float wheel_center_y;
-    float head_dx;
-    float head_dy;
     float buffer_ratio;
+    float relative_angle_deg;
     uint8_t show_fire;
     uint8_t show_gyro;
     uint8_t show_enable;
@@ -195,8 +196,10 @@ static void ui_update_overlay(void)
     }
     else
     {
-        display_leg_length += 0.28f * (leg_length - display_leg_length);
-        display_power += 0.20f * (chassis_power - display_power);
+        // display_leg_length += 0.28f * (leg_length - display_leg_length);
+        // display_power += 0.20f * (chassis_power - display_power);
+        display_leg_length = leg_length;
+        display_power = chassis_power;
     }
 
     display_leg_length = ui_clamp_f32(display_leg_length, leg_length_min_m, leg_length_max_m);
@@ -207,7 +210,7 @@ static void ui_update_overlay(void)
 
     body_angle = ui_clamp_f32(body_angle, -0.6f, 0.6f);
     leg_angle = ui_clamp_f32(leg_angle, -0.8f, 0.8f);
-    relative_angle = ui_clamp_f32(relative_angle, -1.2f, 1.2f);
+    relative_angle = ui_clamp_f32(relative_angle, -3.1415926f, 3.1415926f);
     leg_length_ratio = (display_leg_length - leg_length_min_m) / (leg_length_max_m - leg_length_min_m);
     leg_length_ratio = ui_clamp_f32(leg_length_ratio, 0.0f, 1.0f);
     leg_visual_length = leg_visual_length_min +
@@ -234,25 +237,29 @@ static void ui_update_overlay(void)
     ui_g_Ungroup_wheel_round->start_y = (uint32_t)lroundf(wheel_center_y);
     ui_g_Ungroup_wheel_round->details_c = (uint32_t)lroundf(wheel_radius);
 
-    head_dx = sinf(relative_angle) * (chassis_head_length * 0.5f);
-    head_dy = cosf(relative_angle) * (chassis_head_length * 0.5f);
-    ui_g_Ungroup_car_head->start_x = (uint32_t)lroundf(chassis_center_x - head_dx);
-    ui_g_Ungroup_car_head->start_y = (uint32_t)lroundf(chassis_center_y - head_dy);
-    ui_g_Ungroup_car_head->details_d = (uint32_t)lroundf(chassis_center_x + head_dx);
-    ui_g_Ungroup_car_head->details_e = (uint32_t)lroundf(chassis_center_y + head_dy);
+    relative_angle_deg = -relative_angle * rad_to_deg;
+    ui_g_Ungroup_chassis_dirct->start_x = (uint32_t)lroundf(chassis_arc_center_x);
+    ui_g_Ungroup_chassis_dirct->start_y = (uint32_t)lroundf(chassis_arc_center_y);
+    ui_g_Ungroup_chassis_dirct->details_a =
+        ui_wrap_angle_u32((int32_t)lroundf(relative_angle_deg) - chassis_arc_half_span_deg);
+    ui_g_Ungroup_chassis_dirct->details_b =
+        ui_wrap_angle_u32((int32_t)lroundf(relative_angle_deg) + chassis_arc_half_span_deg);
+    ui_g_Ungroup_chassis_dirct->details_d = 90U;
+    ui_g_Ungroup_chassis_dirct->details_e = 90U;
 
     buffer_ratio = ui_clamp_f32(buffer_energy / 60.0f, 0.0f, 1.0f);
-    ui_g_Ungroup_energe_buffer->details_d =
+    ui_g_Ungroup_energr_buffer->details_d =
         (uint32_t)lroundf(energy_bar_left + (buffer_ratio * energy_bar_width));
+    ui_g_Ungroup_energr_buffer->details_e = 80U;
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);
     show_enable = (uint8_t)((chassis_move_balance.start_flag != 0U) &&
                             (robot_state.power_management_chassis_output != 0U));
 
-    ui_g_Ungroup_fiic_round->color = show_fire ? 2U : 3U;
-    ui_g_Ungroup_w_round->color = show_gyro ? 2U : 3U;
-    ui_g_Ungroup_enable_round->color = show_enable ? 2U : 3U;
+    ui_g_Ungroup_Fire_round->color = show_fire ? 2U : 4U;
+    ui_g_Ungroup_W_round->color = show_gyro ? 2U : 4U;
+    ui_g_Ungroup_enable_round->color = show_enable ? 2U : 4U;
 }
 
 static float ui_clamp_f32(float value, float min_value, float max_value)
@@ -268,6 +275,21 @@ static float ui_clamp_f32(float value, float min_value, float max_value)
     }
 
     return value;
+}
+
+static uint32_t ui_wrap_angle_u32(int32_t angle_deg)
+{
+    while (angle_deg < 0)
+    {
+        angle_deg += 360;
+    }
+
+    while (angle_deg >= 360)
+    {
+        angle_deg -= 360;
+    }
+
+    return (uint32_t)angle_deg;
 }
 
 static void buzzer_warn_error(uint8_t num)

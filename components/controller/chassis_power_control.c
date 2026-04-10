@@ -26,6 +26,7 @@
 #include "controller.h"
 #include <math.h>
 
+extern robot_status_t robot_state;
 #define POWER_LIMIT (robot_state.chassis_power_limit)
 #define WARNING_POWER 40.0f
 #define WARNING_POWER_BUFF 50.0f
@@ -148,7 +149,7 @@ float total_power = 0;
 void chassis_power_control(chassis_t *chassis_power_control)
 {
 
-	uint16_t max_power_limit = 75; // hardcoded for test
+	uint16_t max_power_limit = POWER_LIMIT; // hardcoded for test
 	fp32 chassis_max_power = 0.0f;
 	fp32 input_power = 0.0f;
 	fp32 scaled_give_power[2] = {0.0f};
@@ -160,7 +161,7 @@ void chassis_power_control(chassis_t *chassis_power_control)
 	fp32 toque_coefficient = 1.99688994e-6f; // (20/16384)*(0.3)*(187/3591)/9.55
 	fp32 a = 1.23e-07f;
 	fp32 k2 = 1.453e-07f;
-	fp32 constant = 4.081f;
+	fp32 constant = 0.5f;
 
 	get_chassis_power_and_buffer(&chassis_power, &chassis_power_buffer);
 	PID_calc(&chassis_power_control->buffer_pid, chassis_power_buffer, 30);

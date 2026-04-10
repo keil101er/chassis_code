@@ -51,7 +51,6 @@
 
 
 
-
 #define ROLL_PID_KP 40.0f
 #define ROLL_PID_KI 0.0f 
 #define ROLL_PID_KD 0.1f

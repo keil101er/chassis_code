@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#define TOTAL_FIGURE 14
+#define TOTAL_FIGURE 12
 #define TOTAL_STRING 3
 
 typedef enum
@@ -16,12 +16,12 @@ typedef enum
     UI_G_INIT_STAGE_DONE
 } ui_g_init_stage_e;
 
-static const uint8_t ui_g_init_static_indices[4] = {1, 2, 6, 9};
-static const uint8_t ui_g_init_move_indices[5] = {3, 4, 5, 7, 8};
-static const uint8_t ui_g_init_state_data_indices[5] = {0, 10, 11, 12, 13};
-static const uint8_t ui_g_runtime_move_indices[4] = {3, 4, 5, 7};
-static const uint8_t ui_g_runtime_data_indices[3] = {0, 8, 13};
-static const uint8_t ui_g_runtime_state_indices[3] = {10, 11, 12};
+static const uint8_t ui_g_init_static_indices[2] = {1, 2};
+static const uint8_t ui_g_init_move_indices[4] = {3, 4, 5, 10};
+static const uint8_t ui_g_init_state_data_indices[6] = {0, 6, 7, 8, 9, 11};
+static const uint8_t ui_g_runtime_move_indices[4] = {3, 4, 5, 10};
+static const uint8_t ui_g_runtime_data_indices[3] = {0, 6, 11};
+static const uint8_t ui_g_runtime_state_indices[3] = {7, 8, 9};
 
 ui_interface_figure_t ui_g_now_figures[TOTAL_FIGURE];
 uint8_t ui_g_dirty_figure[TOTAL_FIGURE];
@@ -29,8 +29,8 @@ ui_interface_string_t ui_g_now_strings[TOTAL_STRING];
 uint8_t ui_g_dirty_string[TOTAL_STRING];
 
 uint8_t ui_g_max_send_count[TOTAL_FIGURE + TOTAL_STRING] = {
-    2, 1, 1, 2, 2, 2, 1,
-    2, 2, 1, 3, 3, 3, 2,
+    2, 1, 1, 2, 2, 2,
+    2, 3, 3, 3, 2, 2,
     1, 1, 1,
 };
 
@@ -206,8 +206,8 @@ void ui_init_g(void)
     ui_g_Ungroup_leg_value->operate_type = 1;
     ui_g_Ungroup_leg_value->layer = 0;
     ui_g_Ungroup_leg_value->color = 6;
-    ui_g_Ungroup_leg_value->start_x = 1556;
-    ui_g_Ungroup_leg_value->start_y = 397;
+    ui_g_Ungroup_leg_value->start_x = 1661;
+    ui_g_Ungroup_leg_value->start_y = 391;
     ui_g_Ungroup_leg_value->width = 2;
     ui_g_Ungroup_leg_value->font_size = 20;
 
@@ -215,11 +215,11 @@ void ui_init_g(void)
     ui_g_Ungroup_car_line_left->operate_type = 1;
     ui_g_Ungroup_car_line_left->layer = 0;
     ui_g_Ungroup_car_line_left->color = 3;
-    ui_g_Ungroup_car_line_left->start_x = 675;
-    ui_g_Ungroup_car_line_left->start_y = 126;
+    ui_g_Ungroup_car_line_left->start_x = 684;
+    ui_g_Ungroup_car_line_left->start_y = 127;
     ui_g_Ungroup_car_line_left->width = 2;
-    ui_g_Ungroup_car_line_left->details_d = 835;
-    ui_g_Ungroup_car_line_left->details_e = 602;
+    ui_g_Ungroup_car_line_left->details_d = 844;
+    ui_g_Ungroup_car_line_left->details_e = 603;
 
     ui_g_Ungroup_car_line_right->figure_type = UI_FIGURE_TYPE_LINE;
     ui_g_Ungroup_car_line_right->operate_type = 1;
@@ -235,110 +235,92 @@ void ui_init_g(void)
     ui_g_Ungroup_car_body_line->operate_type = 1;
     ui_g_Ungroup_car_body_line->layer = 0;
     ui_g_Ungroup_car_body_line->color = 8;
-    ui_g_Ungroup_car_body_line->start_x = 1695;
-    ui_g_Ungroup_car_body_line->start_y = 450;
+    ui_g_Ungroup_car_body_line->start_x = 1497;
+    ui_g_Ungroup_car_body_line->start_y = 441;
     ui_g_Ungroup_car_body_line->width = 3;
-    ui_g_Ungroup_car_body_line->details_d = 1844;
-    ui_g_Ungroup_car_body_line->details_e = 450;
+    ui_g_Ungroup_car_body_line->details_d = 1646;
+    ui_g_Ungroup_car_body_line->details_e = 441;
 
     ui_g_Ungroup_leg_line->figure_type = UI_FIGURE_TYPE_LINE;
     ui_g_Ungroup_leg_line->operate_type = 1;
     ui_g_Ungroup_leg_line->layer = 0;
     ui_g_Ungroup_leg_line->color = 1;
-    ui_g_Ungroup_leg_line->start_x = 1770;
-    ui_g_Ungroup_leg_line->start_y = 450;
+    ui_g_Ungroup_leg_line->start_x = 1567;
+    ui_g_Ungroup_leg_line->start_y = 340;
     ui_g_Ungroup_leg_line->width = 3;
-    ui_g_Ungroup_leg_line->details_d = 1770;
-    ui_g_Ungroup_leg_line->details_e = 474;
+    ui_g_Ungroup_leg_line->details_d = 1567;
+    ui_g_Ungroup_leg_line->details_e = 442;
 
     ui_g_Ungroup_wheel_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
     ui_g_Ungroup_wheel_round->operate_type = 1;
     ui_g_Ungroup_wheel_round->layer = 0;
-    ui_g_Ungroup_wheel_round->color = 7;
-    ui_g_Ungroup_wheel_round->start_x = 1770;
-    ui_g_Ungroup_wheel_round->start_y = 474;
+    ui_g_Ungroup_wheel_round->color = 5;
+    ui_g_Ungroup_wheel_round->start_x = 1567;
+    ui_g_Ungroup_wheel_round->start_y = 339;
     ui_g_Ungroup_wheel_round->width = 5;
     ui_g_Ungroup_wheel_round->details_c = 24;
 
-    ui_g_Ungroup_chassis->figure_type = UI_FIGURE_TYPE_RECT;
-    ui_g_Ungroup_chassis->operate_type = 1;
-    ui_g_Ungroup_chassis->layer = 0;
-    ui_g_Ungroup_chassis->color = 2;
-    ui_g_Ungroup_chassis->start_x = 1737;
-    ui_g_Ungroup_chassis->start_y = 485;
-    ui_g_Ungroup_chassis->width = 3;
-    ui_g_Ungroup_chassis->details_d = 1797;
-    ui_g_Ungroup_chassis->details_e = 565;
+    ui_g_Ungroup_energr_buffer->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_energr_buffer->operate_type = 1;
+    ui_g_Ungroup_energr_buffer->layer = 0;
+    ui_g_Ungroup_energr_buffer->color = 2;
+    ui_g_Ungroup_energr_buffer->start_x = 710;
+    ui_g_Ungroup_energr_buffer->start_y = 80;
+    ui_g_Ungroup_energr_buffer->width = 15;
+    ui_g_Ungroup_energr_buffer->details_d = 1209;
+    ui_g_Ungroup_energr_buffer->details_e = 80;
 
-    ui_g_Ungroup_car_head->figure_type = UI_FIGURE_TYPE_LINE;
-    ui_g_Ungroup_car_head->operate_type = 1;
-    ui_g_Ungroup_car_head->layer = 0;
-    ui_g_Ungroup_car_head->color = 8;
-    ui_g_Ungroup_car_head->start_x = 1767;
-    ui_g_Ungroup_car_head->start_y = 525;
-    ui_g_Ungroup_car_head->width = 3;
-    ui_g_Ungroup_car_head->details_d = 1767;
-    ui_g_Ungroup_car_head->details_e = 585;
+    ui_g_Ungroup_Fire_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_Fire_round->operate_type = 1;
+    ui_g_Ungroup_Fire_round->layer = 0;
+    ui_g_Ungroup_Fire_round->color = 4;
+    ui_g_Ungroup_Fire_round->start_x = 225;
+    ui_g_Ungroup_Fire_round->start_y = 814;
+    ui_g_Ungroup_Fire_round->width = 6;
+    ui_g_Ungroup_Fire_round->details_c = 30;
 
-    ui_g_Ungroup_energe_buffer->figure_type = UI_FIGURE_TYPE_LINE;
-    ui_g_Ungroup_energe_buffer->operate_type = 1;
-    ui_g_Ungroup_energe_buffer->layer = 0;
-    ui_g_Ungroup_energe_buffer->color = 2;
-    ui_g_Ungroup_energe_buffer->start_x = 710;
-    ui_g_Ungroup_energe_buffer->start_y = 120;
-    ui_g_Ungroup_energe_buffer->width = 15;
-    ui_g_Ungroup_energe_buffer->details_d = 1209;
-    ui_g_Ungroup_energe_buffer->details_e = 120;
-
-    ui_g_Ungroup_energe_buffer_Rect->figure_type = UI_FIGURE_TYPE_RECT;
-    ui_g_Ungroup_energe_buffer_Rect->operate_type = 1;
-    ui_g_Ungroup_energe_buffer_Rect->layer = 0;
-    ui_g_Ungroup_energe_buffer_Rect->color = 8;
-    ui_g_Ungroup_energe_buffer_Rect->start_x = 710;
-    ui_g_Ungroup_energe_buffer_Rect->start_y = 120;
-    ui_g_Ungroup_energe_buffer_Rect->width = 1;
-    ui_g_Ungroup_energe_buffer_Rect->details_d = 1210;
-    ui_g_Ungroup_energe_buffer_Rect->details_e = 135;
-
-    ui_g_Ungroup_w_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
-    ui_g_Ungroup_w_round->operate_type = 1;
-    ui_g_Ungroup_w_round->layer = 0;
-    ui_g_Ungroup_w_round->color = 3;
-    ui_g_Ungroup_w_round->start_x = 115;
-    ui_g_Ungroup_w_round->start_y = 759;
-    ui_g_Ungroup_w_round->width = 6;
-    ui_g_Ungroup_w_round->details_c = 30;
+    ui_g_Ungroup_W_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
+    ui_g_Ungroup_W_round->operate_type = 1;
+    ui_g_Ungroup_W_round->layer = 0;
+    ui_g_Ungroup_W_round->color = 4;
+    ui_g_Ungroup_W_round->start_x = 223;
+    ui_g_Ungroup_W_round->start_y = 726;
+    ui_g_Ungroup_W_round->width = 6;
+    ui_g_Ungroup_W_round->details_c = 30;
 
     ui_g_Ungroup_enable_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
     ui_g_Ungroup_enable_round->operate_type = 1;
     ui_g_Ungroup_enable_round->layer = 0;
-    ui_g_Ungroup_enable_round->color = 3;
-    ui_g_Ungroup_enable_round->start_x = 116;
-    ui_g_Ungroup_enable_round->start_y = 682;
+    ui_g_Ungroup_enable_round->color = 4;
+    ui_g_Ungroup_enable_round->start_x = 223;
+    ui_g_Ungroup_enable_round->start_y = 644;
     ui_g_Ungroup_enable_round->width = 6;
     ui_g_Ungroup_enable_round->details_c = 30;
 
-    ui_g_Ungroup_fiic_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
-    ui_g_Ungroup_fiic_round->operate_type = 1;
-    ui_g_Ungroup_fiic_round->layer = 0;
-    ui_g_Ungroup_fiic_round->color = 3;
-    ui_g_Ungroup_fiic_round->start_x = 115;
-    ui_g_Ungroup_fiic_round->start_y = 836;
-    ui_g_Ungroup_fiic_round->width = 6;
-    ui_g_Ungroup_fiic_round->details_c = 30;
+    ui_g_Ungroup_chassis_dirct->figure_type = UI_FIGURE_TYPE_ARC;
+    ui_g_Ungroup_chassis_dirct->operate_type = 1;
+    ui_g_Ungroup_chassis_dirct->layer = 0;
+    ui_g_Ungroup_chassis_dirct->color = 6;
+    ui_g_Ungroup_chassis_dirct->start_x = 960;
+    ui_g_Ungroup_chassis_dirct->start_y = 540;
+    ui_g_Ungroup_chassis_dirct->width = 8;
+    ui_g_Ungroup_chassis_dirct->details_a = 330;
+    ui_g_Ungroup_chassis_dirct->details_b = 30;
+    ui_g_Ungroup_chassis_dirct->details_d = 90;
+    ui_g_Ungroup_chassis_dirct->details_e = 90;
 
     ui_g_Ungroup_power_value->figure_type = UI_FIGURE_TYPE_NUMBER;
     ui_g_Ungroup_power_value->operate_type = 1;
     ui_g_Ungroup_power_value->layer = 0;
     ui_g_Ungroup_power_value->color = 5;
-    ui_g_Ungroup_power_value->start_x = 53;
-    ui_g_Ungroup_power_value->start_y = 616;
-    ui_g_Ungroup_power_value->width = 3;
-    ui_g_Ungroup_power_value->font_size = 25;
+    ui_g_Ungroup_power_value->start_x = 171;
+    ui_g_Ungroup_power_value->start_y = 580;
+    ui_g_Ungroup_power_value->width = 2;
+    ui_g_Ungroup_power_value->font_size = 20;
 
-    ui_init_text(ui_g_Ungroup_fire_mode, 1, 105, 854, 3, 30, "F");
-    ui_init_text(ui_g_Ungroup_w_flag, 3, 103, 777, 3, 30, "R");
-    ui_init_text(ui_g_Ungroup_enable_flag, 2, 103, 701, 3, 30, "E");
+    ui_init_text(ui_g_Ungroup_fire_mode, 3, 216, 830, 3, 30, "F");
+    ui_init_text(ui_g_Ungroup_w_flag, 3, 212, 743, 3, 30, "R");
+    ui_init_text(ui_g_Ungroup_Enable_flag, 3, 212, 663, 3, 30, "E");
 
     ui_prepare_names();
     ui_g_init_stage = UI_G_INIT_STAGE_STATIC;
@@ -354,17 +336,17 @@ uint8_t ui_init_step_g(void)
     switch (ui_g_init_stage)
     {
     case UI_G_INIT_STAGE_STATIC:
-        ui_send_figure_subset(ui_g_init_static_indices, 4, 1U);
+        ui_send_figure_subset(ui_g_init_static_indices, 2, 1U);
         ui_g_init_stage = UI_G_INIT_STAGE_MOVE;
         break;
 
     case UI_G_INIT_STAGE_MOVE:
-        ui_send_figure_subset(ui_g_init_move_indices, 5, 1U);
+        ui_send_figure_subset(ui_g_init_move_indices, 4, 1U);
         ui_g_init_stage = UI_G_INIT_STAGE_STATE_DATA;
         break;
 
     case UI_G_INIT_STAGE_STATE_DATA:
-        ui_send_figure_subset(ui_g_init_state_data_indices, 5, 1U);
+        ui_send_figure_subset(ui_g_init_state_data_indices, 6, 1U);
         ui_g_init_stage = UI_G_INIT_STAGE_STRING_F;
         break;
 
@@ -379,7 +361,7 @@ uint8_t ui_init_step_g(void)
         break;
 
     case UI_G_INIT_STAGE_STRING_E:
-        ui_send_single_string(ui_g_Ungroup_enable_flag, 1U);
+        ui_send_single_string(ui_g_Ungroup_Enable_flag, 1U);
         ui_mark_all_update_mode();
         ui_g_init_stage = UI_G_INIT_STAGE_DONE;
         return 1U;
@@ -520,32 +502,32 @@ void ui_refresh_fragile_create_g(void)
         break;
 
     case 1:
-        figure_index_list[0] = 13U;
-        ui_send_figure_subset(figure_index_list, 1, 1U);
-        break;
-
-    case 2:
-        figure_index_list[0] = 7U;
-        ui_send_figure_subset(figure_index_list, 1, 1U);
-        break;
-
-    case 3:
-        figure_index_list[0] = 8U;
-        ui_send_figure_subset(figure_index_list, 1, 1U);
-        break;
-
-    case 4:
-        figure_index_list[0] = 10U;
-        ui_send_figure_subset(figure_index_list, 1, 1U);
-        break;
-
-    case 5:
         figure_index_list[0] = 11U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
+    case 2:
+        figure_index_list[0] = 6U;
+        ui_send_figure_subset(figure_index_list, 1, 1U);
+        break;
+
+    case 3:
+        figure_index_list[0] = 10U;
+        ui_send_figure_subset(figure_index_list, 1, 1U);
+        break;
+
+    case 4:
+        figure_index_list[0] = 7U;
+        ui_send_figure_subset(figure_index_list, 1, 1U);
+        break;
+
+    case 5:
+        figure_index_list[0] = 8U;
+        ui_send_figure_subset(figure_index_list, 1, 1U);
+        break;
+
     case 6:
-        figure_index_list[0] = 12U;
+        figure_index_list[0] = 9U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
@@ -558,7 +540,7 @@ void ui_refresh_fragile_create_g(void)
         break;
 
     default:
-        ui_send_single_string(ui_g_Ungroup_enable_flag, 1U);
+        ui_send_single_string(ui_g_Ungroup_Enable_flag, 1U);
         break;
     }
 

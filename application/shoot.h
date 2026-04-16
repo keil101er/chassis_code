@@ -84,8 +84,8 @@
 #define TRIGGER_ANGLE_PID_KD        0.0f
 
 //拨弹轮电机速度PID
-#define TRIGGER_SPEED_PID_KP        800.0f
-#define TRIGGER_SPEED_PID_KI        2.0f
+#define TRIGGER_SPEED_PID_KP        750.0f
+#define TRIGGER_SPEED_PID_KI        0.25f
 #define TRIGGER_SPEED_PID_KD        0.0f
 
 #define TRIGGER_BULLET_PID_MAX_OUT  9000.0f

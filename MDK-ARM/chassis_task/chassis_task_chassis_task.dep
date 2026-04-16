@@ -1678,7 +1678,7 @@ I (../bsp/boards/bsp_rc.h)(0x61063AF8)
 I (../components/algorithm/user_lib.h)(0x69702E8F)
 I (..\application\detect_task.h)(0x695BC176)
 I (../bsp/boards/CANdata_analysis.h)(0x69A03FA7)
-I (..\application\shoot.h)(0x69D34585)
+I (..\application\shoot.h)(0x69DA0CA4)
 I (..\application\gimbal_task.h)(0x68359F82)
 F (..\application\detect_task.c)(0x69CF89FE)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\detect_task.o --omf_browse chassis_task\detect_task.crf --depend chassis_task\detect_task.d)
 I (..\application\detect_task.h)(0x695BC176)
@@ -1887,12 +1887,12 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x68FB729D
 I (..\application\detect_task.h)(0x695BC176)
 I (..\application\referee.h)(0x69C268B1)
 I (../application/protocol/protocol.h)(0x69C2688D)
-I (..\application\shoot.h)(0x69D34585)
+I (..\application\shoot.h)(0x69DA0CA4)
 I (..\application\gimbal_task.h)(0x68359F82)
 I (ui_g.h)(0x69D22D3C)
 I (ui_interface.h)(0x69CE7523)
 I (ui_types.h)(0x69CE7523)
-F (..\application\chassisR_task.c)(0x69D609B5)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\chassisr_task.o --omf_browse chassis_task\chassisr_task.crf --depend chassis_task\chassisr_task.d)
+F (..\application\chassisR_task.c)(0x69DB99FB)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\chassisr_task.o --omf_browse chassis_task\chassisr_task.crf --depend chassis_task\chassisr_task.d)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x5EC77604)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5EC775FC)
 I (../bsp/boards/CANdata_analysis.h)(0x69A03FA7)
@@ -1971,7 +1971,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x68FB729D
 I (../Inc/can.h)(0x6738AA0E)
 I (..\application\detect_task.h)(0x695BC176)
 I (../components/controller/chassis_power_control.h)(0x681E2556)
-I (..\application\shoot.h)(0x69D34585)
+I (..\application\shoot.h)(0x69DA0CA4)
 I (..\application\gimbal_task.h)(0x68359F82)
 I (..\application\test_task.h)(0x6968A5B3)
 I (..\application\referee.h)(0x69C268B1)
@@ -2037,7 +2037,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x68FB729D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x68FB729D)
 I (..\application\CAN_receive.h)(0x695BC16F)
 I (..\application\detect_task.h)(0x695BC176)
-F (.\chassisL_task.c)(0x69D11181)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\chassisl_task.o --omf_browse chassis_task\chassisl_task.crf --depend chassis_task\chassisl_task.d)
+F (.\chassisL_task.c)(0x69DFA547)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\chassisl_task.o --omf_browse chassis_task\chassisl_task.crf --depend chassis_task\chassisl_task.d)
 I (chassisL_task.h)(0x69883049)
 I (../Inc/main.h)(0x6738AA10)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x68FB732F)
@@ -2114,7 +2114,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h)(0x68FB729D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x68FB729D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x68FB729D)
 I (../Inc/can.h)(0x6738AA0E)
-I (..\application\shoot.h)(0x69D34585)
+I (..\application\shoot.h)(0x69DA0CA4)
 I (..\application\gimbal_task.h)(0x68359F82)
 I (..\application\referee.h)(0x69C268B1)
 I (../application/protocol/protocol.h)(0x69C2688D)
@@ -2389,8 +2389,8 @@ I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5EC77604)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5EC775FC)
 I (../application/protocol/protocol.h)(0x69C2688D)
 I (..\application\referee.h)(0x69C268B1)
-F (..\application\shoot.c)(0x69D8B0E1)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\shoot.o --omf_browse chassis_task\shoot.crf --depend chassis_task\shoot.d)
-I (..\application\shoot.h)(0x69D34585)
+F (..\application\shoot.c)(0x69D8C169)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ..\application -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../components/algorithm/Include -I ../components/devices -I ../components/algorithm/mahony -I ../components/algorithm -I ../MDK-ARM -I ../components/controller -I ../application -I ../application/protocol -I ../components/support -I ../bsp/boards-I.\RTE\_chassis_task-IC:\Users\r9000p\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\r9000p\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o chassis_task\shoot.o --omf_browse chassis_task\shoot.crf --depend chassis_task\shoot.d)
+I (..\application\shoot.h)(0x69DA0CA4)
 I (..\application\struct_typedef.h)(0x68CEBA2D)
 I (..\application\CAN_receive.h)(0x695BC16F)
 I (..\application\gimbal_task.h)(0x68359F82)

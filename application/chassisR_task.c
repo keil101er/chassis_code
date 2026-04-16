@@ -366,7 +366,7 @@ void ChassisR_task(void)
 	chassis_move_balance.v_set = 0;
 	chassis_move_balance.recover_flag = 0;
 	chassis_move_balance.roll_set =
-		 0.0005;
+		 0.0f;
 		// 0.000f;
 	shoot_control.shoot_send_flag = 0;
 	chassis_move_balance.target_x = 0;
@@ -455,7 +455,8 @@ void ChassisR_task(void)
 		}
 
 		// 遥控器和键鼠控制切换逻辑(左右拨杆都处于中间时键鼠控制)
-		if (chassis_move_balance.chassis_RC->rc.s[0] == 3 && chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		 if (chassis_move_balance.chassis_RC->rc.s[0] == 3 && chassis_move_balance.chassis_RC->rc.s[1] == 3)
+		// if (chassis_move_balance.chassis_RC->rc.s[1] == 3)
 		{
 			RC_KEY_flag = 1;
 		}
@@ -475,22 +476,33 @@ void ChassisR_task(void)
 		// 	fire_mode = 0;
 		// }
 
-		// 自瞄测试
-		// if(chassis_move_balance.chassis_RC->rc.s[1] == 3)
-		// {
-		// 	gimbal_mode=2;
-		// }
-		// else
+		//自瞄测试
+		// if(chassis_move_balance.chassis_RC->rc.s[1] == 2)
 		// {
 		// 	gimbal_mode=0;
 		// }
-
+		// else if(chassis_move_balance.chassis_RC->rc.s[1] == 3 )
+		// {
+		// 	if(chassis_move_balance.chassis_RC->mouse.press_r)
+		// 	{
+		// 		gimbal_mode=2;
+		// 	}
+		// 	else
+		// 	{
+		// 		gimbal_mode=1;
+		// 	}
+		// }
+		// else
+		// {
+		// 	gimbal_mode=1;
+		// }
+		
 		//正常
 		if (chassis_move_balance.chassis_RC->rc.s[0] == 2)
 		{
 			gimbal_mode = 0;
 		}
-		else if (chassis_move_balance.chassis_RC->rc.s[1] == 2 || chassis_move_balance.chassis_RC->mouse.press_r)
+		else if (chassis_move_balance.chassis_RC->rc.s[1] == 3 && chassis_move_balance.chassis_RC->mouse.press_r)
 		{
 			gimbal_mode = 2;
 		}
@@ -513,7 +525,11 @@ void ChassisR_task(void)
 		// shoot_control.shoot_send_flag=0;
 		c_transmit_date(yaw_sen, pitch_sen,gimbal_mode, shoot_control.shoot_send_flag, 11);
 		osDelay(1);
+		//测试
+		// yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.000007f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
 
+		// pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.000007f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
+		
 		float dt = (float)CHASSR_TIME / 1000.0f; // 1/1000
 
 		if (chassis_move_balance.chassis_RC->rc.s[0] == 3) // 右拨杆中间，使能

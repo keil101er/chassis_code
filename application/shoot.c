@@ -237,18 +237,6 @@ static void shoot_set_mode(void)
             shoot_control.shoot_mode = 2; // 单发
         }
         }
-
-    // if (C_data.MODE == 1 && gimbal_mode == 2 )
-    // {
-    //     shoot_control.shoot_mode = 1; // 触发单发
-    //     auto_shoot_busy = 1;          // 锁定，拒绝后续重复命令
-    // }
-    // else if (C_data.MODE == 0 && gimbal_mode == 2 )
-    // {
-    //     shoot_control.shoot_mode = 0;
-    //     shoot_control.given_current = 0;
-    //     shoot_control.speed_set = 0.0f;
-    // }
     }
     // 下拨进入射击状态
     else
@@ -269,13 +257,12 @@ static void shoot_set_mode(void)
             }
         }
     }
-        // 上位机自动开火：仅在空闲时接受新的开火命令
-    if (C_data.MODE == 1 && gimbal_mode == 2 && auto_shoot_busy == 0)
+    // 上位机自动开火：仅在空闲时接受新的开火命令
+    if (C_data.MODE == 1 && gimbal_mode == 2 )
     {
-        shoot_control.shoot_mode = 2; // 触发单发
-        auto_shoot_busy = 1;          // 锁定，拒绝后续重复命令
+        shoot_control.shoot_mode = 1; // 触发连发
     }
-    else if (C_data.MODE == 0 && gimbal_mode == 2 && auto_shoot_busy == 0)
+    else if (C_data.MODE == 0 && gimbal_mode == 2 )
     {                               
         shoot_control.shoot_mode = 0;
         shoot_control.given_current = 0;
@@ -372,38 +359,58 @@ int16_t shoot_control_loop(void)
         shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
         shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
         // 键鼠模式
-        if(RC_KEY_flag)
+        if(gimbal_mode !=2)
         {
-            if (shoot_control.press_l)
+            if(RC_KEY_flag)
+            {
+                if (shoot_control.press_l)
+                {
+                    shoot_control.speed_set = TRIGGER_SPEED; // 拨弹盘准备速度
+                    trigger_motor_turn_back();
+                    // 计算拨弹轮电机PID
+                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                }
+                else
+                {
+                    shoot_control.shoot_mode = 0;
+                    shoot_control.given_current = 0;
+                    shoot_control.speed_set = 0.0f;
+                }
+            }
+            else
+            {
+                if(shoot_control.shoot_rc->rc.ch[4] >500)
+                {
+                    shoot_control.speed_set = TRIGGER_SPEED;  //拨弹盘准备速度
+                    trigger_motor_turn_back();
+                    //计算拨弹轮电机PID
+                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                }
+                else
+                {
+                    shoot_control.shoot_mode=0;
+                    shoot_control.given_current = 0;
+                    shoot_control.speed_set =0.0f;
+                }
+            }
+        }
+        else
+        {
+            if(C_data.MODE == 1)
             {
                 shoot_control.speed_set = TRIGGER_SPEED; // 拨弹盘准备速度
-                trigger_motor_turn_back();
-                // 计算拨弹轮电机PID
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                    trigger_motor_turn_back();
+                    // 计算拨弹轮电机PID
+                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
             }
             else
             {
                 shoot_control.shoot_mode = 0;
                 shoot_control.given_current = 0;
-                shoot_control.speed_set = 0.0f;
-            }
-        }
-        else
-        {
-            if(shoot_control.shoot_rc->rc.ch[4] >500)
-            {
-                shoot_control.speed_set = TRIGGER_SPEED;  //拨弹盘准备速度
-                trigger_motor_turn_back();
-                //计算拨弹轮电机PID
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-            }
-            else
-            {
-                shoot_control.shoot_mode=0;
-                shoot_control.given_current = 0;
-                shoot_control.speed_set =0.0f;
+                shoot_control.speed_set = 0.0f;                
             }
         }
     }

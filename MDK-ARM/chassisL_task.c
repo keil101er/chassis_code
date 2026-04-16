@@ -148,7 +148,7 @@ void ChassisL_init(chassis_t *chassis, vmc_leg_t *vmc, pid_type_def *legl)
 {
     const static float legl_pid[3] =
         // {0,0,0};
-        {250, LEG_PID_KI, LEG_PID_KD};
+        {LEG_PID_KP, 0.0f, LEG_PID_KD};
 
     joint_motor_init(&chassis->joint_motor[2], 6, MIT_MODE); // 发送id为6
     joint_motor_init(&chassis->joint_motor[3], 8, MIT_MODE); // 发送id为8

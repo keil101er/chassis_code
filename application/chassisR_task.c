@@ -16,7 +16,7 @@
 #include "VMC_calc.h"
 #include "test_task.h"
 #include "referee.h"
-#define YAW_MOUSE_SEN 0.000015f	  // 0.00005f
+#define YAW_MOUSE_SEN 0.00001f	  // 0.00005f
 #define PITCH_MOUSE_SEN -0.00002f // 0.00015f
 #define VELOCITY_EPSILON 1e-4f
 ////reducation of 3508 motor
@@ -353,7 +353,7 @@ float mode_rc;
 float gimbal_mode;
 float fire_mode;
 uint8_t jump_status = 0;
-float key_speed=0.9f;
+float key_speed=-1.0f;
 float w_speed=1.5f;
 
 // 大约4ms执行一次
@@ -387,7 +387,7 @@ void ChassisR_task(void)
 	{
 		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
 		{
-			key_speed=1.0f + robot_state.robot_level * 0.1f;
+			key_speed=-0.9f - robot_state.robot_level * 0.1f;
 			w_speed=1.5f + robot_state.robot_level * 0.1f;
 		}
 		// if(debug_flag==0&&debug_count<=51)
@@ -643,9 +643,9 @@ void ChassisR_task(void)
 			else
 			{
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
-				 chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.004f);//速度上限
+				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.004f);//速度上限
 			}
-			turn_speed_compensation=1.0f - fabs(yaw_sen * 70);
+			turn_speed_compensation=1.0f - fabs(yaw_sen * 100);
 			mySaturate(&turn_speed_compensation,0.5f,1.0f);
 			chassis_move_balance.target_v= chassis_move_balance.target_v * turn_speed_compensation;
 			
@@ -724,7 +724,7 @@ void ChassisR_task(void)
 			//      // filter_flag = 1;
 			//  }
 
-			yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.000007f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
+			yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.000005f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
 
 			pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.000007f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
 
@@ -869,7 +869,7 @@ void ChassisR_init(chassis_t *chassis, vmc_leg_t *vmc, pid_type_def *legr, pid_t
 
 	const static float legr_pid[3] =
 		//   {0,0,0};
-		{250.0f, 0.0f, 500.0f}; //{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
+		{LEG_PID_KP, 0.0f, LEG_PID_KD}; //{LEG_PID_KP, LEG_PID_KI,LEG_PID_KD};
 
 	const static fp32 power_pid[3] = {POWER_PID_KP, POWER_PID_KI, POWER_PID_KD};
 
@@ -1342,7 +1342,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 功率控制，测试
-	chassis_power_control(chassis);
+	// chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅
 

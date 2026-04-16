@@ -13,7 +13,7 @@
 //#define LEG_PID_KI  0.0f//不积分
 //#define LEG_PID_KD  50.0f
 
-#define LEG_PID_KP  200.0f
+#define LEG_PID_KP  300.0f
 #define LEG_PID_KI  0.0f//不积分
 #define LEG_PID_KD  500.0f
 #define LEG_PID_MAX_OUT  90.0f //90牛

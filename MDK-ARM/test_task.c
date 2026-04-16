@@ -167,7 +167,7 @@ static void ui_update_overlay(void)
     float buffer_energy = 0.0f;
     float leg_length = chassis_move_balance.leg_set;
     float body_angle = -chassis_move_balance.myPithR;
-    float leg_angle = -right.theta;
+    float leg_angle = right.theta;
     float relative_angle = -chassis_move_balance.relative_angle;
     float leg_length_ratio;
     float leg_visual_length;

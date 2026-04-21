@@ -389,7 +389,7 @@ void ChassisR_task(void)
 	{
 		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
 		{
-			key_speed=-0.9f - robot_state.robot_level * 0.1f;
+			key_speed=-0.8f - robot_state.robot_level * 0.1f;
 			w_speed=1.5f + robot_state.robot_level * 0.1f;
 		}
 		// if(debug_flag==0&&debug_count<=51)
@@ -856,7 +856,8 @@ void ChassisR_task(void)
 			mit_ctrl(&hcan1, 0x06, 0.0f, 0.0f, 0.0f, 0.8f, right.torque_set[0]); // right.torque_set[0]
 			osDelay(CHASSR_TIME);
 			// 顺时针为正
-			chassis_move_balance.wheel_motor[0].given_current = (chassis_move_balance.wheel_motor[0].wheel_T / 0.000396211f);
+			// chassis_move_balance.wheel_motor[0].given_current = (chassis_move_balance.wheel_motor[0].wheel_T / 0.000396211f);
+			chassis_move_balance.wheel_motor[0].given_current = (chassis_move_balance.wheel_motor[0].wheel_T / 0.000366211f);
 			CAN_cmd_chassis(-chassis_move_balance.wheel_motor[0].given_current);
 			osDelay(CHASSR_TIME);
 		}
@@ -1150,21 +1151,21 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 	else
 	{
-		if (turn_R_compensation > 0.0f)
-		{
-			vmcr->F0 = 17.2f / arm_cos_f32(vmcr->theta) + PID_calc_1(leg, vmcr->L0, chassis->leg_set) - chassis->roll_f0 + turn_R_compensation; // f0=前馈(抵消重力)+腿长pd+roll轴补偿
-		}
-		else
-		{
+		// if (turn_R_compensation > 0.0f)
+		// {
+		// 	vmcr->F0 = 17.2f / arm_cos_f32(vmcr->theta) + PID_calc_1(leg, vmcr->L0, chassis->leg_set) - chassis->roll_f0 + turn_R_compensation; // f0=前馈(抵消重力)+腿长pd+roll轴补偿
+		// }
+		// else
+		// {
 			vmcr->F0 = 17.2f / arm_cos_f32(vmcr->theta) + PID_calc_1(leg, vmcr->L0, chassis->leg_set) - chassis->roll_f0; // f0=前馈(抵消重力)+腿长pd+roll轴补偿
-		}
+		// }
 	}
 
 	// 自动跳跃逻辑
 	jump_distance=(float)stp23_distance+50.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
 	// if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
 	// {
-	// 	if ((chassis->v_filter2 > 0.0f) && (jump_distance < chassis->v_filter2 * 275.0f) && (jump_distance > chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
+	// 	if ((chassis->v_filter2 > 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
 	// 	{
 	// 		AUTO_jump_flag = 1;
 	// 		jump_status=1;
@@ -1372,7 +1373,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 功率控制，测试
-	// chassis_power_control(chassis);
+	//  chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅
 

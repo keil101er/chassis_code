@@ -167,9 +167,9 @@ void chassis_power_control(chassis_t *chassis_power_control)
 	PID_calc(&chassis_power_control->buffer_pid, chassis_power_buffer, 30);
 
 	input_power = max_power_limit - chassis_power_control->buffer_pid.out;
-	if (input_power < 5.0f)
+	if (input_power < 45.0f)
 	{
-		input_power = 5.0f;
+		input_power = 45.0f;
 	}
 
 	chassis_max_power = input_power;

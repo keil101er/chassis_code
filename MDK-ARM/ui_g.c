@@ -215,21 +215,21 @@ void ui_init_g(void)
     ui_g_Ungroup_car_line_left->operate_type = 1;
     ui_g_Ungroup_car_line_left->layer = 0;
     ui_g_Ungroup_car_line_left->color = 3;
-    ui_g_Ungroup_car_line_left->start_x = 684;
-    ui_g_Ungroup_car_line_left->start_y = 127;
+    ui_g_Ungroup_car_line_left->start_x = 637;
+    ui_g_Ungroup_car_line_left->start_y = 85;
     ui_g_Ungroup_car_line_left->width = 2;
-    ui_g_Ungroup_car_line_left->details_d = 844;
-    ui_g_Ungroup_car_line_left->details_e = 603;
+    ui_g_Ungroup_car_line_left->details_d = 900;
+    ui_g_Ungroup_car_line_left->details_e = 502;
 
     ui_g_Ungroup_car_line_right->figure_type = UI_FIGURE_TYPE_LINE;
     ui_g_Ungroup_car_line_right->operate_type = 1;
     ui_g_Ungroup_car_line_right->layer = 0;
     ui_g_Ungroup_car_line_right->color = 3;
-    ui_g_Ungroup_car_line_right->start_x = 1238;
-    ui_g_Ungroup_car_line_right->start_y = 109;
+    ui_g_Ungroup_car_line_right->start_x = 1275;
+    ui_g_Ungroup_car_line_right->start_y = 86;
     ui_g_Ungroup_car_line_right->width = 2;
-    ui_g_Ungroup_car_line_right->details_d = 1078;
-    ui_g_Ungroup_car_line_right->details_e = 602;
+    ui_g_Ungroup_car_line_right->details_d = 1020;
+    ui_g_Ungroup_car_line_right->details_e = 503;
 
     ui_g_Ungroup_car_body_line->figure_type = UI_FIGURE_TYPE_LINE;
     ui_g_Ungroup_car_body_line->operate_type = 1;

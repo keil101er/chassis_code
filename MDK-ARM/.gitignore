@@ -31,5 +31,16 @@ RTE_Components.h
 *.map
 *.dep
 
+# Keil local files
+*.uvguix.*
+
+# Keil build outputs
+chassis_task/*.axf
+chassis_task/*.hex
+chassis_task/*.htm
+chassis_task/*.build_log.htm
+chassis_task/*.iex
+chassis_task/*.lnp
+
 # Agent temp files
 tmpclaude-*

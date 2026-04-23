@@ -217,13 +217,13 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     }
     chassis->wheel_motor[1].wheel_T = (LQR_K[0] * (vmcl->theta + theat_set) + LQR_K[1] * (vmcl->d_theta - 0.0f)
                                        + LQR_K[2] * ((chassis->x_set) - chassis->x_filter) + LQR_K[3] * ((chassis->v_set) - chassis->v_filter2) + 
-                                       LQR_K[4] * (chassis->myPithL - (-0.0f)) + LQR_K[5] * (chassis->myPithGyroL - 0.0f));
+                                       LQR_K[4] * (chassis->myPithL - PITCH_BALANCE_REF_L) + LQR_K[5] * (chassis->myPithGyroL - 0.0f));
 
        
 
     vmcl->Tp = (LQR_K[6] * (vmcl->theta + theat_set) + LQR_K[7] * (vmcl->d_theta - 0.0f)
                 + LQR_K[8] * ((chassis->x_set) - chassis->x_filter) + LQR_K[9] * (chassis->v_set - chassis->v_filter2) + 
-                LQR_K[10] * (chassis->myPithL - (-0.0f)) + LQR_K[11] * (chassis->myPithGyroL - 0.0f));
+                LQR_K[10] * (chassis->myPithL - PITCH_BALANCE_REF_L) + LQR_K[11] * (chassis->myPithGyroL - 0.0f));
 
     vmcl->Tp = vmcl->Tp + chassis->leg_tp; // 髋关节输出力矩=LQR得到的+防劈叉补偿
     //  	vmcl->Tp=vmcl->Tp;
@@ -331,7 +331,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
         // 落地阶段
         else if (chassis->jump_flag_l == 3 && chassis->help_jump_flag == 1) {
             jumpF0_L         = 11.2f;
-            chassis->leg_set = 0.25f;
+            chassis->leg_set = 0.2f;
             jump_time_l++;
             if (jump_time_l >= 85 && jump_time_r >= 85) {
                 jump_time_l             = 0;
@@ -390,7 +390,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
 
     if (right_flag == 1 && left_flag == 1 && vmcl->leg_flag == 0) {
         // if (K_ctrl || (chassis->recover_flag == 0))
-        if(1) 
+        if ( chassis->recover_flag == 0)
         {
             chassis->wheel_motor[1].wheel_T = 0.0f;
             vmcl->Tp                        = LQR_K[6] * (vmcl->theta - 0.0f) + LQR_K[7] * (vmcl->d_theta - 0.0f);

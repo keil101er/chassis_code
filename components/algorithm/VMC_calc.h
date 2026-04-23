@@ -26,7 +26,8 @@
 #define WHEEL_PID_MAX_OUT  16000.0f //90牛
 #define WHEEL_PID_MAX_IOUT 2000.0f
 
-
+#define PITCH_BALANCE_REF_R   (-0.0175f)
+#define PITCH_BALANCE_REF_L   ( 0.0175f)
 
 
 

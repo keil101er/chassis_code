@@ -645,7 +645,7 @@ void ChassisR_task(void)
 			else
 			{
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
-				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.004f);//速度上限
+				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0015f);//速度上限
 			}
 			turn_speed_compensation=1.0f - fabs(yaw_sen * 100);
 			mySaturate(&turn_speed_compensation,0.5f,1.0f);
@@ -811,10 +811,12 @@ void ChassisR_task(void)
 				if(w_cnt<1500)
 				{
 					chassis_move_balance.Wz_target=w_speed;
+					// chassis_move_balance.Wz_target=1.0f;
 				}
 				else if(w_cnt>=1500&&w_cnt<2500)
 				{
 					chassis_move_balance.Wz_target=w_speed * 0.8f;
+					// chassis_move_balance.Wz_target=1.0f;
 				}
 				else
 				{
@@ -1118,11 +1120,11 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 
 	chassis->wheel_motor[0].wheel_T = (LQR_K[0] * (vmcr->theta - theat_set) +
 									   LQR_K[1] * (vmcr->d_theta - 0.0f) + LQR_K[2] * (chassis->x_filter - (chassis->x_set)) +
-									   LQR_K[3] * (chassis->v_filter2 - (chassis->v_set)) + LQR_K[4] * (chassis->myPithR - 0.0f) +
+									   LQR_K[3] * (chassis->v_filter2 - (chassis->v_set)) + LQR_K[4] * (chassis->myPithR -PITCH_BALANCE_REF_R) +
 									   LQR_K[5] * (chassis->myPithGyroR - 0.0f));
 
 	// 右边髋关节输出力矩
-	vmcr->Tp = (LQR_K[6] * (vmcr->theta - theat_set) + LQR_K[7] * (vmcr->d_theta - 0.0f) + LQR_K[8] * (chassis->x_filter - (chassis->x_set)) + LQR_K[9] * (chassis->v_filter2 - chassis->v_set) + LQR_K[10] * (chassis->myPithR - 0.0f) + LQR_K[11] * (chassis->myPithGyroR - 0.0f));
+	vmcr->Tp = (LQR_K[6] * (vmcr->theta - theat_set) + LQR_K[7] * (vmcr->d_theta - 0.0f) + LQR_K[8] * (chassis->x_filter - (chassis->x_set)) + LQR_K[9] * (chassis->v_filter2 - chassis->v_set) + LQR_K[10] * (chassis->myPithR - PITCH_BALANCE_REF_R) + LQR_K[11] * (chassis->myPithGyroR - 0.0f));
 
 	chassis->wheel_motor[0].wheel_T = chassis->wheel_motor[0].wheel_T - chassis->turn_T; // T=LQR值+偏航补偿
 
@@ -1162,19 +1164,19 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 自动跳跃逻辑
-	jump_distance=(float)stp23_distance+50.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
-	// if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
-	// {
-	// 	if ((chassis->v_filter2 > 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
-	// 	{
-	// 		AUTO_jump_flag = 1;
-	// 		jump_status=1;
-	// 	}
-	// 	else
-	// 	{
-	// 		AUTO_jump_flag = 0;
-	// 	}
-	// }
+	jump_distance=(float)stp23_distance + 10.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
+	if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
+	{
+		if ((chassis->v_filter2 < 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
+		{
+			AUTO_jump_flag = 1;
+			jump_status=1;
+		}
+		else
+		{
+			AUTO_jump_flag = 0;
+		}
+	}
 
 	if (chassis_move_balance.chassis_RC->rc.s[0] == 2) // 右拨杆拨至最下边,失能
 	{
@@ -1183,8 +1185,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 	}
 	// 跳跃逻辑
-	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
-	if (k_shift)
+	if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
+	// if (k_shift)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;
@@ -1245,7 +1247,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		else if (chassis->jump_flag_r == 3 && chassis->help_jump_flag == 1)
 		{
 			jumpF0_R = 11.2f;
-			chassis->leg_set = 0.25f;
+			chassis->leg_set = 0.2f;
 			jump_time_r++;
 			if (jump_time_r >= 85 && jump_time_l >= 85)
 			{
@@ -1329,8 +1331,9 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 落地模式，先判断是否离地
 	if (right_flag == 1 && left_flag == 1 && vmcr->leg_flag == 0)
 	{
-		if (K_ctrl || (chassis->recover_flag == 0))
-		if (1)
+		// if (K_ctrl || (chassis->recover_flag == 0))
+		if ( chassis->recover_flag == 0)
+		// if (1)
 		{
 			if (land_flag == 0 && chassis->help_jump_flag == 0)
 			{
@@ -1373,7 +1376,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 
 	// 功率控制，测试
-	//  chassis_power_control(chassis);
+	  chassis_power_control(chassis);
 
 	mySaturate(&vmcr->F0, -80.0f, 100.0f); // 限幅
 

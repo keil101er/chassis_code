@@ -32,7 +32,7 @@
 
 #define SHOOT_FRIC_PWM_ADD_VALUE    100.0f
 
-#define BULLET_HEAT_BEST  35
+#define BULLET_HEAT_BEST  45
 
 //射击摩擦轮激光打开 关闭
 #define SHOOT_ON_KEYBOARD           KEY_PRESSED_OFFSET_Q

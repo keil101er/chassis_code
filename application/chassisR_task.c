@@ -222,7 +222,7 @@ uint16_t k_r = 0;
 uint16_t k_shift = 0;
 uint16_t K_ctrl = 0;
 uint8_t ctrl_leg_auto_flag = 0;
-uint8_t last_k_ctrl = 0;
+uint8_t last_k_r = 0;
 /**
  * @description: 数据融合
  * @param {dt} 时间步长
@@ -554,7 +554,7 @@ void ChassisR_task(void)
 		{
 			if (RC_KEY_flag)
 			{
-				if (key_press_r(k_r))
+				if (key_press_r(K_ctrl))
 				{
 					if (chassis_move_balance.w_flag == 1)
 					{
@@ -752,7 +752,7 @@ void ChassisR_task(void)
 			float leg_target_set = chassis_move_balance.leg_set + (((float)chassis_move_balance.chassis_RC->rc.ch[0]) * (0.0000037f)); // 遥控器改变腿长
 			if (RC_KEY_flag)
 			{
-				if (K_ctrl && !last_k_ctrl)
+				if (k_r && !last_k_r)
 				{
 					ctrl_leg_auto_flag = 1;
 				}
@@ -790,7 +790,7 @@ void ChassisR_task(void)
 			{
 				chassis_move_balance.leg_set = leg_target_set;
 			}
-			last_k_ctrl = (K_ctrl != 0);
+			last_k_r = (k_r != 0);
 
 			if (fabsf(chassis_move_balance.last_leg_set - chassis_move_balance.leg_set) > 0.0006f)
 			{

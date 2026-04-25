@@ -491,11 +491,11 @@ int16_t shoot_control_loop(void)
     get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
 
     //暂时注释
-    // if ((power_heat_data_t1.shooter_17mm_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit))
-    // {
-    //     shoot_control.shoot_mode = 0;
-    // 	shoot_control.given_current = 0;
-    // }
+    if ((power_heat_data_t1.shooter_17mm_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit))
+    {
+        shoot_control.shoot_mode = 0;
+    	shoot_control.given_current = 0;
+    }
 
     return shoot_control.given_current;
 }

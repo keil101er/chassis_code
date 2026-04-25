@@ -221,6 +221,7 @@ uint16_t k_x = 0;
 uint16_t k_r = 0;
 uint16_t k_shift = 0;
 uint16_t K_ctrl = 0;
+uint16_t K_b = 0;
 uint8_t ctrl_leg_auto_flag = 0;
 uint8_t last_k_r = 0;
 /**
@@ -356,7 +357,7 @@ float gimbal_mode;
 float fire_mode;
 uint8_t jump_status = 0;
 float key_speed=-1.0f;
-float w_speed=1.5f;
+float w_speed=0.7f;
 
 // 大约4ms执行一次
 void ChassisR_task(void)
@@ -390,7 +391,7 @@ void ChassisR_task(void)
 		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
 		{
 			key_speed=-0.8f - robot_state.robot_level * 0.1f;
-			w_speed=1.5f + robot_state.robot_level * 0.1f;
+			w_speed=1.2f + robot_state.robot_level * 0.1f;
 		}
 		// if(debug_flag==0&&debug_count<=51)
 		// {
@@ -434,6 +435,7 @@ void ChassisR_task(void)
 		k_x = (key_v & CHASSIS_LEG_DOWN_KEY);
 		k_shift = (key_v & CHASSIS_JUMP_KEY);
 		K_ctrl = (key_v & CHASSIS_FLOAT_KEY);
+		K_b = (key_v & CHASSIS_AUTO_TEST_KEY);
 		// 按键冲突处理
 		if (k_w && k_s)
 		{
@@ -799,7 +801,7 @@ void ChassisR_task(void)
 				left.leg_flag = 1;
 			}
 			chassis_move_balance.last_leg_set = chassis_move_balance.leg_set;
-			// 小陀螺
+			// 小陀螺r
 			if (chassis_move_balance.w_flag == 1)
 			{
 				// w_time += 0.003f;
@@ -808,12 +810,12 @@ void ChassisR_task(void)
 				// 	w_time = 0;
 				// }
 				w_cnt++;
-				if(w_cnt<1500)
+				if(w_cnt<1000)
 				{
 					chassis_move_balance.Wz_target=w_speed;
 					// chassis_move_balance.Wz_target=1.0f;
 				}
-				else if(w_cnt>=1500&&w_cnt<2500)
+				else if(w_cnt>=1000&&w_cnt<2500)
 				{
 					chassis_move_balance.Wz_target=w_speed * 0.8f;
 					// chassis_move_balance.Wz_target=1.0f;

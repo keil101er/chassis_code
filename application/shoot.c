@@ -42,7 +42,7 @@ uint8_t auto_shoot_busy = 0; // 上位机自动开火忙标志：1=正在执行�
 uint16_t auto_shoot_cnt = 0; // 控制弹频
 float relative_angle = 0.0f;
 shoot_control_t shoot_control; // 射击数据
-extern k_b;
+extern uint16_t K_b;
 //***************裁判系统数据获取*****************************************
 extern power_heat_data_t power_heat_data_t1;
 //**************裁判系统数据获取*****************************************
@@ -169,16 +169,23 @@ static void shoot_feedback_update(void)
 // 堵转倒转处理
 static void trigger_motor_turn_back(void)
 {
+    fp32 target_speed = shoot_control.speed_set;
+
     last_trigger_set_speed = shoot_control.speed_set;
+    if (target_speed == 0.0f)
+    {
+        shoot_control.block_time = 0;
+        shoot_control.reverse_time = 0;
+        return;
+    }
+
     if (shoot_control.block_time < BLOCK_TIME)
     {
-        shoot_control.speed_set =TRIGGER_SPEED;
-        //shoot_control.speed_set = 0.0;
+        shoot_control.speed_set = target_speed;
     }
     else // 如果卡弹时间>700，拨弹开启反转
     {
-        shoot_control.speed_set = -TRIGGER_SPEED; // 开启反转
-        // shoot_control.speed_set = 0.0;
+        shoot_control.speed_set = -target_speed; // 开启反转
     }
 
     if (fabs(shoot_control.speed) < BLOCK_TRIGGER_SPEED && shoot_control.block_time < BLOCK_TIME) // 根据拨弹轮速度判断是否卡弹
@@ -195,7 +202,8 @@ static void trigger_motor_turn_back(void)
         shoot_control.block_time = 0;
     }
     
-    if(last_trigger_set_speed == -shoot_control.speed_set)
+    if ((last_trigger_set_speed > 0.0f && shoot_control.speed_set < 0.0f) ||
+        (last_trigger_set_speed < 0.0f && shoot_control.speed_set > 0.0f))
     {
         PID_clear(&shoot_control.trigger_motor_pid);
     }
@@ -338,30 +346,17 @@ int16_t shoot_control_loop(void)
 {
     shoot_set_mode(); // shoot_ready_buu
     shoot_feedback_update();
-    //	if(shoot_control.shoot_mode == SHOOT_READY_BULLET)
-    //	{
-    //	//设置拨弹轮的拨动速度,并开启堵转反转处理
-    //	shoot_control.speed_set = READY_TRIGGER_SPEED;  //拨弹盘准备速度
-    //	trigger_motor_turn_back();
-    //	shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
-    //	shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
-    //}
     float heat_remain = (float)robot_state.shooter_barrel_heat_limit -
-    (float)power_heat_data_t1.shooter_17mm_barrel_heat;
-    if ((power_heat_data_t1.shooter_17mm_barrel_heat + BULLET_HEAT_BEST > robot_state.shooter_barrel_heat_limit))
-    {
-        shoot_control.speed_set = 0.0f;  //拨弹盘准备速度
-        //计算拨弹轮电机PID
-        PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-        shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-    }
-    else
-    {
+                        (float)power_heat_data_t1.shooter_17mm_barrel_heat;
+    bool_t trigger_cmd_active = 0;
+    fp32 trigger_target_speed = 0.0f;
+
     // 以下都会进行
     if (shoot_control.shoot_mode == 0)
     {
         // shoot_laser_off();
         shoot_control.given_current = 0;
+        shoot_control.speed_set = 0.0f;
     }
     //****************SHOOT_READY_BULLET**************************
     else if (shoot_control.shoot_mode == 1)
@@ -373,94 +368,77 @@ int16_t shoot_control_loop(void)
         {
             if(RC_KEY_flag)
             {
-
-                if (shoot_control.press_l)
-                {
-                if (heat_remain <= BULLET_HEAT_BEST)
-                {
-                    shoot_control.speed_set = 0.0f;
-                }
-                else if (heat_remain >= BULLET_HIGH_SPEED_HEAT_BEST)
-                {
-                    shoot_control.speed_set = TRIGGER_SPEED;
-                }
-                else
-                {
-                    shoot_control.speed_set = -7.0f;
-                }
-                trigger_motor_turn_back();
-                // 计算拨弹轮电机PID
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-                }
-                else
-                {
-                    shoot_control.shoot_mode = 0;
-                    shoot_control.given_current = 0;
-                    shoot_control.speed_set = 0.0f;
-                }
+                trigger_cmd_active = shoot_control.press_l;
             }
             else
             {
-                if(shoot_control.shoot_rc->rc.ch[4] >500)
-                {
-                if (heat_remain <= BULLET_HEAT_BEST)
-                {
-                    shoot_control.speed_set = 0.0f;
-                }
-                else if (heat_remain >= BULLET_HIGH_SPEED_HEAT_BEST)
-                {
-                    shoot_control.speed_set = TRIGGER_SPEED;
-                }
-                else
-                {
-                    shoot_control.speed_set = -7.0f;
-                }
-                    trigger_motor_turn_back();
-                    //计算拨弹轮电机PID
-                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
-                }
-                else
-                {
-                    shoot_control.shoot_mode=0;
-                    shoot_control.given_current = 0;
-                    shoot_control.speed_set =0.0f;
-                }
+                trigger_cmd_active = (shoot_control.shoot_rc->rc.ch[4] > 500);
             }
         }
         else
         {
-            if(C_data.MODE == 1 && !k_b)
+            trigger_cmd_active = (C_data.MODE == 1 && !K_b);
+        }
+
+        if (trigger_cmd_active)
+        {
+            if (heat_remain > (float)BULLET_HIGH_SPEED_HEAT_BEST)
             {
-                if (heat_remain <= BULLET_HEAT_BEST)
-                {
-                    shoot_control.speed_set = 0.0f;
-                }
-                else if (heat_remain >= BULLET_HIGH_SPEED_HEAT_BEST)
-                {
-                    shoot_control.speed_set = TRIGGER_SPEED;
-                }
-                else
-                {
-                    shoot_control.speed_set = -7.0f;
-                }
-                trigger_motor_turn_back();
-                // 计算拨弹轮电机PID
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                trigger_target_speed = TRIGGER_SPEED;
+            }
+            else if (heat_remain >= (float)BULLET_HEAT_BEST)
+            {
+                trigger_target_speed = TRIGGER_SPEED * 0.5f;
             }
             else
             {
-                shoot_control.shoot_mode = 0;
-                shoot_control.given_current = 0;
-                shoot_control.speed_set = 0.0f;                
+                trigger_target_speed = 0.0f;
             }
+
+            shoot_control.speed_set = trigger_target_speed;
+
+            if (shoot_control.speed_set == 0.0f)
+            {
+                if (fabs(shoot_control.speed) < 3.0f)
+                {
+                    PID_clear(&shoot_control.trigger_motor_pid);
+                    shoot_control.given_current = 0;
+                }
+                else
+                {
+                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                }
+            }
+            else
+            {
+                trigger_motor_turn_back();
+                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+            }
+        }
+        else
+        {
+            shoot_control.shoot_mode = 0;
+            shoot_control.given_current = 0;
+            shoot_control.speed_set = 0.0f;
         }
     }
     else if (shoot_control.shoot_mode == 2)
     {
-        if (shoot_single_flag == 0)
+        if (heat_remain < (float)BULLET_HEAT_BEST)
+        {
+            PID_clear(&shoot_control.trigger_Angle_pid);
+            PID_clear(&shoot_control.trigger_motor_pid);
+            shoot_control.given_current = 0;
+            shoot_control.speed_set = 0.0f;
+            shoot_control.shoot_mode = 0;
+            shoot_single_flag = 0;
+            shoot_single_cnt = 0;
+            auto_shoot_cnt = 0;
+            auto_shoot_busy = 0;
+        }
+        else if (shoot_single_flag == 0)
         {
             shoot_bullet_control();
             shoot_single_flag++;
@@ -532,10 +510,9 @@ int16_t shoot_control_loop(void)
     //     shoot_control.given_current = 0;
     //     shoot_control.speed_set =0.0f;
     // }
-    get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
+    // get_shoot_heat1_limit_and_heat1(&shoot_control.heat_limit, &shoot_control.heat);
 
     //暂时注释
 
-    }
     return shoot_control.given_current;
 }

@@ -32,7 +32,7 @@
 
 #define SHOOT_FRIC_PWM_ADD_VALUE    100.0f
 
-#define BULLET_HEAT_BEST  39
+#define BULLET_HEAT_BEST  40
 #define BULLET_HIGH_SPEED_HEAT_BEST 80
 //射击摩擦轮激光打开 关闭
 #define SHOOT_ON_KEYBOARD           KEY_PRESSED_OFFSET_Q
@@ -76,7 +76,7 @@
 #define REVERSE_SPEED_LIMIT         13.0f
 
 #define PI_FOUR                     0.78539816339744830961566084581988f
-#define PI_TEN                      0.4f
+#define PI_TEN                      0.3f
 
 //拨弹轮电机角度PID
 #define TRIGGER_ANGLE_PID_KP        35.0f
@@ -84,15 +84,15 @@
 #define TRIGGER_ANGLE_PID_KD        0.0f
 
 //拨弹轮电机速度PID
-#define TRIGGER_SPEED_PID_KP        1000.0f
-#define TRIGGER_SPEED_PID_KI        1.0f
+#define TRIGGER_SPEED_PID_KP        500.0f
+#define TRIGGER_SPEED_PID_KI        8.0f
 #define TRIGGER_SPEED_PID_KD        0.0f
 
 #define TRIGGER_BULLET_PID_MAX_OUT  9000.0f
 #define TRIGGER_BULLET_PID_MAX_IOUT 6000.0f
 
 #define TRIGGER_READY_PID_MAX_OUT   10000.0f
-#define TRIGGER_READY_PID_MAX_IOUT  9000.0f
+#define TRIGGER_READY_PID_MAX_IOUT  1700.0f
 
 #define TRIGGER_ANGLE_PID_MAX_OUT  15.0f
 #define TRIGGER_ANGLE_PID_MAX_IOUT 1.0f

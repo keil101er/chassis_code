@@ -182,7 +182,7 @@ void chassisL_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
     chassis->wheel_motor[1].speed   = 0.0004998609952f * chassis->wheel_motor[1].speed_rpm;             // 速度
     chassis->wheel_motor[1].wheel_T = CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN * chassis->wheel_motor[1].given_current;
     // chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
-    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 4550); // 获取相对角度值，零点ecd=2865
+    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 4193); // 获取相对角度值，零点ecd=2865
                                                                                                //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 
     // static fp32 speed_fliter_1 = 0.0f;

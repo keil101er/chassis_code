@@ -188,7 +188,7 @@ static void trigger_motor_turn_back(void)
         shoot_control.speed_set = -target_speed; // 开启反转
     }
 
-    if (fabs(shoot_control.speed) < BLOCK_TRIGGER_SPEED && shoot_control.block_time < BLOCK_TIME) // 根据拨弹轮速度判断是否卡弹
+    if (fabs(shoot_control.speed) < BLOCK_TRIGGER_SPEED && shoot_control.block_time < BLOCK_TIME && shoot_control.speed_set!=0.0f) // 根据拨弹轮速度判断是否卡弹
     {
         shoot_control.block_time++;
         shoot_control.reverse_time = 0; // 恢复时间
@@ -207,6 +207,70 @@ static void trigger_motor_turn_back(void)
     {
         PID_clear(&shoot_control.trigger_motor_pid);
     }
+}
+
+static fp32 trigger_speed_feedforward(fp32 speed_set, fp32 speed)
+{
+    fp32 feedforward = 0.0f;
+    fp32 speed_error_abs = 0.0f;
+    fp32 speed_abs = fabs(speed);
+    fp32 speed_set_abs = fabs(speed_set);
+
+    if (speed_set == 0.0f)
+    {
+        return 0.0f;
+    }
+
+    if (speed_set > 0.0f)
+    {
+        feedforward = speed_abs < TRIGGER_SPEED_FF_START_SPEED ? TRIGGER_SPEED_FF_POS_START : TRIGGER_SPEED_FF_POS_RUN;
+    }
+    else
+    {
+        feedforward = speed_abs < TRIGGER_SPEED_FF_START_SPEED ? TRIGGER_SPEED_FF_NEG_START : TRIGGER_SPEED_FF_NEG_RUN;
+    }
+
+    if (speed_set * speed > 0.0f)
+    {
+        speed_error_abs = fabs(speed_set - speed);
+        if (speed_abs >= speed_set_abs)
+        {
+            return 0.0f;
+        }
+        if (speed_error_abs < TRIGGER_SPEED_FF_DECAY_ERROR)
+        {
+            feedforward *= speed_error_abs / TRIGGER_SPEED_FF_DECAY_ERROR;
+        }
+    }
+
+    return feedforward;
+}
+
+static int16_t trigger_speed_current_calc(void)
+{
+    static bool_t zero_speed_pid_cleared = 0;
+    fp32 current = 0.0f;
+
+    if (shoot_control.speed_set == 0.0f)
+    {
+        if (!zero_speed_pid_cleared)
+        {
+            PID_clear(&shoot_control.trigger_motor_pid);
+            zero_speed_pid_cleared = 1;
+        }
+    }
+    else
+    {
+        zero_speed_pid_cleared = 0;
+    }
+
+    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
+    current = shoot_control.trigger_motor_pid.out + trigger_speed_feedforward(shoot_control.speed_set, shoot_control.speed);
+    current = float_constrain(current,
+                              -shoot_control.trigger_motor_pid.max_out,
+                              shoot_control.trigger_motor_pid.max_out);
+
+    return (int16_t)current;
 }
 
 // 射击控制，控制拨弹电机角度，完成一次发射
@@ -236,14 +300,14 @@ static void shoot_set_mode(void)
     {
         if(shoot_control.shoot_mode != 2)
         {
-        if (shoot_control.press_l_time >= PRESS_LONG_TIME)
-        {
-            shoot_control.shoot_mode = 1; // 连发
-        }
-        else if (shoot_control.press_l_time == 0 && shoot_control.last_press_l == 1)
-        {
-            shoot_control.shoot_mode = 2; // 单发
-        }
+            if (shoot_control.press_l_time >= PRESS_LONG_TIME)
+            {
+                shoot_control.shoot_mode = 1; // 连发
+            }
+            else if (shoot_control.press_l_time == 0 && shoot_control.last_press_l == 1)
+            {
+                shoot_control.shoot_mode = 2; // 单发
+            }
         }
     }
     // 下拨进入射击状态
@@ -386,7 +450,7 @@ int16_t shoot_control_loop(void)
             {
                 trigger_target_speed = TRIGGER_SPEED;
             }
-            else if (heat_remain >= (float)BULLET_HEAT_BEST)
+            else if (heat_remain > (float)BULLET_HEAT_BEST)
             {
                 trigger_target_speed = TRIGGER_SPEED * 0.5f;
             }
@@ -406,15 +470,13 @@ int16_t shoot_control_loop(void)
                 }
                 else
                 {
-                    PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                    shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                    shoot_control.given_current = trigger_speed_current_calc();
                 }
             }
             else
             {
-                trigger_motor_turn_back();
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                 trigger_motor_turn_back();
+                shoot_control.given_current = trigger_speed_current_calc();
             }
         }
         else
@@ -454,8 +516,7 @@ int16_t shoot_control_loop(void)
                 //  trigger_motor_turn_back();
                 // 计算拨弹轮电机PID
                 shoot_control.speed_set = -PID_angle_calc(&shoot_control.trigger_Angle_pid, shoot_control.angle, shoot_control.set_angle);
-                PID_calc(&shoot_control.trigger_motor_pid, shoot_control.speed, shoot_control.speed_set);
-                shoot_control.given_current = (int16_t)(shoot_control.trigger_motor_pid.out);
+                shoot_control.given_current = trigger_speed_current_calc();
             }
             else
             {

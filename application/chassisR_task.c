@@ -209,7 +209,7 @@ float w_time = 0; // 小陀螺持续时间
 float heng_angle = 0;
 uint16_t w_cnt=0;
 int16_t wheel_motor_current[2]={0,0};
-
+extern fp32 chassis_power_buffer;
 
 uint16_t key_v = 0;
 uint16_t k_w = 0;
@@ -390,8 +390,8 @@ void ChassisR_task(void)
 	{
 		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
 		{
-			key_speed=-0.8f - robot_state.robot_level * 0.1f;
-			w_speed=1.2f + robot_state.robot_level * 0.1f;
+			key_speed=-0.8f - robot_state.robot_level * 0.09f;
+			w_speed=1.2f + robot_state.robot_level * 0.13f;
 		}
 		// if(debug_flag==0&&debug_count<=51)
 		// {
@@ -809,20 +809,36 @@ void ChassisR_task(void)
 				// {
 				// 	w_time = 0;
 				// }
-				w_cnt++;
-				if(w_cnt<1000)
+				// w_cnt++;
+				// if(w_cnt<2000 && chassis_power_buffer<=30)
+				// {
+				// 	w_cnt=2000;
+				// }
+				// else if(w_cnt>=2000 && chassis_power_buffer>=60)
+				// {
+				// 	w_cnt=0;
+				// }
+				// if(w_cnt<2000)
+				// {
+				// 	chassis_move_balance.Wz_target=w_speed;
+				// 	// chassis_move_balance.Wz_target=1.0f;
+				// }
+				// else if(w_cnt>=2000&&w_cnt<3500)
+				// {
+				// 	chassis_move_balance.Wz_target=w_speed * 0.8f;
+				// 	// chassis_move_balance.Wz_target=1.0f;
+				// }
+				// else
+				// {
+				// 	w_cnt=0;
+				// }
+				if(chassis_power_buffer>=60)
 				{
 					chassis_move_balance.Wz_target=w_speed;
-					// chassis_move_balance.Wz_target=1.0f;
 				}
-				else if(w_cnt>=1000&&w_cnt<2500)
+				else if(chassis_power_buffer<=30)
 				{
 					chassis_move_balance.Wz_target=w_speed * 0.8f;
-					// chassis_move_balance.Wz_target=1.0f;
-				}
-				else
-				{
-					w_cnt=0;
 				}
 				// chassis_move_balance.Wz_target = 1.1f + arm_sin_f32(w_time) * 0.2f; // 变速小陀螺目标角速度
 				chassis_move_balance.v_set = 0;
@@ -1167,7 +1183,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 
 	// 自动跳跃逻辑
 	jump_distance=(float)stp23_distance + 10.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
-	if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
+	// if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
+	if (k_shift)
 	{
 		if ((chassis->v_filter2 < 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
 		{
@@ -1187,8 +1204,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 	}
 	// 跳跃逻辑
-	if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
-	// if (k_shift)
+	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
+	if (k_shift)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;

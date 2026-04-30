@@ -145,7 +145,7 @@ extern RC_ctrl_t rc_ctrl;
 float initial_give_power[4]; // initial power from PID calculation
 float initial_total_power = 0;
 float total_power = 0;
-
+fp32 chassis_power_buffer = 0.0f;
 void chassis_power_control(chassis_t *chassis_power_control)
 {
 
@@ -157,7 +157,7 @@ void chassis_power_control(chassis_t *chassis_power_control)
 	const fp32 current_to_torque[2] = {0.000396211f, 0.000366211f};
 
 	fp32 chassis_power = 0.0f;
-	fp32 chassis_power_buffer = 0.0f;
+	
 	fp32 toque_coefficient = 1.99688994e-6f; // (20/16384)*(0.3)*(187/3591)/9.55
 	fp32 a = 1.23e-07f;
 	fp32 k2 = 1.453e-07f;

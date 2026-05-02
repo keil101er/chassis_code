@@ -388,10 +388,15 @@ void ChassisR_task(void)
 	// chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while (1)
 	{
-		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 5)
+		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 7)
 		{
 			key_speed=-0.8f - robot_state.robot_level * 0.09f;
-			w_speed=1.2f + robot_state.robot_level * 0.13f;
+			w_speed=1.21f + robot_state.robot_level * 0.11f;
+		}
+		if(robot_state.robot_level >= 5)
+		{
+			w_speed -= 0.07f;
+			key_speed -= 0.04f;
 		}
 		// if(debug_flag==0&&debug_count<=51)
 		// {
@@ -649,8 +654,8 @@ void ChassisR_task(void)
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
 				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0015f);//速度上限
 			}
-			turn_speed_compensation=1.0f - fabs(yaw_sen * 100);
-			mySaturate(&turn_speed_compensation,0.5f,1.0f);
+			turn_speed_compensation=1.0f - fabs(yaw_sen * 200);
+			mySaturate(&turn_speed_compensation,0.3f,1.0f);
 			chassis_move_balance.target_v= chassis_move_balance.target_v * turn_speed_compensation;
 			
 			if (RC_KEY_flag)
@@ -954,7 +959,7 @@ void ChassisR_init(chassis_t *chassis, vmc_leg_t *vmc, pid_type_def *legr, pid_t
 }
 
 float roll_pid[3] =
-	{60.0f, 0, 0.1f}; // 测试使用
+	{60.0f, 0, 1.0f}; // 测试使用
 //  {ROLL_PID_KP, ROLL_PID_KI,ROLL_PID_KD};
 float tp_pid[3] =
 	//                  {25,0,8};
@@ -1067,7 +1072,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 开始小陀螺状态
 	if (chassis->w_flag == 1)
 	{
-		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.006f); // 斜坡函数
+		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.005f); // 斜坡函数
 		chassis->turn_T = Turn_Pid.Kp * (chassis->Wz_set - 0) - Turn_Pid.Kd * ins->Gyro[2];		// 进入小陀螺模式
 		W_cplt_flag = 1;
 		heng_angle = 0.0f;
@@ -1076,12 +1081,12 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	else if (W_cplt_flag == 1 && chassis->w_flag != 1)
 	{
 		chassis_move_balance.Wz_target = 0.8f;
-		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.005f); // 斜坡函数
+		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.006f); // 斜坡函数
 		chassis->turn_T = Turn_Pid.Kp * (chassis->Wz_set - 0) - Turn_Pid.Kd * ins->Gyro[2];
 		chassis_move_balance.v_set = 0;
 		chassis_move_balance.target_x = 0;
 		chassis_move_balance.v_filter2 = 0;
-		if ((chassis->relative_angle < 0.8f) && (chassis->relative_angle > -0.8f) && chassis_move_balance.Wz_set<1.0f) // 当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
+		if ((chassis->relative_angle < 0.9f) && (chassis->relative_angle > -0.9f) && chassis_move_balance.Wz_set<1.0f) // 当小陀螺速度降到0或者相对角度回到0附近时，退出小陀螺模式
 		{
 			chassis_move_balance.x_filter=0;
 			chassis_move_balance.x_set = chassis_move_balance.x_filter + CHASSIS_X_RIGHT_COMPENSATION;
@@ -1115,6 +1120,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		heng_angle = 0.0f;
 		slope_following(&chassis->relative_angle, &angle, 0.015f);
 		chassis->turn_T = Turn_Pid.Kp * (angle - 0) - Turn_Pid.Kd * ins->Gyro[2];
+		mySaturate(&chassis->turn_T,-2.5f,2.5f);
 		// chassis->turn_T=Turn_Pid.Kp*(angle-0)-Turn_Pid.Kd*ins->Gyro[2];
 	}
 

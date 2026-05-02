@@ -58,7 +58,7 @@
 //#define ROLL_PID_KP 25.0f
 //#define ROLL_PID_KI 0.0f 
 //#define ROLL_PID_KD 1.0f
-#define ROLL_PID_MAX_OUT  100.0f
+#define ROLL_PID_MAX_OUT  20.0f
 #define ROLL_PID_MAX_IOUT 0.0f
 
 
@@ -102,12 +102,12 @@
 //#define TURN_PID_KP 6.0f
 //#define TURN_PID_KI 0.0f 
 //#define TURN_PID_KD 200.0f
-#define TURN_PID_KP 15.0f
+#define TURN_PID_KP 9.0f
 #define TURN_PID_KI 0.0f 
-#define TURN_PID_KD 2.5f
+#define TURN_PID_KD 2.2f
 //Rated torque of the wheel hub motor
 //轮毂电机的额定扭矩
-#define TURN_PID_MAX_OUT  5.0f
+#define TURN_PID_MAX_OUT  2.0f
 #define TURN_PID_MAX_IOUT 0.0f
 
 

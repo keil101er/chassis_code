@@ -210,7 +210,7 @@ float heng_angle = 0;
 uint16_t w_cnt=0;
 int16_t wheel_motor_current[2]={0,0};
 extern fp32 chassis_power_buffer;
-
+uint8_t Power_flag=1;
 uint16_t key_v = 0;
 uint16_t k_w = 0;
 uint16_t k_s = 0;
@@ -871,10 +871,17 @@ void ChassisR_task(void)
 		// 控制计算
 		chassisR_control_loop(&chassis_move_balance, &right, &INS, LQR_K_L, &LegR_Pid);
 		//		mit_ctrl(&hcan1,0X06,0,1,0,1,0);
-
+		if(chassis_power_buffer <= 10)
+		{
+			Power_flag = 0;
+		}
+		else if(chassis_power_buffer >= 45)
+		{
+			Power_flag = 1;
+		}
 		// 关节电机和足电机控制
-		// if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1)
-		if (chassis_move_balance.start_flag == 1)
+		if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag)
+		// if (chassis_move_balance.start_flag == 1)
 		{
 			mit_ctrl(&hcan1, 0x08, 0.0f, 0.0f, 0.0f, 0.8f, right.torque_set[1]); // right.torque_set[1]
 			osDelay(CHASSR_TIME);
@@ -1317,41 +1324,6 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	{
 		right_flag = 1; // 缩腿阶段不进行离地检测
 	}
-	// if (chassis->recover_flag == 0) // 倒地自起不需要检测是否离地
-	// {
-	// 	// if((right_flag==1&&left_flag==1&&vmcr->leg_flag==0&&chassis->jump_flag!=1&&chassis->jump_flag2!=1&&chassis->jump_flag!=2&&chassis->jump_flag2!=2)
-
-	// 	//||chassis->jump_flag==3)
-	// 	if (right_flag == 1 && left_flag == 1 && vmcr->leg_flag == 0)
-	// 	{
-	// 		// 当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
-	// 		chassis->wheel_motor[0].wheel_T = 0.0f;
-	// 		vmcr->Tp = LQR_K[6] * (vmcr->theta - 0.0f) + LQR_K[7] * (vmcr->d_theta - 0.0f);
-
-	// 		// 离地时重置x_set和x_filter
-	// 		chassis->x_filter = 0.0f;
-	// 		chassis->x_set = chassis->x_filter + CHASSIS_X_COMPENSATION;
-	// 		// chassis->x_set = chassis->x_filter;
-	// 		vmcr->Tp = vmcr->Tp + chassis->leg_tp;
-	// 	}
-	// 	else
-	// 	{ // 没有离地
-	// 		vmcr->leg_flag = 0; // 置为0
-	// 		// if(chassis->jump_flag_r==0)
-	// 		// {
-	// 		//不跳跃的时候需要roll轴补偿
-	// 		//  vmcr->F0=vmcr->F0+chassis->roll_f0;//roll轴补偿取反然后加上去
-	// 		// }
-	// 	}
-	// }
-	// else if (chassis->recover_flag == 1)
-	// {
-	// 	chassis->x_filter = 0.0f;
-	// 	chassis->x_set = chassis->x_filter + CHASSIS_X_COMPENSATION;
-	// 	vmcr->Tp = 0.0f;
-	// 	vmcr->F0 = 0.0f;
-	// 	chassis_move_balance.w_flag = 0;
-	// }
 
 	// 落地模式，先判断是否离地
 	if (right_flag == 1 && left_flag == 1 && vmcr->leg_flag == 0)
@@ -1362,7 +1334,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		{
 			if (land_flag == 0 && chassis->help_jump_flag == 0)
 			{
-				chassis->leg_set = 0.24;
+				chassis->leg_set = 0.28f;
 				land_flag++;
 			}
 
@@ -1428,17 +1400,36 @@ void mySaturate(float *in, float min, float max)
 
 uint8_t recover_detect(chassis_t *chassis)
 {
-	// if (((chassis->myPithR < ((-3.1415926f) / 10.5f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) || (chassis->myPithR > (3.1415926f / 12.8f) && chassis->myPithR < (3.1415926f / 2.0f))))
-	if (((chassis->myPithR < ((-3.1415926f) / 15.0f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) || (chassis->myPithR > (3.1415926f / 20.0f) && chassis->myPithR < (3.1415926f / 2.0f))))
+	static uint8_t recover_detect_count = 0;
+	const uint8_t recover_detect_count_threshold = 40;
+	uint8_t recover_pitch_over_limit = 0;
+
+	if (right_flag == 1 && left_flag == 1)
 	{
-
-		// chassis->leg_set = 0.130;
-
-		return 1; // 需要自起
+		recover_pitch_over_limit = (fabsf(chassis->myPithR) > (15.0f * pi / 180.0f));
 	}
 	else
 	{
-
-		return 0;
+		recover_pitch_over_limit =
+			(chassis->myPithR < ((-3.1415926f) / 15.0f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) ||
+			(chassis->myPithR > (3.1415926f / 20.0f) && chassis->myPithR < (3.1415926f / 2.0f));
 	}
+
+	if (recover_pitch_over_limit)
+	{
+		if (recover_detect_count < recover_detect_count_threshold)
+		{
+			recover_detect_count++;
+		}
+		if (recover_detect_count >= recover_detect_count_threshold)
+		{
+			return 1; // 需要自起
+		}
+	}
+	else
+	{
+		recover_detect_count = 0;
+	}
+
+	return 0;
 }

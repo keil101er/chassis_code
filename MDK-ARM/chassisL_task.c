@@ -26,6 +26,7 @@ extern float Poly_Coefficient[12][4];
 
 extern chassis_t chassis_move_balance;
 extern robot_status_t robot_state;
+extern uint8_t Power_flag;
 
 float jump_time_l;
 extern float jump_time_r;
@@ -93,8 +94,8 @@ void ChassisL_task(void)
 		// 	osDelay(CHASSL_TIME);
 		// 	osDelay(CHASSL_TIME);
         // } else {
-            // if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1) 
-            if (chassis_move_balance.start_flag == 1) 
+             if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag) 
+            // if (chassis_move_balance.start_flag == 1) 
             {
 
                 // 关节电机控制
@@ -354,39 +355,6 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     if (chassis->jump_flag_l == 2) {
         left_flag = 1; // 缩腿阶段不进行离地检测
     }
-    // if (chassis->recover_flag == 0)
-    // {
-    // 	// 倒地自起不需要检测是否离地
-    // 	//		if((right_flag==1&&left_flag==1&&vmcl->leg_flag==0&&chassis->jump_flag_l!=1&&chassis->jump_flag!=1&&chassis->jump_flag_l!=2&&chassis->jump_flag!=2)
-
-    // 	//			||chassis->jump_flag_l==3)
-    // 	if (right_flag == 1 && left_flag == 1 && vmcl->leg_flag == 0)
-    // 	{
-    // 		// 当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
-    // 		chassis->wheel_motor[1].wheel_T = 0.0f;
-    // 		vmcl->Tp = LQR_K[6] * (vmcl->theta - 0.0f) + LQR_K[7] * (vmcl->d_theta - 0.0f);
-    // 		chassis->x_filter = 0.0f;
-    // 		chassis->x_set = chassis->x_filter;
-    // 		chassis->turn_set = chassis->total_yaw;
-    // 		vmcl->Tp = vmcl->Tp + chassis->leg_tp;
-    // 	}
-    // 	else
-    // 	{
-    // 		// 没有离地
-    // 		vmcl->leg_flag = 0; // 置为0
-
-    // 		// 不跳跃的时候需要roll轴补偿
-    // 		if (chassis->jump_flag_l == 0)
-    // 		{
-    // 			// vmcl->F0=vmcl->F0+chassis->roll_f0;//roll轴补偿取反然后加上去
-    // 		}
-    // 	}
-    // }
-    // else if (chassis->recover_flag == 1)
-    // {
-    // 	vmcl->Tp = 0.0f;
-    // 	vmcl->F0 = 0.0f;
-    // }
 
     if (right_flag == 1 && left_flag == 1 && vmcl->leg_flag == 0) {
         // if (K_ctrl || (chassis->recover_flag == 0))

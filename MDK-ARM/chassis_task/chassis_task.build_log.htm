@@ -27,66 +27,7 @@ Project File Date:  04/21/2026
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'chassis_task'
-compiling CAN_receive.c...
-..\application\CAN_receive.c(119): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  		   if(chassis_move_balance.joint_motor[4].para.pos>=6.25&&chassis_move_balance.joint_motor[4].para.pos<=12.5)
-..\application\CAN_receive.c(119): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  		   if(chassis_move_balance.joint_motor[4].para.pos>=6.25&&chassis_move_balance.joint_motor[4].para.pos<=12.5)
-..\application\CAN_receive.c(120): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                 chassis_move_balance.joint_motor[4].para.pos-=6.25;
-..\application\CAN_receive.c(122): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                 chassis_move_balance.joint_motor[4].para.pos+=6.25;
-..\application\CAN_receive.c(124): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                 chassis_move_balance.joint_motor[4].para.pos+=12.5;                             
-..\application\CAN_receive.c(129): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                 chassis_move_balance.motor_chassis[4].ecd=chassis_move_balance.joint_motor[4].para.pos*8192/6.25;
-..\application\CAN_receive.c: 6 warnings, 0 errors
-compiling chassis_behaviour.c...
 compiling chassisL_task.c...
-compiling freertos.c...
-compiling chassis_power_control.c...
-..\components\controller\chassis_power_control.c(202): warning:  #111-D: statement is unreachable
-  		initial_give_power[i] = abs(chassis_power_control->wheel_motor[i].given_current)   // ???????????????????????????????????????
-..\components\controller\chassis_power_control.c(155): warning:  #177-D: variable "scaled_give_power"  was declared but never referenced
-  	fp32 scaled_give_power[2] = {0.0f};
-..\components\controller\chassis_power_control.c: 2 warnings, 0 errors
-compiling observe_task.c...
-..\application\observe_task.c(63): warning:  #177-D: variable "wr"  was declared but never referenced
-  	static float wr,wl=0.0f;
-..\application\observe_task.c(63): warning:  #177-D: variable "wl"  was declared but never referenced
-  	static float wr,wl=0.0f;
-..\application\observe_task.c(64): warning:  #177-D: variable "vrb"  was declared but never referenced
-  	static float vrb,vlb=0.0f;
-..\application\observe_task.c(64): warning:  #177-D: variable "vlb"  was declared but never referenced
-  	static float vrb,vlb=0.0f;
-..\application\observe_task.c(65): warning:  #177-D: variable "aver_v"  was declared but never referenced
-  	static float aver_v=0.0f;
-..\application\observe_task.c(66): warning:  #177-D: variable "last_rc"  was declared but never referenced
-  	static float last_rc=0;
-..\application\observe_task.c: 6 warnings, 0 errors
-compiling shoot.c...
-..\application\shoot.c(87): warning:  #174-D: expression has no effect
-      SHOOT_ON_KEYBOARD;
-..\application\shoot.c(305): warning:  #188-D: enumerated type mixed with another type
-                  shoot_control.shoot_mode = 1; // ??????
-..\application\shoot.c(309): warning:  #188-D: enumerated type mixed with another type
-                  shoot_control.shoot_mode = 2; // ??????
-..\application\shoot.c(321): warning:  #188-D: enumerated type mixed with another type
-                shoot_control.shoot_mode = 1;//??????
-..\application\shoot.c(327): warning:  #188-D: enumerated type mixed with another type
-                  shoot_control.shoot_mode = 2;//?????? Single shot
-..\application\shoot.c(335): warning:  #188-D: enumerated type mixed with another type
-          shoot_control.shoot_mode = 1; // ????????????
-..\application\shoot.c(339): warning:  #188-D: enumerated type mixed with another type
-          shoot_control.shoot_mode = 0;
-..\application\shoot.c(484): warning:  #188-D: enumerated type mixed with another type
-              shoot_control.shoot_mode = 0;
-..\application\shoot.c(497): warning:  #188-D: enumerated type mixed with another type
-              shoot_control.shoot_mode = 0;
-..\application\shoot.c(540): warning:  #188-D: enumerated type mixed with another type
-                      shoot_control.shoot_mode = 0;
-..\application\shoot.c: 10 warnings, 0 errors
-compiling test_task.c...
 compiling chassisR_task.c...
 ..\application\chassisR_task.c(244): warning:  #177-D: variable "H"  was declared but never referenced
   	float H = 1;
@@ -94,9 +35,9 @@ compiling chassisR_task.c...
   }
 ..\application\chassisR_task.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=88840 RO-data=4208 RW-data=1536 ZI-data=54816  
+Program Size: Code=89060 RO-data=4208 RW-data=1536 ZI-data=54816  
 FromELF: creating hex file...
-"chassis_task\chassis_task.axf" - 0 Error(s), 26 Warning(s).
+"chassis_task\chassis_task.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -119,7 +60,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
-Build Time Elapsed:  00:00:06
+Build Time Elapsed:  00:00:05
 </pre>
 </body>
 </html>

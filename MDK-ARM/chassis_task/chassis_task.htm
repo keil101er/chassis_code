@@ -3,7 +3,7 @@
 <title>Static Call Graph - [chassis_task\chassis_task.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image chassis_task\chassis_task.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Fri May 01 18:45:23 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat May 02 16:39:10 2026
 <BR><P>
 <H3>Maximum Stack Usage =        448 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1050,7 +1050,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisL_task
 </UL>
 
-<P><STRONG><a name="[bf]"></a>ChassisL_task</STRONG> (Thumb, 422 bytes, Stack size 8 bytes, chassisl_task.o(i.ChassisL_task))
+<P><STRONG><a name="[bf]"></a>ChassisL_task</STRONG> (Thumb, 442 bytes, Stack size 8 bytes, chassisl_task.o(i.ChassisL_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 296<LI>Call Chain = ChassisL_task &rArr; chassisL_control_loop &rArr; VMC_calc_1_left &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -1087,7 +1087,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
-<P><STRONG><a name="[cb]"></a>ChassisR_task</STRONG> (Thumb, 2986 bytes, Stack size 40 bytes, chassisr_task.o(i.ChassisR_task))
+<P><STRONG><a name="[cb]"></a>ChassisR_task</STRONG> (Thumb, 3060 bytes, Stack size 40 bytes, chassisr_task.o(i.ChassisR_task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 328<LI>Call Chain = ChassisR_task &rArr; chassisR_control_loop &rArr; VMC_calc_1_right &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf &rArr; __dunder_d &rArr; _fp_trapveneer &rArr; _fp_trap &rArr; __rt_SIGFPE &rArr; __rt_SIGFPE_inner &rArr; __default_signal_display &rArr; _ttywrch
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -1600,8 +1600,6 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = HAL_PCD_IRQHandler &rArr; PCD_WriteEmptyTxFifo
 </UL>
 <BR>[Calls]<UL><LI><a href="#[127]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_GetHCLKFreq
-<LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ISOOUTIncompleteCallback
-<LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ISOINIncompleteCallback
 <LI><a href="#[12c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_DisconnectCallback
 <LI><a href="#[11e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_DataInStageCallback
 <LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ConnectCallback
@@ -1626,6 +1624,8 @@ Global Symbols
 <LI><a href="#[12a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_SOFCallback
 <LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ResumeCallback
 <LI><a href="#[129]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ResetCallback
+<LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ISOOUTIncompleteCallback
+<LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_PCD_ISOINIncompleteCallback
 </UL>
 <BR>[Called By]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OTG_FS_IRQHandler
 </UL>
@@ -3314,8 +3314,10 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[200]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvInitialiseNewTask
 </UL>
 
-<P><STRONG><a name="[d1]"></a>recover_detect</STRONG> (Thumb, 82 bytes, Stack size 0 bytes, chassisr_task.o(i.recover_detect))
-<BR><BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
+<P><STRONG><a name="[d1]"></a>recover_detect</STRONG> (Thumb, 176 bytes, Stack size 8 bytes, chassisr_task.o(i.recover_detect))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = recover_detect
+</UL>
+<BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ChassisR_task
 </UL>
 
 <P><STRONG><a name="[216]"></a>referee_data_solve</STRONG> (Thumb, 430 bytes, Stack size 16 bytes, referee.o(i.referee_data_solve))

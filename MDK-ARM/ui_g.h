@@ -3,11 +3,11 @@
 
 #include "ui_interface.h"
 
-extern ui_interface_figure_t ui_g_now_figures[12];
-extern uint8_t ui_g_dirty_figure[12];
+extern ui_interface_figure_t ui_g_now_figures[13];
+extern uint8_t ui_g_dirty_figure[13];
 extern ui_interface_string_t ui_g_now_strings[3];
 extern uint8_t ui_g_dirty_string[3];
-extern uint8_t ui_g_max_send_count[15];
+extern uint8_t ui_g_max_send_count[16];
 
 #define ui_g_Ungroup_leg_value ((ui_interface_number_t *)&ui_g_now_figures[0])
 #define ui_g_Ungroup_car_line_left ((ui_interface_line_t *)&ui_g_now_figures[1])
@@ -20,7 +20,8 @@ extern uint8_t ui_g_max_send_count[15];
 #define ui_g_Ungroup_W_round ((ui_interface_round_t *)&ui_g_now_figures[8])
 #define ui_g_Ungroup_enable_round ((ui_interface_round_t *)&ui_g_now_figures[9])
 #define ui_g_Ungroup_chassis_dirct ((ui_interface_arc_t *)&ui_g_now_figures[10])
-#define ui_g_Ungroup_power_value ((ui_interface_number_t *)&ui_g_now_figures[11])
+#define ui_g_Ungroup_AutoShootRegion ((ui_interface_rect_t *)&ui_g_now_figures[11])
+#define ui_g_Ungroup_power_value ((ui_interface_number_t *)&ui_g_now_figures[12])
 
 #define ui_g_Ungroup_fire_mode (&ui_g_now_strings[0])
 #define ui_g_Ungroup_w_flag (&ui_g_now_strings[1])

@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#define TOTAL_FIGURE 12
+#define TOTAL_FIGURE 13
 #define TOTAL_STRING 3
 
 typedef enum
@@ -16,11 +16,11 @@ typedef enum
     UI_G_INIT_STAGE_DONE
 } ui_g_init_stage_e;
 
-static const uint8_t ui_g_init_static_indices[2] = {1, 2};
+static const uint8_t ui_g_init_static_indices[3] = {1, 2, 11};
 static const uint8_t ui_g_init_move_indices[4] = {3, 4, 5, 10};
-static const uint8_t ui_g_init_state_data_indices[6] = {0, 6, 7, 8, 9, 11};
+static const uint8_t ui_g_init_state_data_indices[6] = {0, 6, 7, 8, 9, 12};
 static const uint8_t ui_g_runtime_move_indices[4] = {3, 4, 5, 10};
-static const uint8_t ui_g_runtime_data_indices[3] = {0, 6, 11};
+static const uint8_t ui_g_runtime_data_indices[3] = {0, 6, 12};
 static const uint8_t ui_g_runtime_state_indices[3] = {7, 8, 9};
 
 ui_interface_figure_t ui_g_now_figures[TOTAL_FIGURE];
@@ -30,7 +30,8 @@ uint8_t ui_g_dirty_string[TOTAL_STRING];
 
 uint8_t ui_g_max_send_count[TOTAL_FIGURE + TOTAL_STRING] = {
     2, 1, 1, 2, 2, 2,
-    2, 3, 3, 3, 2, 2,
+    2, 3, 3, 3, 2, 1,
+    2,
     1, 1, 1,
 };
 
@@ -309,6 +310,16 @@ void ui_init_g(void)
     ui_g_Ungroup_chassis_dirct->details_d = 90;
     ui_g_Ungroup_chassis_dirct->details_e = 90;
 
+    ui_g_Ungroup_AutoShootRegion->figure_type = UI_FIGURE_TYPE_RECT;
+    ui_g_Ungroup_AutoShootRegion->operate_type = 1;
+    ui_g_Ungroup_AutoShootRegion->layer = 0;
+    ui_g_Ungroup_AutoShootRegion->color = 6;
+    ui_g_Ungroup_AutoShootRegion->start_x = 630;
+    ui_g_Ungroup_AutoShootRegion->start_y = 265;
+    ui_g_Ungroup_AutoShootRegion->width = 1;
+    ui_g_Ungroup_AutoShootRegion->details_d = 1290;
+    ui_g_Ungroup_AutoShootRegion->details_e = 815;
+
     ui_g_Ungroup_power_value->figure_type = UI_FIGURE_TYPE_NUMBER;
     ui_g_Ungroup_power_value->operate_type = 1;
     ui_g_Ungroup_power_value->layer = 0;
@@ -336,7 +347,7 @@ uint8_t ui_init_step_g(void)
     switch (ui_g_init_stage)
     {
     case UI_G_INIT_STAGE_STATIC:
-        ui_send_figure_subset(ui_g_init_static_indices, 2, 1U);
+        ui_send_figure_subset(ui_g_init_static_indices, 3, 1U);
         ui_g_init_stage = UI_G_INIT_STAGE_MOVE;
         break;
 
@@ -502,7 +513,7 @@ void ui_refresh_fragile_create_g(void)
         break;
 
     case 1:
-        figure_index_list[0] = 11U;
+        figure_index_list[0] = 12U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
@@ -512,30 +523,35 @@ void ui_refresh_fragile_create_g(void)
         break;
 
     case 3:
-        figure_index_list[0] = 10U;
+        figure_index_list[0] = 11U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
     case 4:
-        figure_index_list[0] = 7U;
+        figure_index_list[0] = 10U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
     case 5:
-        figure_index_list[0] = 8U;
+        figure_index_list[0] = 7U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
     case 6:
-        figure_index_list[0] = 9U;
+        figure_index_list[0] = 8U;
         ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
     case 7:
-        ui_send_single_string(ui_g_Ungroup_fire_mode, 1U);
+        figure_index_list[0] = 9U;
+        ui_send_figure_subset(figure_index_list, 1, 1U);
         break;
 
     case 8:
+        ui_send_single_string(ui_g_Ungroup_fire_mode, 1U);
+        break;
+
+    case 9:
         ui_send_single_string(ui_g_Ungroup_w_flag, 1U);
         break;
 
@@ -545,7 +561,7 @@ void ui_refresh_fragile_create_g(void)
     }
 
     refresh_cursor++;
-    if (refresh_cursor >= 10U)
+    if (refresh_cursor >= 11U)
     {
         refresh_cursor = 0U;
     }

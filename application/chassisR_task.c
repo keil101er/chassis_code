@@ -388,9 +388,9 @@ void ChassisR_task(void)
 	// chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while (1)
 	{
-		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 7)
+		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 10)
 		{
-			key_speed=-0.8f - robot_state.robot_level * 0.09f;
+			key_speed=-0.8f - robot_state.robot_level * 0.1f;
 			w_speed=1.21f + robot_state.robot_level * 0.11f;
 		}
 		if(robot_state.robot_level >= 5)
@@ -654,8 +654,8 @@ void ChassisR_task(void)
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
 				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0015f);//速度上限
 			}
-			turn_speed_compensation=1.0f - fabs(yaw_sen * 200);
-			mySaturate(&turn_speed_compensation,0.3f,1.0f);
+			turn_speed_compensation=1.0f - fabs(yaw_sen * 150);
+			mySaturate(&turn_speed_compensation,0.4f,1.0f);
 			chassis_move_balance.target_v= chassis_move_balance.target_v * turn_speed_compensation;
 			
 			if (RC_KEY_flag)
@@ -1218,7 +1218,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 	// 跳跃逻辑
 	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
-	if (k_shift)
+	// 跳跃一旦触发，状态机必须继续跑完；否则松开Shift会卡在缩腿/落地阶段。
+	if (k_shift || chassis->help_jump_flag)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;

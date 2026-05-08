@@ -904,6 +904,7 @@ void ChassisR_task(void)
 			osDelay(CHASSR_TIME);
 			CAN_cmd_chassis(0);
 			osDelay(CHASSR_TIME);
+			CAN_cmd_supercap(0,0,0,0);
 		}
 		// 跳跃PID
 		//  else if(chassis_move_balance.start_flag==0&&chassis_move_balance.help_jump_flag ==1)

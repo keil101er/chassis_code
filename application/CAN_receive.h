@@ -26,6 +26,13 @@
 #define CHASSIS_CAN hcan1
 #define GIMBAL_CAN hcan2
 
+#define CAN_SUPERCAP_TX_ID 0x061
+#define CAN_SUPERCAP_RX_ID 0x051
+#define SUPERCAP_POWER_LIMIT_MIN 30U
+#define SUPERCAP_POWER_LIMIT_MAX 250U
+#define SUPERCAP_ENERGY_BUFFER_MAX 300U
+#define SUPERCAP_OFFLINE_TIMEOUT_MS 200U
+
 /* CAN send and receive ID */
 typedef enum
 {
@@ -54,8 +61,24 @@ typedef struct
 	float vel;
 	fp32 speed;
 	fp32 speed_set;
-	
+
 } motor_measure_t;
+
+typedef struct
+{
+    uint8_t enable_dcdc;
+    uint8_t system_restart;
+    uint16_t referee_power_limit;
+    uint16_t referee_energy_buffer;
+} supercap_tx_msg_t;
+
+typedef struct
+{
+    uint8_t error_code;
+    fp32 chassis_power;
+    uint16_t chassis_power_limit;
+    uint8_t cap_energy_percent_raw;
+} supercap_rx_msg_t;
 
 
 /**
@@ -105,6 +128,16 @@ extern void CAN_cmd_chassis_reset_ID(void);
   * @retval         none
   */
 extern void CAN_cmd_chassis(int16_t motor1);
+
+extern void CAN_cmd_supercap(uint8_t enable_dcdc, uint8_t system_restart, uint16_t power_limit, uint16_t energy_buffer);
+
+extern const supercap_tx_msg_t *get_supercap_tx_data_point(void);
+
+extern const supercap_rx_msg_t *get_supercap_rx_data_point(void);
+
+extern uint8_t supercap_is_online(void);
+
+extern uint32_t get_supercap_last_rx_tick(void);
 
 /**
   * @brief          return the yaw 6020 motor data point

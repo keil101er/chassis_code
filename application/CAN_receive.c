@@ -1,37 +1,28 @@
 /**
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       can_receive.c/h
-  * @brief      there is CAN interrupt function  to receive motor data,
-  *             and CAN send function to send motor current to control motor.
-  *             这里是CAN中断接收函数，接收电机数据,CAN发送函数发送电机电流控制电机.
-  * @note       
-  * @history
-  *  Version    Date            Author          Modification
-  *  V1.0.0     Dec-26-2018     RM              1. done
-  *  V1.1.0     Nov-11-2019     RM              1. support hal lib
-  *
-  @verbatim
-  ==============================================================================
-
-  ==============================================================================
-  @endverbatim
+  * @brief      CAN receive callbacks and transmit helpers.
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
 
 #include "CAN_receive.h"
 
 #include "cmsis_os.h"
-
 #include "main.h"
 #include "chassisR_task.h"
 #include "dm_8009_drv.h"
 #include "detect_task.h"
 #include "CANdata_analysis.h"
 #include "shoot.h"
+#include "string.h"
 
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
-//motor data read
+
+static void supercap_rx_parse(const uint8_t rx_data[8]);
+static uint16_t supercap_clamp_power_limit(uint16_t power_limit);
+static uint16_t supercap_clamp_energy_buffer(uint16_t energy_buffer);
+
 #define get_motor_measure(ptr, data)                                    \
     {                                                                   \
         (ptr)->last_ecd = (ptr)->ecd;                                   \
@@ -40,339 +31,287 @@ extern CAN_HandleTypeDef hcan2;
         (ptr)->given_current = (uint16_t)((data)[4] << 8 | (data)[5]);  \
         (ptr)->temperate = (data)[6];                                   \
     }
-/*
-motor data,  0:chassis motor1 3508;1:chassis motor3 3508;2:chassis motor3 3508;3:chassis motor4 3508;
-4:yaw gimbal motor 6020;5:pitch gimbal motor 6020;6:trigger motor 2006;
-电机数据, 0:底盘电机1 3508电机,  1:底盘电机2 3508电机,2:底盘电机3 3508电机,3:底盘电机4 3508电机;
-4:yaw云台电机 6020电机; 5:pitch云台电机 6020电机; 6:拨弹电机 2006电机*/
+
 motor_measure_t motor_chassis[7];
-	
+
 extern chassis_t chassis_move_balance;
-	
-extern 	shoot_control_t shoot_control;
+extern shoot_control_t shoot_control;
+extern chassis_t chassis_move_balance;
+
 CAN_RxHeaderTypeDef RxHeader1;
 uint8_t g_Can1RxData[64];
-uint16_t auto_cnt=0;
-	
-extern chassis_t  chassis_move_balance;
-static CAN_TxHeaderTypeDef  gimbal_tx_message;
-static uint8_t              gimbal_can_send_data[8];
-static CAN_TxHeaderTypeDef  chassis_tx_message;
-static uint8_t              chassis_can_send_data[8];
+uint16_t auto_cnt = 0;
 
-/**
-  * @brief          hal CAN fifo call back, receive motor data
-  * @param[in]      hcan, the point to CAN handle
-  * @retval         none
-  */
-/**
-  * @brief          hal库CAN回调函数,接收电机数据
-  * @param[in]      hcan:CAN句柄指针
-  * @retval         none
-  */
+static CAN_TxHeaderTypeDef gimbal_tx_message;
+static uint8_t gimbal_can_send_data[8];
+static CAN_TxHeaderTypeDef chassis_tx_message;
+static uint8_t chassis_can_send_data[8];
+
+supercap_tx_msg_t supercap_tx_msg;
+supercap_rx_msg_t supercap_rx_msg;
+static uint32_t supercap_last_rx_tick = 0U;
+
+static uint16_t supercap_clamp_power_limit(uint16_t power_limit)
+{
+    if (power_limit < SUPERCAP_POWER_LIMIT_MIN)
+    {
+        return SUPERCAP_POWER_LIMIT_MIN;
+    }
+    if (power_limit > SUPERCAP_POWER_LIMIT_MAX)
+    {
+        return SUPERCAP_POWER_LIMIT_MAX;
+    }
+    return power_limit;
+}
+
+static uint16_t supercap_clamp_energy_buffer(uint16_t energy_buffer)
+{
+    if (energy_buffer > SUPERCAP_ENERGY_BUFFER_MAX)
+    {
+        return SUPERCAP_ENERGY_BUFFER_MAX;
+    }
+    return energy_buffer;
+}
+
+static void supercap_rx_parse(const uint8_t rx_data[8])
+{
+    // 港科超电回包:
+    // byte0 errorCode
+    // byte1-4 chassisPower(float, little-endian)
+    // byte5-6 chassisPowerLimit(uint16_t, little-endian)
+    // byte7 capEnergyPercent
+    supercap_rx_msg.error_code = rx_data[0];
+    memcpy(&supercap_rx_msg.chassis_power, &rx_data[1], 4);
+    supercap_rx_msg.chassis_power_limit = (uint16_t)(rx_data[5] | (rx_data[6] << 8));
+    supercap_rx_msg.cap_energy_percent_raw = rx_data[7];
+    supercap_last_rx_tick = HAL_GetTick();
+}
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rx_header;
-	
     uint8_t rx_data[8];
 
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
-	if(hcan==&hcan1)  //右边对应can1，关节电机为motor[0] RXid为6 TXid(masterID)为 3 和 motor[1] RXid为8  TXid(masterID)为 4
-  {
-	
-       switch (rx_header.StdId)
-      {
-				case 0x15 ://上板数据发送函数  ID为 0x15
-				{
-					// C_fbdata1(&C_data, rx_data,8);
-          C_fbdata2(&C_data, rx_data,8);
-          if(C_data.MODE==1)
-          {
-            auto_cnt++;
-          }
-					break;
-				}
-				
-	   case 3 :
-				{
-					
-				dm4310_fbdata1(&chassis_move_balance.joint_motor[0], rx_data,8);
-				
-					break;
-				}
-			
-        case 4:{
-			
-				dm4310_fbdata1(&chassis_move_balance.joint_motor[1], rx_data,8);
-			
-			break;	
-				}
-		
-				
-				
-		case 9:
-	  {
-
-		   dm4310_fbdata1(&chassis_move_balance.joint_motor[4], rx_data,8);
-		  
-		   if(chassis_move_balance.joint_motor[4].para.pos>=6.25&&chassis_move_balance.joint_motor[4].para.pos<=12.5)
-               chassis_move_balance.joint_motor[4].para.pos-=6.25;
-           if(chassis_move_balance.joint_motor[4].para.pos<=0&&chassis_move_balance.joint_motor[4].para.pos>-6.25)
-               chassis_move_balance.joint_motor[4].para.pos+=6.25;
-           if(chassis_move_balance.joint_motor[4].para.pos<=-6.25&&chassis_move_balance.joint_motor[4].para.pos>=-12.5)
-               chassis_move_balance.joint_motor[4].para.pos+=12.5;                             
-              
-     		 
-		   
-		       chassis_move_balance.motor_chassis[4].last_ecd=chassis_move_balance.motor_chassis[4].ecd;
-               chassis_move_balance.motor_chassis[4].ecd=chassis_move_balance.joint_motor[4].para.pos*8192/6.25;
-
-           break; 
-    }		
-				
-		
-		  //DJ
-           case CAN_3508_M1_ID:
-           case CAN_3508_M2_ID:
-           case CAN_3508_M3_ID:
-           case CAN_3508_M4_ID:
-         {
-              static uint8_t i = 0;
-              //get motor id
-			        i = rx_header.StdId - CAN_3508_M1_ID;
-              get_motor_measure(&chassis_move_balance.wheel_motor[i], rx_data);
-//              detect_hook(CHASSIS_MOTOR1_TOE + i);
-//					 	  detect_hook(CHASSIS_MOTOR1_TOE);
-		      break;			
-		  }
-		 default: break;		
-	  }
-
-  }
-	  
-  
-  
-  
-		if(hcan==&hcan2)
+    if (hcan == &hcan1)
     {
-	      switch (rx_header.StdId)
+        switch (rx_header.StdId)
         {
-		    
-		case 3 :{dm4310_fbdata1(&chassis_move_balance.joint_motor[2], rx_data,8);}
-				break;
-        case 4 :{dm4310_fbdata1(&chassis_move_balance.joint_motor[3], rx_data,8);}
-				break;	
-		
-		    case Wheel_ID:
-			case CAN_TRIGGER_MOTOR_ID:
-		  {
-             static uint8_t mm = 0;
-			mm = rx_header.StdId-0x204;
-			get_motor_measure(&chassis_move_balance.wheel_motor[mm], rx_data);
-//    detect_hook(CHASSIS_MOTOR1_TOE + i);
-//		detect_hook(CHASSIS_MOTOR2_TOE);
-			  
-			  
-		   }
-		  break;
+        case CAN_SUPERCAP_RX_ID:
+            supercap_rx_parse(rx_data);
+            break;
 
-//		 case 0x207:
-//			 
-//		  {
-//             static uint8_t tr = 6;
+        case 0x15:
+            C_fbdata2(&C_data, rx_data, 8);
+            if (C_data.MODE == 1)
+            {
+                auto_cnt++;
+            }
+            break;
 
-//			get_motor_measure(&motor_chassis[tr], rx_data);
-////    detect_hook(CHASSIS_MOTOR1_TOE + i);
-////		detect_hook(CHASSIS_MOTOR2_TOE);
-//		   }
-//		  break;	
-//		   
-		   
-		   default: break;		
-	     }
-		
-    }	
-	
+        case 3:
+            dm4310_fbdata1(&chassis_move_balance.joint_motor[0], rx_data, 8);
+            break;
+
+        case 4:
+            dm4310_fbdata1(&chassis_move_balance.joint_motor[1], rx_data, 8);
+            break;
+
+        case 9:
+            dm4310_fbdata1(&chassis_move_balance.joint_motor[4], rx_data, 8);
+
+            if (chassis_move_balance.joint_motor[4].para.pos >= 6.25f &&
+                chassis_move_balance.joint_motor[4].para.pos <= 12.5f)
+            {
+                chassis_move_balance.joint_motor[4].para.pos -= 6.25f;
+            }
+            if (chassis_move_balance.joint_motor[4].para.pos <= 0.0f &&
+                chassis_move_balance.joint_motor[4].para.pos > -6.25f)
+            {
+                chassis_move_balance.joint_motor[4].para.pos += 6.25f;
+            }
+            if (chassis_move_balance.joint_motor[4].para.pos <= -6.25f &&
+                chassis_move_balance.joint_motor[4].para.pos >= -12.5f)
+            {
+                chassis_move_balance.joint_motor[4].para.pos += 12.5f;
+            }
+
+            chassis_move_balance.motor_chassis[4].last_ecd = chassis_move_balance.motor_chassis[4].ecd;
+            chassis_move_balance.motor_chassis[4].ecd =
+                chassis_move_balance.joint_motor[4].para.pos * 8192 / 6.25f;
+            break;
+
+        case CAN_3508_M1_ID:
+        case CAN_3508_M2_ID:
+        case CAN_3508_M3_ID:
+        case CAN_3508_M4_ID:
+        {
+            static uint8_t i = 0;
+            i = rx_header.StdId - CAN_3508_M1_ID;
+            get_motor_measure(&chassis_move_balance.wheel_motor[i], rx_data);
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
+
+    if (hcan == &hcan2)
+    {
+        switch (rx_header.StdId)
+        {
+        case 3:
+            dm4310_fbdata1(&chassis_move_balance.joint_motor[2], rx_data, 8);
+            break;
+
+        case 4:
+            dm4310_fbdata1(&chassis_move_balance.joint_motor[3], rx_data, 8);
+            break;
+
+        case Wheel_ID:
+        case CAN_TRIGGER_MOTOR_ID:
+        {
+            static uint8_t mm = 0;
+            mm = rx_header.StdId - 0x204;
+            get_motor_measure(&chassis_move_balance.wheel_motor[mm], rx_data);
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
 }
 
-//void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
-//{
-//	
-
-//    uint8_t dm_motor_data[8];
-
-//    HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &RxHeader1, dm_motor_data);
-////  if((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) != RESET)
-////  {
-////    if(hfdcan->Instance == FDCAN2)
-////    {
-////      /* Retrieve Rx messages from RX FIFO0 */
-////			memset(g_Can2RxData, 0, sizeof(g_Can2RxData));
-////      HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &RxHeader2, g_Can2RxData);
-//			switch(RxHeader1.StdId)
-//			{
-//        case 3 :dm4310_fbdata1(&chassis_move_balance.joint_motor[2], g_Can1RxData,8);break;
-//        case 4 :dm4310_fbdata1(&chassis_move_balance.joint_motor[3], g_Can1RxData,8);break;	         	
-////				case 0 :dm6215_fbdata(&chassis_move.wheel_motor[1], g_Can2RxData,RxHeader2.DataLength);break;
-//				default: break;
-//			}	
-//}
-
-
-
-/**
-  * @brief          send control current of motor (0x205, 0x206, 0x207, 0x208)
-  * @param[in]      yaw: (0x205) 6020 motor control current, range [-30000,30000] 
-  * @param[in]      pitch: (0x206) 6020 motor control current, range [-30000,30000]
-  * @param[in]      shoot: (0x207) 2006 motor control current, range [-10000,10000]
-  * @param[in]      rev: (0x208) reserve motor control current
-  * @retval         none
-  */
-/**
-  * @brief          发送电机控制电流(0x205,0x206,0x207,0x208)
-  * @param[in]      yaw: (0x205) 6020电机控制电流, 范围 [-30000,30000]
-  * @param[in]      pitch: (0x206) 6020电机控制电流, 范围 [-30000,30000]
-  * @param[in]      shoot: (0x207) 2006电机控制电流, 范围 [-10000,10000]
-  * @param[in]      rev: (0x208) 保留，电机控制电流
-  * @retval         none
-  */
-void CAN_cmd_gimbal(int16_t yaw,int16_t pitch, int16_t shoot, int16_t rev)
+void CAN_cmd_gimbal(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
 {
     uint32_t send_mail_box;
+
     gimbal_tx_message.StdId = CAN_GIMBAL_ALL_ID;
     gimbal_tx_message.IDE = CAN_ID_STD;
     gimbal_tx_message.RTR = CAN_RTR_DATA;
     gimbal_tx_message.DLC = 0x08;
-	gimbal_can_send_data[0] = (yaw >> 8);
-    gimbal_can_send_data[1] = yaw;
-    gimbal_can_send_data[2] = (pitch >> 8);
-    gimbal_can_send_data[3] = pitch;
-    gimbal_can_send_data[4] = (shoot >> 8);
-    gimbal_can_send_data[5] = shoot;
-    gimbal_can_send_data[6] = (rev >> 8);
-    gimbal_can_send_data[7] = rev;
+    gimbal_can_send_data[0] = (uint8_t)(yaw >> 8);
+    gimbal_can_send_data[1] = (uint8_t)yaw;
+    gimbal_can_send_data[2] = (uint8_t)(pitch >> 8);
+    gimbal_can_send_data[3] = (uint8_t)pitch;
+    gimbal_can_send_data[4] = (uint8_t)(shoot >> 8);
+    gimbal_can_send_data[5] = (uint8_t)shoot;
+    gimbal_can_send_data[6] = (uint8_t)(rev >> 8);
+    gimbal_can_send_data[7] = (uint8_t)rev;
     HAL_CAN_AddTxMessage(&GIMBAL_CAN, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
 }
 
-/**
-  * @brief          send CAN packet of ID 0x700, it will set chassis motor 3508 to quick ID setting
-  * @param[in]      none
-  * @retval         none
-  */
-/**
-  * @brief           发送ID为0x700的CAN包,它会设置3508电机进入快速设置ID
-  * @param[in]      none
-  * @retval         none
-  */
 void CAN_cmd_chassis_reset_ID(void)
 {
     uint32_t send_mail_box;
+
     chassis_tx_message.StdId = 0x700;
     chassis_tx_message.IDE = CAN_ID_STD;
     chassis_tx_message.RTR = CAN_RTR_DATA;
     chassis_tx_message.DLC = 0x08;
-    chassis_can_send_data[0] = 0;
-    chassis_can_send_data[1] = 0;
-    chassis_can_send_data[2] = 0;
-    chassis_can_send_data[3] = 0;
-    chassis_can_send_data[4] = 0;
-    chassis_can_send_data[5] = 0;
-    chassis_can_send_data[6] = 0;
-    chassis_can_send_data[7] = 0;
-
+    chassis_can_send_data[0] = 0U;
+    chassis_can_send_data[1] = 0U;
+    chassis_can_send_data[2] = 0U;
+    chassis_can_send_data[3] = 0U;
+    chassis_can_send_data[4] = 0U;
+    chassis_can_send_data[5] = 0U;
+    chassis_can_send_data[6] = 0U;
+    chassis_can_send_data[7] = 0U;
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 
-
-/**
-  * @brief          send control current of motor (0x201, 0x202, 0x203, 0x204)
-  * @param[in]      motor1: (0x201) 3508 motor control current, range [-16384,16384] 
-  * @param[in]      motor2: (0x202) 3508 motor control current, range [-16384,16384] 
-  * @param[in]      motor3: (0x203) 3508 motor control current, range [-16384,16384] 
-  * @param[in]      motor4: (0x204) 3508 motor control current, range [-16384,16384] 
-  * @retval         none
-  */
-/**
-  * @brief          发送电机控制电流(0x201,0x202,0x203,0x204)
-  * @param[in]      motor1: (0x201) 3508电机控制电流, 范围 [-16384,16384]
-  * @param[in]      motor2: (0x202) 3508电机控制电流, 范围 [-16384,16384]
-  * @param[in]      motor3: (0x203) 3508电机控制电流, 范围 [-16384,16384]
-  * @param[in]      motor4: (0x204) 3508电机控制电流, 范围 [-16384,16384]
-  * @retval         none
-  */
 void CAN_cmd_chassis(int16_t motor1)
 {
     uint32_t send_mail_box;
+
     chassis_tx_message.StdId = CAN_CHASSIS_ALL_ID;
     chassis_tx_message.IDE = CAN_ID_STD;
     chassis_tx_message.RTR = CAN_RTR_DATA;
     chassis_tx_message.DLC = 0x08;
-    chassis_can_send_data[0] = motor1 >> 8;
-    chassis_can_send_data[1] = motor1;
+    chassis_can_send_data[0] = (uint8_t)(motor1 >> 8);
+    chassis_can_send_data[1] = (uint8_t)motor1;
+    chassis_can_send_data[2] = 0U;
+    chassis_can_send_data[3] = 0U;
+    chassis_can_send_data[4] = 0U;
+    chassis_can_send_data[5] = 0U;
+    chassis_can_send_data[6] = 0U;
+    chassis_can_send_data[7] = 0U;
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 
-/**
-  * @brief          return the yaw 6020 motor data point
-  * @param[in]      none
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回yaw 6020电机数据指针
-  * @param[in]      none
-  * @retval         电机数据指针
-  */
+void CAN_cmd_supercap(uint8_t enable_dcdc, uint8_t system_restart, uint16_t power_limit, uint16_t energy_buffer)
+{
+    uint32_t send_mail_box;
+
+    power_limit = supercap_clamp_power_limit(power_limit);
+    energy_buffer = supercap_clamp_energy_buffer(energy_buffer);
+
+    supercap_tx_msg.enable_dcdc = (enable_dcdc != 0U) ? 1U : 0U;
+    supercap_tx_msg.system_restart = (system_restart != 0U) ? 1U : 0U;
+    supercap_tx_msg.referee_power_limit = power_limit;
+    supercap_tx_msg.referee_energy_buffer = energy_buffer;
+
+    chassis_tx_message.StdId = CAN_SUPERCAP_TX_ID;
+    chassis_tx_message.IDE = CAN_ID_STD;
+    chassis_tx_message.RTR = CAN_RTR_DATA;
+    chassis_tx_message.DLC = 0x08;
+    chassis_can_send_data[0] = (uint8_t)((supercap_tx_msg.enable_dcdc & 0x01U) |
+                                         ((supercap_tx_msg.system_restart & 0x01U) << 1));
+    chassis_can_send_data[1] = (uint8_t)(supercap_tx_msg.referee_power_limit & 0xFFU);
+    chassis_can_send_data[2] = (uint8_t)((supercap_tx_msg.referee_power_limit >> 8) & 0xFFU);
+    chassis_can_send_data[3] = (uint8_t)(supercap_tx_msg.referee_energy_buffer & 0xFFU);
+    chassis_can_send_data[4] = (uint8_t)((supercap_tx_msg.referee_energy_buffer >> 8) & 0xFFU);
+    chassis_can_send_data[5] = 0U;
+    chassis_can_send_data[6] = 0U;
+    chassis_can_send_data[7] = 0U;
+    HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+
+    supercap_tx_msg.system_restart = 0U;
+}
+
+const supercap_tx_msg_t *get_supercap_tx_data_point(void)
+{
+    return &supercap_tx_msg;
+}
+
+const supercap_rx_msg_t *get_supercap_rx_data_point(void)
+{
+    return &supercap_rx_msg;
+}
+
+uint8_t supercap_is_online(void)
+{
+    if (supercap_last_rx_tick == 0U)
+    {
+        return 0U;
+    }
+    return ((HAL_GetTick() - supercap_last_rx_tick) <= SUPERCAP_OFFLINE_TIMEOUT_MS) ? 1U : 0U;
+}
+
+uint32_t get_supercap_last_rx_tick(void)
+{
+    return supercap_last_rx_tick;
+}
+
 const motor_measure_t *get_yaw_gimbal_motor_measure_point(void)
 {
     return &motor_chassis[4];
 }
 
-/**
-  * @brief          return the pitch 6020 motor data point
-  * @param[in]      none
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回pitch 6020电机数据指针
-  * @param[in]      none
-  * @retval         电机数据指针
-  */
 const motor_measure_t *get_pitch_gimbal_motor_measure_point(void)
 {
     return &motor_chassis[6];
 }
 
-
-/**
-  * @brief          return the trigger 2006 motor data point
-  * @param[in]      none
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回拨弹电机 2006电机数据指针
-  * @param[in]      none
-  * @retval         电机数据指针
-  */
 const motor_measure_t *get_trigger_motor_measure_point(void)
 {
     return &chassis_move_balance.wheel_motor[3];
 }
 
-
-/**
-  * @brief          return the chassis 3508 motor data point
-  * @param[in]      i: motor number,range [0,3]
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回底盘电机 3508电机数据指针
-  * @param[in]      i: 电机编号,范围[0,3]
-  * @retval         电机数据指针
-  */
 const motor_measure_t *get_chassis_motor_measure_point(uint8_t i)
 {
-
     return &motor_chassis[(i & 0x03)];
 }
-

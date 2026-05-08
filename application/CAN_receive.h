@@ -66,18 +66,18 @@ typedef struct
 
 typedef struct
 {
-    uint8_t enable_dcdc;
-    uint8_t system_restart;
-    uint16_t referee_power_limit;
-    uint16_t referee_energy_buffer;
+    uint8_t enable_dcdc;//超电使能信号
+    uint8_t system_restart;//超电重启信号
+    uint16_t referee_power_limit;//裁判系统功率限制
+    uint16_t referee_energy_buffer;//裁判系统缓存能量
 } supercap_tx_msg_t;
 
 typedef struct
 {
-    uint8_t error_code;
-    fp32 chassis_power;
-    uint16_t chassis_power_limit;
-    uint8_t cap_energy_percent_raw;
+    uint8_t error_code;//错误码
+    fp32 chassis_power;//当前实际功率
+    uint16_t chassis_power_limit;//当前可用功率
+    uint8_t cap_energy_percent_raw;//超电剩余电量百分比
 } supercap_rx_msg_t;
 
 

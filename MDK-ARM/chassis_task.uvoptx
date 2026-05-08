@@ -202,7 +202,7 @@
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>supercap_rx_msg</ItemText>
+          <ItemText>supercap_rx_msg,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

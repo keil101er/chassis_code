@@ -220,8 +220,8 @@ uint16_t k_z = 0;
 uint16_t k_x = 0;
 uint16_t k_r = 0;
 uint16_t k_shift = 0;
-uint16_t K_ctrl = 0;
 uint16_t K_b = 0;
+uint16_t k_v = 0;
 uint8_t ctrl_leg_auto_flag = 0;
 uint8_t last_k_r = 0;
 /**
@@ -438,8 +438,8 @@ void ChassisR_task(void)
 		k_r = (key_v & CHASSIS_SPIN_KEY);
 		k_z = (key_v & CHASSIS_LEG_UP_KEY);
 		k_x = (key_v & CHASSIS_LEG_DOWN_KEY);
-		k_shift = (key_v & CHASSIS_JUMP_KEY);
-		K_ctrl = (key_v & CHASSIS_FLOAT_KEY);
+		k_v = (key_v & CHASSIS_JUMP_KEY);
+		k_shift = (key_v & CHASSIS_FLOAT_KEY);
 		K_b = (key_v & CHASSIS_AUTO_TEST_KEY);
 		// 按键冲突处理
 		if (k_w && k_s)
@@ -456,11 +456,6 @@ void ChassisR_task(void)
 		{
 			k_z = 0;
 			k_x = 0;
-		}
-		if (k_shift && K_ctrl)
-		{
-			k_shift = 0;
-			K_ctrl = 0;
 		}
 
 		// 遥控器和键鼠控制切换逻辑(左右拨杆都处于中间时键鼠控制)
@@ -561,7 +556,7 @@ void ChassisR_task(void)
 		{
 			if (RC_KEY_flag)
 			{
-				if (key_press_r(K_ctrl))
+				if (key_press_r(k_shift))
 				{
 					if (chassis_move_balance.w_flag == 1)
 					{
@@ -1080,7 +1075,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	if (chassis->w_flag == 1)
 	{
 		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.005f); // 斜坡函数
-		chassis->turn_T = Turn_Pid.Kp * (chassis->Wz_set - 0) - Turn_Pid.Kd * ins->Gyro[2];		// 进入小陀螺模式
+		chassis->turn_T = Wz_Pid.Kp * (chassis->Wz_set - 0) - Wz_Pid.Kd * ins->Gyro[2];		// 进入小陀螺模式
 		W_cplt_flag = 1;
 		heng_angle = 0.0f;
 	}
@@ -1089,7 +1084,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	{
 		chassis_move_balance.Wz_target = 0.8f;
 		slope_following(&chassis_move_balance.Wz_target, &chassis_move_balance.Wz_set, 0.006f); // 斜坡函数
-		chassis->turn_T = Turn_Pid.Kp * (chassis->Wz_set - 0) - Turn_Pid.Kd * ins->Gyro[2];
+		chassis->turn_T = Wz_Pid.Kp * (chassis->Wz_set - 0) - Wz_Pid.Kd * ins->Gyro[2];
 		chassis_move_balance.v_set = 0;
 		chassis_move_balance.target_x = 0;
 		chassis_move_balance.v_filter2 = 0;
@@ -1119,7 +1114,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		// PID控制，使底盘相对角度保持在目标角度
 		// PID control to keep chassis relative angle at target angle
 		chassis->turn_T = Turn_Pid.Kp * (chassis->relative_angle - heng_angle) - Turn_Pid.Kd * ins->Gyro[2];
-		angle = 0;
+		angle = 0; 
+		mySaturate(&chassis->turn_T,-2.5f,2.5f);
 	}
 	// 正常模式
 	else
@@ -1197,7 +1193,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 自动跳跃逻辑
 	jump_distance=(float)stp23_distance + 10.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
 	// if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
-	if (k_shift)
+	if (k_v)
 	{
 		if ((chassis->v_filter2 < 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
 		{
@@ -1219,7 +1215,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 跳跃逻辑
 	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
 	// 跳跃一旦触发，状态机必须继续跑完；否则松开Shift会卡在缩腿/落地阶段。
-	if (k_shift || chassis->help_jump_flag)
+	if (k_v || chassis->help_jump_flag)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;

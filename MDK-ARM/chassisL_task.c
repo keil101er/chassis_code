@@ -51,7 +51,7 @@ extern INS_t INS;
 uint32_t CHASSL_TIME = 1;
 int16_t shoot_can_set_current;
 
-extern uint16_t k_shift;
+extern uint16_t k_v;
 extern float gimbal_mode;
 
 void ChassisL_task(void)
@@ -183,7 +183,7 @@ void chassisL_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
     chassis->wheel_motor[1].speed   = 0.0004998609952f * chassis->wheel_motor[1].speed_rpm;             // 速度
     chassis->wheel_motor[1].wheel_T = CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN * chassis->wheel_motor[1].given_current;
     // chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
-    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 2517); // 获取相对角度值，零点ecd=2865
+    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 2090); // 获取相对角度值，零点ecd=2865
                                                                                                //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 
     // static fp32 speed_fliter_1 = 0.0f;
@@ -264,7 +264,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     // 起跳阶段
     // if (chassis->chassis_RC->rc.s[1] == 1 || k_shift)
     // 跳跃一旦触发，状态机必须继续跑完；否则松开Shift会卡在缩腿/落地阶段。
-    if (k_shift || chassis->help_jump_flag)
+    if (k_v || chassis->help_jump_flag)
     {
         chassis->leg_set = 0.15f;
         if (chassis->chassis_RC->rc.ch[4] < -500 || AUTO_jump_flag == 1) {

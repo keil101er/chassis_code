@@ -159,8 +159,8 @@ static void ui_update_overlay(void)
     const float leg_length_max_m = 0.32f;
     const float chassis_arc_center_x = 960.0f;
     const float chassis_arc_center_y = 540.0f;
-    const float energy_bar_left = 710.0f;
-    const float energy_bar_width = 499.0f;
+    const float supercap_bar_left = 710.0f;
+    const float supercap_bar_width = 499.0f;
     const float rad_to_deg = 57.2957795f;
     const int32_t chassis_arc_half_span_deg = 30;
 
@@ -176,7 +176,8 @@ static void ui_update_overlay(void)
     float body_dy;
     float wheel_center_x;
     float wheel_center_y;
-    float buffer_ratio;
+    float supercap_ratio;
+    uint32_t supercap_bar_color = 2U;
     float relative_angle_deg;
     uint8_t show_fire;
     uint8_t show_gyro;
@@ -240,10 +241,20 @@ static void ui_update_overlay(void)
     ui_g_Ungroup_chassis_dirct->details_d = 90U;
     ui_g_Ungroup_chassis_dirct->details_e = 90U;
 
-    buffer_ratio = ui_clamp_f32((float)supercap_rx_msg.cap_energy_percent_raw / 245.0f, 0.0f, 1.0f);
-    ui_g_Ungroup_energr_buffer->details_d =
-        (uint32_t)lroundf(energy_bar_left + (buffer_ratio * energy_bar_width));
-    ui_g_Ungroup_energr_buffer->details_e = 80U;
+    supercap_ratio = ui_clamp_f32((float)supercap_rx_msg.cap_energy_percent_raw / 245.0f, 0.0f, 1.0f);
+    if (supercap_rx_msg.cap_energy_percent_raw < 50U)
+    {
+        supercap_bar_color = 4U;
+    }
+    else if (supercap_rx_msg.cap_energy_percent_raw < 150U)
+    {
+        supercap_bar_color = 1U;
+    }
+
+    ui_g_Ungroup_supercap_capacity_bar->details_d =
+        (uint32_t)lroundf(supercap_bar_left + (supercap_ratio * supercap_bar_width));
+    ui_g_Ungroup_supercap_capacity_bar->details_e = 80U;
+    ui_g_Ungroup_supercap_capacity_bar->color = supercap_bar_color;
 
     show_fire = (uint8_t)((shoot_control.fire_mode == FIREING) || (shoot_control.fric_enabled != 0U));
     show_gyro = (uint8_t)(chassis_move_balance.w_flag != 0U);

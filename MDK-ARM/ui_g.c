@@ -261,15 +261,15 @@ void ui_init_g(void)
     ui_g_Ungroup_wheel_round->width = 5;
     ui_g_Ungroup_wheel_round->details_c = 24;
 
-    ui_g_Ungroup_energr_buffer->figure_type = UI_FIGURE_TYPE_LINE;
-    ui_g_Ungroup_energr_buffer->operate_type = 1;
-    ui_g_Ungroup_energr_buffer->layer = 0;
-    ui_g_Ungroup_energr_buffer->color = 2;
-    ui_g_Ungroup_energr_buffer->start_x = 710;
-    ui_g_Ungroup_energr_buffer->start_y = 80;
-    ui_g_Ungroup_energr_buffer->width = 15;
-    ui_g_Ungroup_energr_buffer->details_d = 1209;
-    ui_g_Ungroup_energr_buffer->details_e = 80;
+    ui_g_Ungroup_supercap_capacity_bar->figure_type = UI_FIGURE_TYPE_LINE;
+    ui_g_Ungroup_supercap_capacity_bar->operate_type = 1;
+    ui_g_Ungroup_supercap_capacity_bar->layer = 0;
+    ui_g_Ungroup_supercap_capacity_bar->color = 2;
+    ui_g_Ungroup_supercap_capacity_bar->start_x = 710;
+    ui_g_Ungroup_supercap_capacity_bar->start_y = 80;
+    ui_g_Ungroup_supercap_capacity_bar->width = 15;
+    ui_g_Ungroup_supercap_capacity_bar->details_d = 1209;
+    ui_g_Ungroup_supercap_capacity_bar->details_e = 80;
 
     ui_g_Ungroup_Fire_round->figure_type = UI_FIGURE_TYPE_CIRCLE;
     ui_g_Ungroup_Fire_round->operate_type = 1;

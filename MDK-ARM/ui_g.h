@@ -15,7 +15,7 @@ extern uint8_t ui_g_max_send_count[16];
 #define ui_g_Ungroup_car_body_line ((ui_interface_line_t *)&ui_g_now_figures[3])
 #define ui_g_Ungroup_leg_line ((ui_interface_line_t *)&ui_g_now_figures[4])
 #define ui_g_Ungroup_wheel_round ((ui_interface_round_t *)&ui_g_now_figures[5])
-#define ui_g_Ungroup_energr_buffer ((ui_interface_line_t *)&ui_g_now_figures[6])
+#define ui_g_Ungroup_supercap_capacity_bar ((ui_interface_line_t *)&ui_g_now_figures[6])
 #define ui_g_Ungroup_Fire_round ((ui_interface_round_t *)&ui_g_now_figures[7])
 #define ui_g_Ungroup_W_round ((ui_interface_round_t *)&ui_g_now_figures[8])
 #define ui_g_Ungroup_enable_round ((ui_interface_round_t *)&ui_g_now_figures[9])

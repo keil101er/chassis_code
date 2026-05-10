@@ -45,13 +45,12 @@ const static float jump_pid[3] = {600.0f, 0.0f, 200.0f};
 float jumpF0_L = 17.2f; // 左腿跳跃初始力
 
 extern float theat_set;
-extern uint16_t K_ctrl;
 
 extern INS_t INS;
 uint32_t CHASSL_TIME = 1;
 int16_t shoot_can_set_current;
 
-extern uint16_t k_v;
+extern uint16_t key_jump;
 extern float gimbal_mode;
 
 void ChassisL_task(void)
@@ -264,7 +263,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     // 起跳阶段
     // if (chassis->chassis_RC->rc.s[1] == 1 || k_shift)
     // 跳跃一旦触发，状态机必须继续跑完；否则松开Shift会卡在缩腿/落地阶段。
-    if (k_v || chassis->help_jump_flag)
+    if (key_jump || chassis->help_jump_flag)
     {
         chassis->leg_set = 0.15f;
         if (chassis->chassis_RC->rc.ch[4] < -500 || AUTO_jump_flag == 1) {

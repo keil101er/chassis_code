@@ -212,18 +212,20 @@ int16_t wheel_motor_current[2]={0,0};
 extern fp32 chassis_power_buffer;
 uint8_t Power_flag=1;
 uint16_t key_v = 0;
-uint16_t k_w = 0;
-uint16_t k_s = 0;
-uint16_t k_a = 0;
-uint16_t k_d = 0;
-uint16_t k_z = 0;
-uint16_t k_x = 0;
-uint16_t k_r = 0;
-uint16_t k_shift = 0;
-uint16_t K_b = 0;
-uint16_t k_v = 0;
+uint16_t key_forward = 0;
+uint16_t key_backward = 0;
+uint16_t key_move_left = 0;
+uint16_t key_move_right = 0;
+uint16_t key_leg_up = 0;
+uint16_t key_leg_down = 0;
+uint16_t key_leg_auto_adjust_toggle = 0;
+uint16_t key_spin_mode_toggle = 0;
+uint16_t key_auto_test = 0;
+uint16_t key_jump = 0;
 uint8_t ctrl_leg_auto_flag = 0;
-uint8_t last_k_r = 0;
+uint8_t last_key_leg_auto_adjust_toggle = 0;
+
+extern supercap_rx_msg_t supercap_rx_msg;
 /**
  * @description: 数据融合
  * @param {dt} 时间步长
@@ -431,31 +433,31 @@ void ChassisR_task(void)
 
 		// 刷新键盘值
 		key_v = chassis_move_balance.chassis_RC->key.v;
-		k_w = (key_v & CHASSIS_FRONT_KEY);
-		k_s = (key_v & CHASSIS_BACK_KEY);
-		k_a = (key_v & CHASSIS_LEFT_KEY);
-		k_d = (key_v & CHASSIS_RIGHT_KEY);
-		k_r = (key_v & CHASSIS_SPIN_KEY);
-		k_z = (key_v & CHASSIS_LEG_UP_KEY);
-		k_x = (key_v & CHASSIS_LEG_DOWN_KEY);
-		k_v = (key_v & CHASSIS_JUMP_KEY);
-		k_shift = (key_v & CHASSIS_FLOAT_KEY);
-		K_b = (key_v & CHASSIS_AUTO_TEST_KEY);
+		key_forward = (key_v & CHASSIS_FRONT_KEY);
+		key_backward = (key_v & CHASSIS_BACK_KEY);
+		key_move_left = (key_v & CHASSIS_LEFT_KEY);
+		key_move_right = (key_v & CHASSIS_RIGHT_KEY);
+		key_leg_auto_adjust_toggle = (key_v & CHASSIS_SPIN_KEY);
+		key_leg_up = (key_v & CHASSIS_LEG_UP_KEY);
+		key_leg_down = (key_v & CHASSIS_LEG_DOWN_KEY);
+		key_jump = (key_v & CHASSIS_JUMP_KEY);
+		key_spin_mode_toggle = (key_v & CHASSIS_FLOAT_KEY);
+		key_auto_test = (key_v & CHASSIS_AUTO_TEST_KEY);
 		// 按键冲突处理
-		if (k_w && k_s)
+		if (key_forward && key_backward)
 		{
-			k_w = 0;
-			k_s = 0;
+			key_forward = 0;
+			key_backward = 0;
 		}
-		if (k_a && k_d)
+		if (key_move_left && key_move_right)
 		{
-			k_a = 0;
-			k_d = 0;
+			key_move_left = 0;
+			key_move_right = 0;
 		}
-		if (k_z && k_x)
+		if (key_leg_up && key_leg_down)
 		{
-			k_z = 0;
-			k_x = 0;
+			key_leg_up = 0;
+			key_leg_down = 0;
 		}
 
 		// 遥控器和键鼠控制切换逻辑(左右拨杆都处于中间时键鼠控制)
@@ -556,7 +558,7 @@ void ChassisR_task(void)
 		{
 			if (RC_KEY_flag)
 			{
-				if (key_press_r(k_shift))
+				if (key_press_r(key_spin_mode_toggle))
 				{
 					if (chassis_move_balance.w_flag == 1)
 					{
@@ -585,53 +587,53 @@ void ChassisR_task(void)
 			{
 				if (chassis_move_balance.w_flag == 0 || chassis_move_balance.w_flag == 2)
 				{
-					if (k_w)
+					if (key_forward)
 					{
-						if (k_a)
-						{ // W + A: 45 deg Left
+						if (key_move_left)
+						{ // Forward + Move Left: 45 deg Left
 							chassis_move_balance.w_flag = 2;
 							heng_target = -0.7854f; // -PI/4
 							chassis_move_balance.target_v = key_speed;
 						}
-						else if (k_d)
-						{ // W + D: 45 deg Right
+						else if (key_move_right)
+						{ // Forward + Move Right: 45 deg Right
 							chassis_move_balance.w_flag = 2;
 							heng_target = 0.7854f; // PI/4
 							chassis_move_balance.target_v = key_speed;
 						}
 						else
-						{ // W Only: Forward
+						{ // Forward Only
 							chassis_move_balance.w_flag = 0;
 							chassis_move_balance.target_v = key_speed;
 						}
 					}
-					else if (k_s)
+					else if (key_backward)
 					{
-						if (k_a)
-						{ // S + A: Back-Left (Face Right 45 + Back)
+						if (key_move_left)
+						{ // Backward + Move Left
 							chassis_move_balance.w_flag = 2;
 							heng_target = 0.7854f; // PI/4
 							chassis_move_balance.target_v = -key_speed;
 						}
-						else if (k_d)
-						{ // S + D: Back-Right (Face Left 45 + Back)
+						else if (key_move_right)
+						{ // Backward + Move Right
 							chassis_move_balance.w_flag = 2;
 							heng_target = -0.7854f; // -PI/4
 							chassis_move_balance.target_v = -key_speed;
 						}
 						else
-						{ // S Only: Backward
+						{ // Backward Only
 							chassis_move_balance.w_flag = 0;
 							chassis_move_balance.target_v = -key_speed;
 						}
 					}
-					else if (k_a) // A Only: 90 deg Left
+					else if (key_move_left) // Move Left Only: 90 deg Left
 					{
 						chassis_move_balance.w_flag = 2;
 						heng_target = 1.5708f; // PI/2
 						chassis_move_balance.target_v = -key_speed;
 					}
-					else if (k_d) // D Only: 90 deg Right
+					else if (key_move_right) // Move Right Only: 90 deg Right
 					{
 						chassis_move_balance.w_flag = 2;
 						heng_target = 1.5708f; // PI/2
@@ -754,16 +756,16 @@ void ChassisR_task(void)
 			float leg_target_set = chassis_move_balance.leg_set + (((float)chassis_move_balance.chassis_RC->rc.ch[0]) * (0.0000037f)); // 遥控器改变腿长
 			if (RC_KEY_flag)
 			{
-				if (k_r && !last_k_r)
+				if (key_leg_auto_adjust_toggle && !last_key_leg_auto_adjust_toggle)
 				{
 					ctrl_leg_auto_flag = 1;
 				}
-				if (k_z)
+				if (key_leg_up)
 				{
 					leg_target_set += 0.0007f;
 					ctrl_leg_auto_flag = 0;
 				}
-				else if (k_x)
+				else if (key_leg_down)
 				{
 					leg_target_set -= 0.0007f;
 					ctrl_leg_auto_flag = 0;
@@ -792,7 +794,7 @@ void ChassisR_task(void)
 			{
 				chassis_move_balance.leg_set = leg_target_set;
 			}
-			last_k_r = (k_r != 0);
+			last_key_leg_auto_adjust_toggle = (key_leg_auto_adjust_toggle != 0);
 
 			if (fabsf(chassis_move_balance.last_leg_set - chassis_move_balance.leg_set) > 0.0006f)
 			{
@@ -1194,8 +1196,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 
 	// 自动跳跃逻辑
 	jump_distance=(float)stp23_distance + 10.0f; // 距离传感器测得的距离加上底盘到传感器的偏移距离209mm
-	// if (chassis->chassis_RC->rc.s[1] == 1||k_shift)
-	if (k_v)
+	// if (chassis->chassis_RC->rc.s[1] == 1||key_spin_mode_toggle)
+	if (key_jump)
 	{
 		if ((chassis->v_filter2 < 0.0f) && (jump_distance < -chassis->v_filter2 * 275.0f) && (jump_distance > -chassis->v_filter2 * 206.0f) && (stp23_distance > 0)&&(chassis->myPithR>-0.1f&&chassis->myPithR<0.1f)&&(jump_status==0)) // 前进且距离合适且陀螺仪pitch角度在合理范围内
 		{
@@ -1217,7 +1219,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	// 跳跃逻辑
 	// if (chassis->chassis_RC->rc.s[1] == 1 || k_shift) // 左上拨杆拨至最上边
 	// 跳跃一旦触发，状态机必须继续跑完；否则松开Shift会卡在缩腿/落地阶段。
-	if (k_v || chassis->help_jump_flag)
+	if (key_jump || chassis->help_jump_flag)
 	{
 		chassis->leg_set = 0.15f;
 		jump_module_R = 1;

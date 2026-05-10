@@ -71,9 +71,9 @@
 
 //卡弹时间 以及反转时间
 #define BLOCK_TRIGGER_SPEED         1.0f
-#define BLOCK_TIME                  300
-#define REVERSE_TIME                150
-#define REVERSE_SPEED_LIMIT         13.0f
+#define BLOCK_TIME                  400
+#define REVERSE_TIME                100
+#define REVERSE_SPEED_LIMIT         5.0f
 
 #define PI_FOUR                     0.78539816339744830961566084581988f
 #define PI_TEN                      0.3f
@@ -91,7 +91,7 @@
 //拨弹轮速度环前馈，负方向为正常拨弹，正方向为堵转反转退弹
 #define TRIGGER_SPEED_FF_POS_START  1200.0f
 #define TRIGGER_SPEED_FF_POS_RUN    700.0f
-#define TRIGGER_SPEED_FF_NEG_START  (-2000.0f)
+#define TRIGGER_SPEED_FF_NEG_START  (-2500.0f)
 #define TRIGGER_SPEED_FF_NEG_RUN    (-1000.0f)
 #define TRIGGER_SPEED_FF_START_SPEED 3.0f
 #define TRIGGER_SPEED_FF_DECAY_ERROR 2.0f

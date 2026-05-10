@@ -92,17 +92,11 @@ void shoot_init(void)
 // 射击数据更新
 static void shoot_feedback_update(void)
 {
-    static fp32 speed_fliter_1 = 0.0f;
-    static fp32 speed_fliter_2 = 0.0f;
-    static fp32 speed_fliter_3 = 0.0f;
+    static const fp32 speed_filter_alpha = 0.3f;
+    fp32 raw_speed = shoot_control.shoot_motor_measure->speed_rpm * MOTOR_RPM_TO_SPEED;
 
-    // 拨弹轮电机速度滤波一下
-    static const fp32 fliter_num[3] = {1.725709860247969f, -0.75594777109163436f, 0.030237910843665373f};
-
-    speed_fliter_1 = speed_fliter_2;
-    speed_fliter_2 = speed_fliter_3;
-    speed_fliter_3 = speed_fliter_2 * fliter_num[0] + speed_fliter_1 * fliter_num[1] + (shoot_control.shoot_motor_measure->speed_rpm * MOTOR_RPM_TO_SPEED) * fliter_num[2];
-    shoot_control.speed = speed_fliter_3;
+    // 拨弹轮电机速度改为一阶低通，降低滤波滞后
+    shoot_control.speed += speed_filter_alpha * (raw_speed - shoot_control.speed);
 
     // 电机圈数重置， 因为输出轴旋转一圈， 电机轴旋转 36圈，将电机轴数据处理成输出轴数据，用于控制输出轴角度，转子转一圈ecd_count加减1；
     if (shoot_control.shoot_motor_measure->ecd - shoot_control.shoot_motor_measure->last_ecd > HALF_ECD_RANGE)
@@ -170,6 +164,7 @@ static void shoot_feedback_update(void)
 static void trigger_motor_turn_back(void)
 {
     fp32 target_speed = shoot_control.speed_set;
+    fp32 speed_abs = fabs(shoot_control.speed);
 
     last_trigger_set_speed = shoot_control.speed_set;
     if (target_speed == 0.0f)
@@ -182,24 +177,38 @@ static void trigger_motor_turn_back(void)
     if (shoot_control.block_time < BLOCK_TIME)
     {
         shoot_control.speed_set = target_speed;
+        if (speed_abs < BLOCK_TRIGGER_SPEED && shoot_control.speed_set != 0.0f) // 根据拨弹轮速度判断是否卡弹
+        {
+            shoot_control.block_time++;
+            shoot_control.reverse_time = 0;
+        }
+        else
+        {
+            shoot_control.block_time = 0;
+            shoot_control.reverse_time = 0;
+        }
     }
-    else // 如果卡弹时间>700，拨弹开启反转
+    else // 如果卡弹时间达到阈值，拨弹开启反转
     {
-        shoot_control.speed_set = -target_speed; // 开启反转
-    }
+        shoot_control.speed_set = -target_speed;
 
-    if (fabs(shoot_control.speed) < BLOCK_TRIGGER_SPEED && shoot_control.block_time < BLOCK_TIME && shoot_control.speed_set!=0.0f) // 根据拨弹轮速度判断是否卡弹
-    {
-        shoot_control.block_time++;
-        shoot_control.reverse_time = 0; // 恢复时间
-    }
-    else if (shoot_control.block_time == BLOCK_TIME && shoot_control.reverse_time < REVERSE_TIME)
-    {
-        shoot_control.reverse_time++;
-    }
-    else
-    {
-        shoot_control.block_time = 0;
+        // 反转后只要速度明显恢复，立即切回正转
+        if (speed_abs > REVERSE_SPEED_LIMIT)
+        {
+            shoot_control.block_time = 0;
+            shoot_control.reverse_time = 0;
+            shoot_control.speed_set = target_speed;
+        }
+        else if (shoot_control.reverse_time < REVERSE_TIME)
+        {
+            shoot_control.reverse_time++;
+        }
+        else
+        {
+            shoot_control.block_time = 0;
+            shoot_control.reverse_time = 0;
+            shoot_control.speed_set = target_speed;
+        }
     }
     
     if ((last_trigger_set_speed > 0.0f && shoot_control.speed_set < 0.0f) ||

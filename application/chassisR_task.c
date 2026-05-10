@@ -887,6 +887,7 @@ void ChassisR_task(void)
 			chassis_move_balance.wheel_motor[0].given_current = (chassis_move_balance.wheel_motor[0].wheel_T / 0.000366211f);
 			CAN_cmd_chassis(-chassis_move_balance.wheel_motor[0].given_current);
 			osDelay(CHASSR_TIME);
+			CAN_cmd_supercap(1,0,robot_state.chassis_power_limit,chassis_power_buffer);
 		}
 
 		//			mit_ctrl(&hcan1,0x08, 0.0f, 0.0f,0.0f, 0.0f,0.0f);//right.torque_set[1]
@@ -904,7 +905,7 @@ void ChassisR_task(void)
 			osDelay(CHASSR_TIME);
 			CAN_cmd_chassis(0);
 			osDelay(CHASSR_TIME);
-			CAN_cmd_supercap(0,0,0,0);
+			CAN_cmd_supercap(1,0,robot_state.chassis_power_limit,chassis_power_buffer);
 		}
 		// 跳跃PID
 		//  else if(chassis_move_balance.start_flag==0&&chassis_move_balance.help_jump_flag ==1)

@@ -834,13 +834,20 @@ void ChassisR_task(void)
 				// {
 				// 	w_cnt=0;
 				// }
-				if(chassis_power_buffer>=60)
+				if(supercap_rx_msg.cap_energy_percent_raw > 150 && supercap_is_online())
 				{
-					chassis_move_balance.Wz_target=w_speed;
+					chassis_move_balance.Wz_target=w_speed + 0.5f;
 				}
-				else if(chassis_power_buffer<=30)
+				else if(supercap_rx_msg.cap_energy_percent_raw < 50 || !supercap_is_online())
 				{
-					chassis_move_balance.Wz_target=w_speed * 0.8f;
+					// if(chassis_power_buffer>=60)
+					// {
+					// 	chassis_move_balance.Wz_target=w_speed;
+					// }
+					// else if(chassis_power_buffer<=30)
+					// {
+						chassis_move_balance.Wz_target=w_speed * 0.8f;
+					// }
 				}
 				// chassis_move_balance.Wz_target = 1.1f + arm_sin_f32(w_time) * 0.2f; // 变速小陀螺目标角速度
 				chassis_move_balance.v_set = 0;

@@ -15,7 +15,7 @@
 #include "ui_g.h"
 #include "ui_interface.h"
 #include "remote_control.h"
-
+#include "CAN_receive.h"
 
 uint8_t Txcplt_flag = 1;
 
@@ -42,6 +42,7 @@ uint16_t stp23_start_angle = 0;
 uint16_t stp23_end_angle = 0;
 uint16_t stp23_timestamp = 0;
 extern float total_power;
+extern supercap_rx_msg_t supercap_rx_msg;
 void Buletooth_debug_task(void)
 {
     snprintf(debug_info, sizeof(debug_info), "%d,%.2f,%.2f\n",
@@ -188,21 +189,13 @@ static void ui_update_overlay(void)
         leg_length = right.L0;
     }
 
-    if (display_value_initialized == 0U)
-    {
-        display_leg_length = leg_length;
-        display_power = chassis_power;
-        display_value_initialized = 1U;
-    }
-    else
-    {
-        // display_leg_length += 0.28f * (leg_length - display_leg_length);
-        // display_power += 0.20f * (chassis_power - display_power);
-        display_leg_length = leg_length;
-        display_power = chassis_power;
-    }
+    display_leg_length = leg_length;
+    display_power = chassis_power;
+    // display_leg_length=supercap_rx_msg.cap_energy_percent_raw;
+    // display_power=supercap_rx_msg.chassis_power_limit;
 
     display_leg_length = ui_clamp_f32(display_leg_length, leg_length_min_m, leg_length_max_m);
+    // display_leg_length = ui_clamp_f32(display_leg_length, 0.0f, 9999.0f);
     display_power = ui_clamp_f32(display_power, 0.0f, 9999.0f);
 
     ui_g_Ungroup_leg_value->number = (int32_t)lroundf(display_leg_length * 1000.0f);
@@ -247,7 +240,7 @@ static void ui_update_overlay(void)
     ui_g_Ungroup_chassis_dirct->details_d = 90U;
     ui_g_Ungroup_chassis_dirct->details_e = 90U;
 
-    buffer_ratio = ui_clamp_f32(buffer_energy / 60.0f, 0.0f, 1.0f);
+    buffer_ratio = ui_clamp_f32((float)supercap_rx_msg.cap_energy_percent_raw / 245.0f, 0.0f, 1.0f);
     ui_g_Ungroup_energr_buffer->details_d =
         (uint32_t)lroundf(energy_bar_left + (buffer_ratio * energy_bar_width));
     ui_g_Ungroup_energr_buffer->details_e = 80U;

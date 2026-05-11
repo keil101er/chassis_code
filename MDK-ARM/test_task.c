@@ -250,6 +250,10 @@ static void ui_update_overlay(void)
     {
         supercap_bar_color = 1U;
     }
+    else
+    {
+        supercap_bar_color = 2U;
+    }
 
     ui_g_Ungroup_supercap_capacity_bar->details_d =
         (uint32_t)lroundf(supercap_bar_left + (supercap_ratio * supercap_bar_width));

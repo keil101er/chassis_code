@@ -395,11 +395,11 @@ void ChassisR_task(void)
 			key_speed=-0.8f - robot_state.robot_level * 0.1f;
 			w_speed=1.21f + robot_state.robot_level * 0.11f;
 		}
-		if(robot_state.robot_level >= 5)
+		if(robot_state.robot_level >= 3)
 		{
-			w_speed -= 0.07f;
-			key_speed -= 0.04f;
+			key_speed =-1.1f;
 		}
+		mySaturate(&key_speed,-1.2f,0.0f);
 		// if(debug_flag==0&&debug_count<=51)
 		// {
 		// 	debug_count++;
@@ -803,7 +803,7 @@ void ChassisR_task(void)
 				left.leg_flag = 1;
 			}
 			chassis_move_balance.last_leg_set = chassis_move_balance.leg_set;
-			// 小陀螺r
+			// 小陀螺
 			if (chassis_move_balance.w_flag == 1)
 			{
 				// w_time += 0.003f;
@@ -836,7 +836,7 @@ void ChassisR_task(void)
 				// }
 				if(supercap_rx_msg.cap_energy_percent_raw > 150 && supercap_is_online())
 				{
-					chassis_move_balance.Wz_target=w_speed + 0.5f;
+					chassis_move_balance.Wz_target=w_speed + 0.6f;
 				}
 				else if(supercap_rx_msg.cap_energy_percent_raw < 50 || !supercap_is_online())
 				{
@@ -859,8 +859,9 @@ void ChassisR_task(void)
 			{
 				w_time = 0;
 				w_cnt=0;
-				chassis_move_balance.Wz_target = 0;
+				chassis_move_balance.Wz_target = 0.0f;
 			}
+			mySaturate(&chassis_move_balance.Wz_target,0.0f,2.0f);
 		}
 		// 更新数据
 		chassisR_feedback_update(&chassis_move_balance, &right, &INS);

@@ -193,13 +193,13 @@ static void trigger_motor_turn_back(void)
         shoot_control.speed_set = -target_speed;
 
         // 反转后只要速度明显恢复，立即切回正转
-        if (speed_abs > REVERSE_SPEED_LIMIT)
-        {
-            shoot_control.block_time = 0;
-            shoot_control.reverse_time = 0;
-            shoot_control.speed_set = target_speed;
-        }
-        else if (shoot_control.reverse_time < REVERSE_TIME)
+        // if (speed_abs > REVERSE_SPEED_LIMIT)
+        // {
+        //     shoot_control.block_time = 0;
+        //     shoot_control.reverse_time = 0;
+        //     shoot_control.speed_set = target_speed;
+        // }
+        if (shoot_control.reverse_time < REVERSE_TIME)
         {
             shoot_control.reverse_time++;
         }

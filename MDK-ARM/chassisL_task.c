@@ -54,6 +54,7 @@ extern uint16_t key_jump;
 extern float gimbal_mode;
 
 extern uint8_t chassis_stand_flag;
+extern uint8_t recover_disable_hold_flag;
 
 void ChassisL_task(void)
 {
@@ -95,7 +96,7 @@ void ChassisL_task(void)
 		// 	osDelay(CHASSL_TIME);
 		// 	osDelay(CHASSL_TIME);
         // } else {
-             if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag) 
+             if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag && !recover_disable_hold_flag) 
             // if (chassis_move_balance.start_flag == 1) 
             {
 
@@ -374,7 +375,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     {
         // if (K_ctrl || (chassis->recover_flag == 0))
         // if ( chassis->recover_flag == 0)
-        if(1)
+        if(chassis->recover_flag != 2)
         {
             chassis->wheel_motor[1].wheel_T = 0.0f;
             vmcl->Tp                        = LQR_K[6] * (vmcl->theta + 0.0f) + LQR_K[7] * (vmcl->d_theta - 0.0f);
@@ -386,6 +387,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             chassis->turn_set               = chassis->total_yaw;
             vmcl->Tp                        = vmcl->Tp + chassis->leg_tp;
         } else {
+
             vmcl->Tp          = 0.0f;
             vmcl->F0          = 0.0f;
             chassis->x_filter = 0.0f;
@@ -394,7 +396,6 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
     } 
     else 
     {
-        vmcl->leg_flag = 0;
         if (chassis->recover_flag) {
             chassis->x_filter = 0.0f;
             chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
@@ -402,6 +403,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             vmcl->F0          = 0.0f;
         }
     }
+    vmcl->leg_flag = 0;
     mySaturate(&vmcl->F0, -80.0f, 100.0f); // 限幅
 
     VMC_calc_2(vmcl); // 计算期望的关节输出力矩

@@ -229,6 +229,8 @@ uint8_t chassis_enable_flag=0;
 uint8_t last_chassis_enable_flag=0;
 uint16_t chassis_start_cnt=0;
 uint8_t chassis_stand_flag=0;
+uint8_t recover_disable_hold_flag = 0;
+uint16_t recover_disable_hold_cnt = 0;
 uint8_t  pitch_gyro_over_limit_flag = 0;
 uint16_t pitch_gyro_over_limit_cnt = 0;
 
@@ -565,11 +567,6 @@ void ChassisR_task(void)
 			chassis_move_balance.start_flag = 0;
 			mode_rc = 0; // 无力模式
 		}
-		// 倒地检测
-		pre_recover_flag = chassis_move_balance.recover_flag;
-		chassis_move_balance.recover_flag = recover_detect(&chassis_move_balance);
-		// chassis_move_balance.recover_flag = 0;
-
 		// CHASSR_TIME=1;
 		if (chassis_move_balance.start_flag == 1)
 		{
@@ -883,6 +880,32 @@ void ChassisR_task(void)
 		// 更新数据
 		chassisR_feedback_update(&chassis_move_balance, &right, &INS);
 
+		// 倒地检测使用当前周期最新姿态，并锁存到满足退出条件
+		pre_recover_flag = chassis_move_balance.recover_flag;
+		chassis_move_balance.recover_flag = recover_detect(&chassis_move_balance);
+		if (pre_recover_flag == 0 && chassis_move_balance.recover_flag != 0)
+		{
+			recover_disable_hold_flag = 1;
+			recover_disable_hold_cnt = 0;
+		}
+		if (chassis_move_balance.recover_flag == 0)
+		{
+			recover_disable_hold_flag = 0;
+			recover_disable_hold_cnt = 0;
+		}
+		else if (recover_disable_hold_flag)
+		{
+			if (recover_disable_hold_cnt < RECOVER_DISABLE_HOLD_COUNT_THRESHOLD)
+			{
+				recover_disable_hold_cnt++;
+			}
+			if (recover_disable_hold_cnt >= RECOVER_DISABLE_HOLD_COUNT_THRESHOLD)
+			{
+				recover_disable_hold_flag = 0;
+				recover_disable_hold_cnt = 0;
+			}
+		}
+
 		//测试
 		// yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.00003f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
 		// pitch_sen = ((float)chassis_move_balance.chassis_RC->rc.ch[3]) * (0.00003f) - chassis_move_balance.chassis_RC->mouse.y * PITCH_MOUSE_SEN;
@@ -903,7 +926,7 @@ void ChassisR_task(void)
 		}
 		last_chassis_enable_flag=chassis_enable_flag;
 		// 关节电机和足电机控制
-		if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag)
+		if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag && !recover_disable_hold_flag)
 		// if (chassis_move_balance.start_flag == 1)
 		{
 			chassis_enable_flag=1;
@@ -1049,11 +1072,11 @@ void chassisR_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
 	//
 	// 倒地检测
 	// 根据pitch角度判断倒地自起是否完成
-	if (ins->Pitch < (3.1415926f / 15.5f) && ins->Pitch > (-3.1415926f / 15.5f))
-	{
-		chassis->recover_flag = 0;
-		// chassis_move_balance.target_x=0;
-	}
+	// if (ins->Pitch < (3.1415926f / 15.5f) && ins->Pitch > (-3.1415926f / 15.5f))
+	// {
+	// 	chassis->recover_flag = 0;
+	// 	// chassis_move_balance.target_x=0;
+	// }
 }
 
 void dm4310_fbdata(Joint_Motor_t *motor, uint8_t *rx_data, uint32_t data_len)
@@ -1365,7 +1388,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	{
 		// if (K_ctrl || (chassis->recover_flag == 0))
 		// if ( chassis->recover_flag == 0)
-		if (1)
+		if (chassis->recover_flag != 2)
 		{
 			if (land_flag == 0 && chassis->help_jump_flag == 0)
 			{
@@ -1393,7 +1416,6 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	}
 	else
 	{
-		vmcr->leg_flag = 0; // 置为0
 		land_flag = 0;
 		if (chassis->recover_flag)
 		{
@@ -1405,6 +1427,7 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 			chassis_move_balance.w_flag = 0;
 		}
 	}
+	vmcr->leg_flag = 0; // 置为0
 
 	// 功率控制，测试
 	  chassis_power_control(chassis);
@@ -1434,56 +1457,107 @@ void mySaturate(float *in, float min, float max)
 
 uint8_t recover_detect(chassis_t *chassis)
 {
-	static uint8_t recover_detect_count = 0;
-	const uint8_t recover_detect_count_threshold = 20;
+	static uint8_t recover_pitch_detect_count = 0;
+	static uint8_t recover_gyro_detect_count = 0;
+	static uint8_t recover_release_count = 0;
 	uint8_t recover_pitch_over_limit = 0;
+	uint8_t recover_release_ready = 0;
 
-	//pitch倾角检测
+	// pitch倾角检测
 	if (right_flag == 1 && left_flag == 1)
 	{
-		recover_pitch_over_limit = (fabsf(chassis->myPithR) > (15.0f * pi / 180.0f));
+		recover_pitch_over_limit = (fabsf(chassis->myPithR) > RECOVER_PITCH_AIR_ANGLE_THRESHOLD);
 	}
 	else
 	{
 		recover_pitch_over_limit =
-			(chassis->myPithR < ((-3.1415926f) / 15.0f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) ||
-			(chassis->myPithR > (3.1415926f / 20.0f) && chassis->myPithR < (3.1415926f / 2.0f));
+			(chassis->myPithR < RECOVER_PITCH_NEG_ANGLE_THRESHOLD && chassis->myPithR > (-RECOVER_PITCH_ANGLE_LIMIT)) ||
+			(chassis->myPithR > RECOVER_PITCH_POS_ANGLE_THRESHOLD && chassis->myPithR < RECOVER_PITCH_ANGLE_LIMIT);
 	}
 
-	//pitch角速度检测
-	if(fabs(INS.Gyro[0]) > 3.0f)
+	if (chassis->recover_flag != 0)
 	{
-		pitch_gyro_over_limit_cnt++;
+		recover_release_ready =
+			(fabsf(chassis->myPithR) < RECOVER_PITCH_EXIT_ANGLE_THRESHOLD) &&
+			(fabsf(chassis->myPithGyroR) < RECOVER_PITCH_GYRO_THRESHOLD);
+
+		if (recover_release_ready)
+		{
+			if (recover_release_count < RECOVER_RELEASE_COUNT_THRESHOLD)
+			{
+				recover_release_count++;
+			}
+		}
+		else
+		{
+			recover_release_count = 0;
+		}
+
+		if (fabsf(chassis->myPithGyroR) > RECOVER_PITCH_GYRO_THRESHOLD)
+		{
+			if (recover_gyro_detect_count < RECOVER_GYRO_DETECT_COUNT_THRESHOLD)
+			{
+				recover_gyro_detect_count++;
+			}
+		}
+		else
+		{
+			recover_gyro_detect_count = 0;
+		}
+
+		if (recover_gyro_detect_count >= RECOVER_GYRO_DETECT_COUNT_THRESHOLD)
+		{
+			recover_release_count = 0;
+			return 2;
+		}
+
+		if (recover_release_count >= RECOVER_RELEASE_COUNT_THRESHOLD)
+		{
+			recover_pitch_detect_count = 0;
+			recover_gyro_detect_count = 0;
+			recover_release_count = 0;
+			return 0;
+		}
+
+		return chassis->recover_flag;
+	}
+
+	// pitch角速度检测
+	if (fabsf(chassis->myPithGyroR) > RECOVER_PITCH_GYRO_THRESHOLD)
+	{
+		if (recover_gyro_detect_count < RECOVER_GYRO_DETECT_COUNT_THRESHOLD)
+		{
+			recover_gyro_detect_count++;
+		}
 	}
 	else
 	{
-		pitch_gyro_over_limit_cnt=0;
+		recover_gyro_detect_count = 0;
 	}
 
-	if(pitch_gyro_over_limit_cnt > 10)
+	if (recover_gyro_detect_count >= RECOVER_GYRO_DETECT_COUNT_THRESHOLD)
 	{
-		pitch_gyro_over_limit_cnt = 0;
+		recover_pitch_detect_count = 0;
+		recover_release_count = 0;
 		return 2;
-
 	}
-
-
-
 
 	if (recover_pitch_over_limit)
 	{
-		if (recover_detect_count < recover_detect_count_threshold)
+		if (recover_pitch_detect_count < RECOVER_PITCH_DETECT_COUNT_THRESHOLD)
 		{
-			recover_detect_count++;
+			recover_pitch_detect_count++;
 		}
-		if (recover_detect_count >= recover_detect_count_threshold)
+		if (recover_pitch_detect_count >= RECOVER_PITCH_DETECT_COUNT_THRESHOLD)
 		{
+			recover_gyro_detect_count = 0;
+			recover_release_count = 0;
 			return 1; // 需要自起
 		}
 	}
 	else
 	{
-		recover_detect_count = 0;
+		recover_pitch_detect_count = 0;
 	}
 
 	return 0;

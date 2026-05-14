@@ -53,6 +53,8 @@ int16_t shoot_can_set_current;
 extern uint16_t key_jump;
 extern float gimbal_mode;
 
+extern uint8_t chassis_stand_flag;
+
 void ChassisL_task(void)
 {
     while (INS.ins_flag == 0) // 等待IMU初始化完成
@@ -351,17 +353,34 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
 
 
     pre_left_flag = left_flag;
-    left_flag     = ground_detectionL(vmcl, ins); // 右腿离地检测
-    if (chassis->jump_flag_l == 2) {
+	//起身瞬间不进行离地检测，避免跳起
+	if(chassis_stand_flag)
+	{
+		ground_detectionL_reset();
+		left_flag = 0;
+	}
+	else
+	{
+		left_flag = ground_detectionL(vmcl, ins); // 右腿离地检测
+	}
+    
+    if (chassis->jump_flag_l == 2) 
+    {
+		ground_detectionL_reset();
         left_flag = 1; // 缩腿阶段不进行离地检测
     }
 
-    if (right_flag == 1 && left_flag == 1 && vmcl->leg_flag == 0) {
+    if (right_flag == 1 && left_flag == 1 && vmcl->leg_flag == 0) 
+    {
         // if (K_ctrl || (chassis->recover_flag == 0))
-        if ( chassis->recover_flag == 0)
+        // if ( chassis->recover_flag == 0)
+        if(1)
         {
             chassis->wheel_motor[1].wheel_T = 0.0f;
-            vmcl->Tp                        = LQR_K[6] * (vmcl->theta - 0.0f) + LQR_K[7] * (vmcl->d_theta - 0.0f);
+            vmcl->Tp                        = LQR_K[6] * (vmcl->theta + 0.0f) + LQR_K[7] * (vmcl->d_theta - 0.0f);
+            // vmcl->Tp = LQR_K[6] * (vmcl->theta + theat_set) + LQR_K[7] * (vmcl->d_theta - 0.0f)
+            + LQR_K[8] * ((chassis->x_set) - chassis->x_filter) + LQR_K[9] * (chassis->v_set - chassis->v_filter2) + 
+            LQR_K[10] * (chassis->myPithL - PITCH_BALANCE_REF_L) + LQR_K[11] * (chassis->myPithGyroL - 0.0f);
             chassis->x_filter               = 0.0f;
             chassis->x_set                  = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
             chassis->turn_set               = chassis->total_yaw;
@@ -372,7 +391,9 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             chassis->x_filter = 0.0f;
             chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
         }
-    } else {
+    } 
+    else 
+    {
         vmcl->leg_flag = 0;
         if (chassis->recover_flag) {
             chassis->x_filter = 0.0f;

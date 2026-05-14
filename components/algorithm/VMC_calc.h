@@ -13,9 +13,9 @@
 //#define LEG_PID_KI  0.0f//不积分
 //#define LEG_PID_KD  50.0f
 
-#define LEG_PID_KP  300.0f
+#define LEG_PID_KP  400.0f
 #define LEG_PID_KI  0.0f//不积分
-#define LEG_PID_KD  500.0f
+#define LEG_PID_KD  666.7f
 #define LEG_PID_MAX_OUT  90.0f //90牛
 #define LEG_PID_MAX_IOUT 0.0f
 
@@ -98,6 +98,8 @@ extern void VMC_calc_2(vmc_leg_t *vmc);//计算期望的关节输出力矩
 extern uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins);//右腿离地检测
 extern uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins);//左腿离地检测
 
+extern void ground_detectionR_reset(void);
+extern void ground_detectionL_reset(void);
 extern float LQR_K_calc(float *coe,float len);
 	
 

@@ -224,6 +224,15 @@ uint16_t key_auto_test = 0;
 uint16_t key_jump = 0;
 uint8_t ctrl_leg_auto_flag = 0;
 uint8_t last_key_leg_auto_adjust_toggle = 0;
+uint8_t key_sprint = 0;
+uint8_t chassis_enable_flag=0;
+uint8_t last_chassis_enable_flag=0;
+uint16_t chassis_start_cnt=0;
+uint8_t chassis_stand_flag=0;
+uint8_t  pitch_gyro_over_limit_flag = 0;
+uint16_t pitch_gyro_over_limit_cnt = 0;
+
+
 
 extern supercap_rx_msg_t supercap_rx_msg;
 /**
@@ -370,8 +379,7 @@ void ChassisR_task(void)
 	chassis_move_balance.x_set = 0;
 	chassis_move_balance.v_set = 0;
 	chassis_move_balance.recover_flag = 0;
-	chassis_move_balance.roll_set =
-		 0.0f;
+	chassis_move_balance.roll_set =0.0f;
 		// 0.000f;
 	shoot_control.shoot_send_flag = 0;
 	chassis_move_balance.target_x = 0;
@@ -390,16 +398,51 @@ void ChassisR_task(void)
 	// chassis_move_balance.leg_set = 0.127f;//原始腿长    腿长限制在0.127------0.32  会比设定高1-2cm
 	while (1)
 	{
+		// 刷新键盘值
+		key_v = chassis_move_balance.chassis_RC->key.v;
+		key_forward = (key_v & CHASSIS_FRONT_KEY);
+		key_backward = (key_v & CHASSIS_BACK_KEY);
+		key_move_left = (key_v & CHASSIS_LEFT_KEY);
+		key_move_right = (key_v & CHASSIS_RIGHT_KEY);
+		key_leg_auto_adjust_toggle = (key_v & CHASSIS_SPIN_KEY);
+		key_leg_up = (key_v & CHASSIS_LEG_UP_KEY);
+		key_leg_down = (key_v & CHASSIS_LEG_DOWN_KEY);
+		key_jump = (key_v & CHASSIS_JUMP_KEY);
+		key_spin_mode_toggle = (key_v & CHASSIS_FLOAT_KEY);
+		key_auto_test = (key_v & CHASSIS_AUTO_TEST_KEY);
+		key_sprint = (key_v & CHASSIS_SPRINT_KEY);
+		// 按键冲突处理
+		if (key_forward && key_backward)
+		{
+			key_forward = 0;
+			key_backward = 0;
+		}
+		if (key_move_left && key_move_right)
+		{
+			key_move_left = 0;
+			key_move_right = 0;
+		}
+		if (key_leg_up && key_leg_down)
+		{
+			key_leg_up = 0;
+			key_leg_down = 0;
+		}
+
+		//根据等级改变转速和移速
 		if(robot_state.robot_level >= 1 && robot_state.robot_level <= 10)
 		{
-			key_speed=-0.8f - robot_state.robot_level * 0.1f;
-			w_speed=1.21f + robot_state.robot_level * 0.11f;
+			key_speed=-(0.02f * robot_state.chassis_power_limit);
+			w_speed=(0.03f * robot_state.chassis_power_limit);
 		}
 		if(robot_state.robot_level >= 3)
 		{
 			key_speed =-1.1f;
 		}
-		mySaturate(&key_speed,-1.2f,0.0f);
+		mySaturate(&key_speed,-1.1f,-0.5f);
+		if(key_sprint)
+		{
+			key_speed = -2.0f;
+		}
 		// if(debug_flag==0&&debug_count<=51)
 		// {
 		// 	debug_count++;
@@ -431,34 +474,7 @@ void ChassisR_task(void)
 		//		INS.Yaw,chassis_move_balance.chassis_RC->key.v,
 		//		chassis_move_balance.DUBS_ON);
 
-		// 刷新键盘值
-		key_v = chassis_move_balance.chassis_RC->key.v;
-		key_forward = (key_v & CHASSIS_FRONT_KEY);
-		key_backward = (key_v & CHASSIS_BACK_KEY);
-		key_move_left = (key_v & CHASSIS_LEFT_KEY);
-		key_move_right = (key_v & CHASSIS_RIGHT_KEY);
-		key_leg_auto_adjust_toggle = (key_v & CHASSIS_SPIN_KEY);
-		key_leg_up = (key_v & CHASSIS_LEG_UP_KEY);
-		key_leg_down = (key_v & CHASSIS_LEG_DOWN_KEY);
-		key_jump = (key_v & CHASSIS_JUMP_KEY);
-		key_spin_mode_toggle = (key_v & CHASSIS_FLOAT_KEY);
-		key_auto_test = (key_v & CHASSIS_AUTO_TEST_KEY);
-		// 按键冲突处理
-		if (key_forward && key_backward)
-		{
-			key_forward = 0;
-			key_backward = 0;
-		}
-		if (key_move_left && key_move_right)
-		{
-			key_move_left = 0;
-			key_move_right = 0;
-		}
-		if (key_leg_up && key_leg_down)
-		{
-			key_leg_up = 0;
-			key_leg_down = 0;
-		}
+
 
 		// 遥控器和键鼠控制切换逻辑(左右拨杆都处于中间时键鼠控制)
 		 if (chassis_move_balance.chassis_RC->rc.s[0] == 3 && chassis_move_balance.chassis_RC->rc.s[1] == 3)
@@ -552,6 +568,7 @@ void ChassisR_task(void)
 		// 倒地检测
 		pre_recover_flag = chassis_move_balance.recover_flag;
 		chassis_move_balance.recover_flag = recover_detect(&chassis_move_balance);
+		// chassis_move_balance.recover_flag = 0;
 
 		// CHASSR_TIME=1;
 		if (chassis_move_balance.start_flag == 1)
@@ -649,7 +666,7 @@ void ChassisR_task(void)
 			else
 			{
 				//  chassis_move_balance.target_v = ((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0035f);//速度上限
-				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0015f);//速度上限
+				 chassis_move_balance.target_v = -((float)chassis_move_balance.chassis_RC->rc.ch[1]) * (0.0025f);//速度上限
 			}
 			turn_speed_compensation=1.0f - fabs(yaw_sen * 150);
 			mySaturate(&turn_speed_compensation,0.4f,1.0f);
@@ -861,7 +878,7 @@ void ChassisR_task(void)
 				w_cnt=0;
 				chassis_move_balance.Wz_target = 0.0f;
 			}
-			mySaturate(&chassis_move_balance.Wz_target,0.0f,2.0f);
+			mySaturate(&chassis_move_balance.Wz_target,0.0f,1.9f);
 		}
 		// 更新数据
 		chassisR_feedback_update(&chassis_move_balance, &right, &INS);
@@ -884,10 +901,12 @@ void ChassisR_task(void)
 		{
 			Power_flag = 1;
 		}
+		last_chassis_enable_flag=chassis_enable_flag;
 		// 关节电机和足电机控制
 		if (chassis_move_balance.start_flag == 1 && robot_state.power_management_chassis_output==1 && Power_flag)
 		// if (chassis_move_balance.start_flag == 1)
 		{
+			chassis_enable_flag=1;
 			mit_ctrl(&hcan1, 0x08, 0.0f, 0.0f, 0.0f, 0.8f, right.torque_set[1]); // right.torque_set[1]
 			osDelay(CHASSR_TIME);
 			mit_ctrl(&hcan1, 0x06, 0.0f, 0.0f, 0.0f, 0.8f, right.torque_set[0]); // right.torque_set[0]
@@ -899,15 +918,9 @@ void ChassisR_task(void)
 			osDelay(CHASSR_TIME);
 			CAN_cmd_supercap(1,0,robot_state.chassis_power_limit,chassis_power_buffer);
 		}
-
-		//			mit_ctrl(&hcan1,0x08, 0.0f, 0.0f,0.0f, 0.0f,0.0f);//right.torque_set[1]
-		//			osDelay(CHASSR_TIME);
-		//			mit_ctrl(&hcan1,0x06, 0.0f, 0.0f,0.0f, 0.0f,0.0f);//right.torque_set[0]
-		//			osDelay(CHASSR_TIME);
-		//			CAN_cmd_chassis(0);
-		// else if (chassis_move_balance.start_flag == 0)
 		else
 		{
+			chassis_enable_flag=0;
 			chassis_move_balance.wheel_motor[0].given_current=0;
 			mit_ctrl(&hcan1, 0x08, 0.0f, 0.0f, 0.0f, 0.8f, 0.0f); // right.torque_set[1]
 			osDelay(CHASSR_TIME);
@@ -917,17 +930,10 @@ void ChassisR_task(void)
 			osDelay(CHASSR_TIME);
 			CAN_cmd_supercap(1,0,robot_state.chassis_power_limit,chassis_power_buffer);
 		}
-		// 跳跃PID
-		//  else if(chassis_move_balance.start_flag==0&&chassis_move_balance.help_jump_flag ==1)
-		//  //(不在意,不在意, float pos, float vel,float kp, float kd, float torq)
-		//  {
-		//    	mit_ctrl(&hcan1,0x08, 0.0f, 0.0f,0.0f, 0.8f,15.0f);
-		//  	osDelay(CHASSR_TIME);
-		//  	mit_ctrl(&hcan1,0x06, 0.0f, 0.0f,0.0f, 0.8f,15.0f);
-		//  	osDelay(CHASSR_TIME);
-		//  	CAN_cmd_chassis(0);
-		//  	osDelay(CHASSR_TIME);
-		//  }
+		if(last_chassis_enable_flag == 0&& chassis_enable_flag == 1)
+		{
+			chassis_stand_flag = 1;
+		}
 	}
 }
 
@@ -1328,9 +1334,29 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		}
 	}
 	pre_right_flag = right_flag;
-	right_flag = ground_detectionR(vmcr, ins); // 右腿离地检测
+	if(chassis_stand_flag == 1)
+	{
+		chassis_start_cnt++;
+	}
+	if(chassis_start_cnt > 100)
+	{
+		chassis_start_cnt = 0;
+		chassis_stand_flag = 0;
+	}
+	//起身瞬间不进行离地检测，避免跳起
+	if(chassis_stand_flag)
+	{
+		ground_detectionR_reset();
+		right_flag = 0;
+	}
+	else
+	{
+		right_flag = ground_detectionR(vmcr, ins); // 右腿离地检测
+	}
+
 	if (chassis->jump_flag_r == 2)
 	{
+		ground_detectionR_reset();
 		right_flag = 1; // 缩腿阶段不进行离地检测
 	}
 
@@ -1338,19 +1364,18 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 	if (right_flag == 1 && left_flag == 1 && vmcr->leg_flag == 0)
 	{
 		// if (K_ctrl || (chassis->recover_flag == 0))
-		if ( chassis->recover_flag == 0)
-		// if (1)
+		// if ( chassis->recover_flag == 0)
+		if (1)
 		{
 			if (land_flag == 0 && chassis->help_jump_flag == 0)
 			{
-				chassis->leg_set = 0.28f;
+				chassis->leg_set = 0.26f;
 				land_flag++;
 			}
-
 			// 当两腿同时离地并且遥控器没有在控制腿的伸缩时，才认为离地
 			chassis->wheel_motor[0].wheel_T = 0.0f;
 			vmcr->Tp = LQR_K[6] * (vmcr->theta - 0.0f) + LQR_K[7] * (vmcr->d_theta - 0.0f);
-
+			// vmcr->Tp = LQR_K[6] * (vmcr->theta - theat_set) + LQR_K[7] * (vmcr->d_theta - 0.0f) + LQR_K[8] * (chassis->x_filter - (chassis->x_set)) + LQR_K[9] * (chassis->v_filter2 - chassis->v_set) + LQR_K[10] * (chassis->myPithR - PITCH_BALANCE_REF_R) + LQR_K[11] * (chassis->myPithGyroR - 0.0f);
 			// 离地时重置x_set和x_filter
 			chassis->x_filter = 0.0f;
 			chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
@@ -1410,9 +1435,10 @@ void mySaturate(float *in, float min, float max)
 uint8_t recover_detect(chassis_t *chassis)
 {
 	static uint8_t recover_detect_count = 0;
-	const uint8_t recover_detect_count_threshold = 40;
+	const uint8_t recover_detect_count_threshold = 20;
 	uint8_t recover_pitch_over_limit = 0;
 
+	//pitch倾角检测
 	if (right_flag == 1 && left_flag == 1)
 	{
 		recover_pitch_over_limit = (fabsf(chassis->myPithR) > (15.0f * pi / 180.0f));
@@ -1423,6 +1449,26 @@ uint8_t recover_detect(chassis_t *chassis)
 			(chassis->myPithR < ((-3.1415926f) / 15.0f) && chassis->myPithR > ((-3.1415926f) / 2.0f)) ||
 			(chassis->myPithR > (3.1415926f / 20.0f) && chassis->myPithR < (3.1415926f / 2.0f));
 	}
+
+	//pitch角速度检测
+	if(fabs(INS.Gyro[0]) > 3.0f)
+	{
+		pitch_gyro_over_limit_cnt++;
+	}
+	else
+	{
+		pitch_gyro_over_limit_cnt=0;
+	}
+
+	if(pitch_gyro_over_limit_cnt > 10)
+	{
+		pitch_gyro_over_limit_cnt = 0;
+		return 2;
+
+	}
+
+
+
 
 	if (recover_pitch_over_limit)
 	{

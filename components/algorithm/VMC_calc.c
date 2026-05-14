@@ -135,12 +135,18 @@ float dd_zwR=0.0f;
 float fn[4]={0.0f};
 float aver_fn=0.0f;
 float  W_aR=0.0f;
+static uint16_t groundR_cnt=0;
+
+void ground_detectionR_reset(void)
+{
+	groundR_cnt = 0;
+}
 
 uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins)
 {
 //	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0
 //+4.842f*(ins->MotionAccel_n[2]-vmc->dd_L0*arm_cos_f32(vmc->theta)+2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta)+vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta));
-	 dd_zwR=ins->MotionAccel_n[2] - vmc->dd_L0*arm_cos_f32(vmc->theta) + 2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta);
+ 	dd_zwR=ins->MotionAccel_n[2] - vmc->dd_L0*arm_cos_f32(vmc->theta) + 2.0f*vmc->d_L0*vmc->d_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->dd_theta*arm_sin_f32(vmc->theta) + vmc->L0*vmc->d_theta*vmc->d_theta*arm_cos_f32(vmc->theta);
  	 W_aR=0.4842f*dd_zwR;
 	//vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0+4.745f;
 	vmc->FN=5.4f*(vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0)+4.745f+W_aR;
@@ -159,12 +165,20 @@ uint8_t ground_detectionR(vmc_leg_t *vmc,INS_t *ins)
 	
 	if(aver_fnr<17.0f)
 	{
-
-	  return 1;  //离地了
+		groundR_cnt++;
 	}
 	else
 	{
-	  return 0;	
+	  groundR_cnt = 0;
+	}
+	if(groundR_cnt>3)
+	{
+		groundR_cnt = 60;
+		return 1; //离地
+	}
+	else
+	{
+		return 0;
 	}
 }
 
@@ -173,6 +187,13 @@ float averl[4]={0.0f};
 float aver_fnl=0.0f;
 float dd_zwL=0.0f;
 float  W_aL=0.0f;
+static uint16_t groundL_cnt=0;
+
+void ground_detectionL_reset(void)
+{
+	groundL_cnt = 0;
+}
+
 uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins)
 {
 //	vmc->FN=vmc->F0*arm_cos_f32(vmc->theta)+vmc->Tp*arm_sin_f32(vmc->theta)/vmc->L0
@@ -191,12 +212,21 @@ uint8_t ground_detectionL(vmc_leg_t *vmc,INS_t *ins)
 	aver_fnl=0.25f*averl[0]+0.25f*averl[1]+0.25f*averl[2]+0.25f*averl[3];//对支持力进行均值滤波
 	
 	if(aver_fnl<17.0f)
-	{//离地了
-	  return 1;
+	{
+		groundL_cnt++;
 	}
 	else
 	{
-	  return 0;	
+	  groundL_cnt = 0;
+	}
+	if(groundL_cnt>3)
+	{
+		groundL_cnt = 60;
+		return 1;
+	}
+	else
+	{
+		return 0;
 	}
 }
 

@@ -83,9 +83,9 @@ void chassis_power_control(chassis_t *chassis_power_control)
 	// }
 	if(supercap_is_online())
 	{
-		if(supercap_rx_msg.chassis_power_limit > 30.0f + max_power_limit)
+		if(supercap_rx_msg.chassis_power_limit > 300.0f + max_power_limit)
 		{
-			input_power = 30.0f + max_power_limit;
+			input_power = 300.0f + max_power_limit;
 		}
 		else if(supercap_rx_msg.chassis_power_limit < 45)
 		{

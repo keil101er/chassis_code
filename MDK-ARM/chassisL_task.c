@@ -387,20 +387,19 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             chassis->turn_set               = chassis->total_yaw;
             vmcl->Tp                        = vmcl->Tp + chassis->leg_tp;
         } else {
-
-            vmcl->Tp          = 0.0f;
-            vmcl->F0          = 0.0f;
-            chassis->x_filter = 0.0f;
-            chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
+            // vmcl->Tp          = 0.0f;
+            // vmcl->F0          = 0.0f;
+            // chassis->x_filter = 0.0f;
+            // chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
         }
     } 
     else 
     {
         if (chassis->recover_flag) {
-            chassis->x_filter = 0.0f;
-            chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
-            vmcl->Tp          = 0.0f;
-            vmcl->F0          = 0.0f;
+            // chassis->x_filter = 0.0f;
+            // chassis->x_set    = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
+            // vmcl->Tp          = 0.0f;
+            // vmcl->F0          = 0.0f;
         }
     }
     vmcl->leg_flag = 0;

@@ -885,6 +885,8 @@ void ChassisR_task(void)
 		chassis_move_balance.recover_flag = recover_detect(&chassis_move_balance);
 		if (pre_recover_flag == 0 && chassis_move_balance.recover_flag != 0)
 		{
+			chassis_move_balance.x_filter = 0.0f;
+			chassis_move_balance.x_set = chassis_move_balance.x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 			recover_disable_hold_flag = 1;
 			recover_disable_hold_cnt = 0;
 		}
@@ -1409,8 +1411,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 			chassis->leg_set = 0.13f;
 			chassis->x_filter = 0.0f;
 			chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
-			vmcr->Tp = 0.0f;
-			vmcr->F0 = 0.0f;
+			// vmcr->Tp = 0.0f;
+			// vmcr->F0 = 0.0f;
 			chassis_move_balance.w_flag = 0;
 		}
 	}
@@ -1420,10 +1422,8 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		if (chassis->recover_flag)
 		{
 			chassis->leg_set = 0.13f;
-			chassis->x_filter = 0.0f;
-			chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
-			vmcr->Tp = 0.0f;
-			vmcr->F0 = 0.0f;
+			// vmcr->Tp = 0.0f;
+			// vmcr->F0 = 0.0f;
 			chassis_move_balance.w_flag = 0;
 		}
 	}

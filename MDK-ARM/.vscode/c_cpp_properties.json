@@ -21,6 +21,8 @@
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\application\\protocol",
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\components\\support",
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\bsp\\boards",
+                "C:\\Keil_v5\\ARM\\ARMCC\\include",
+                "C:\\Keil_v5\\ARM\\ARMCC\\include\\rw",
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\Src",
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\Drivers\\STM32F4xx_HAL_Driver\\Src",
                 "d:\\RM_code\\code_rmuc\\chassis - supercap\\Middlewares\\Third_Party\\FreeRTOS\\Source",

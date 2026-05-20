@@ -56,7 +56,7 @@
 // m/s  diameter 60mm
 #define FRIC_RPM_TO_SPEED           0.00314159265358793f
 //拨弹速度
-#define TRIGGER_SPEED               (-15.0f)
+#define TRIGGER_SPEED               (-20.0f)
 #define CONTINUE_TRIGGER_SPEED      (10.0f)
 #define READY_TRIGGER_SPEED         (20.0f)
 
@@ -84,15 +84,15 @@
 #define TRIGGER_ANGLE_PID_KD        0.0f
 
 //拨弹轮电机速度PID
-#define TRIGGER_SPEED_PID_KP        200.0f
+#define TRIGGER_SPEED_PID_KP        250.0f
 #define TRIGGER_SPEED_PID_KI        3.0f
 #define TRIGGER_SPEED_PID_KD        0.0f
 
 //拨弹轮速度环前馈，负方向为正常拨弹，正方向为堵转反转退弹
 #define TRIGGER_SPEED_FF_POS_START  1200.0f
 #define TRIGGER_SPEED_FF_POS_RUN    700.0f
-#define TRIGGER_SPEED_FF_NEG_START  (-3500.0f)
-#define TRIGGER_SPEED_FF_NEG_RUN    (-1200.0f)
+#define TRIGGER_SPEED_FF_NEG_START  (-4000.0f)
+#define TRIGGER_SPEED_FF_NEG_RUN    (-1300.0f)
 #define TRIGGER_SPEED_FF_START_SPEED 3.0f
 #define TRIGGER_SPEED_FF_DECAY_ERROR 2.0f
 

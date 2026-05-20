@@ -56,6 +56,7 @@ extern float gimbal_mode;
 extern uint8_t chassis_stand_flag;
 extern uint8_t recover_disable_hold_flag;
 
+extern uint8_t chassis_shoutui_flag;
 void ChassisL_task(void)
 {
     while (INS.ins_flag == 0) // 等待IMU初始化完成
@@ -185,7 +186,7 @@ void chassisL_feedback_update(chassis_t *chassis, vmc_leg_t *vmc, INS_t *ins)
     chassis->wheel_motor[1].speed   = 0.0004998609952f * chassis->wheel_motor[1].speed_rpm;             // 速度
     chassis->wheel_motor[1].wheel_T = CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN * chassis->wheel_motor[1].given_current;
     // chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd,0);     //获取相对角度值
-    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 2090); // 获取相对角度值，零点ecd=2865
+    chassis->yaw_motor_angle = motor_ecd_to_angle_change(chassis->motor_chassis[4].ecd, 2086); // 获取相对角度值，零点ecd=2865
                                                                                                //	shoot_control.shoot_motor_measure = get_trigger_motor_measure_point();//获取拨弹轮电机数据
 
     // static fp32 speed_fliter_1 = 0.0f;
@@ -384,7 +385,7 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             LQR_K[10] * (chassis->myPithL - PITCH_BALANCE_REF_L) + LQR_K[11] * (chassis->myPithGyroL - 0.0f);
             chassis->x_filter               = 0.0f;
             chassis->x_set                  = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
-            chassis->turn_set               = chassis->total_yaw;
+            // chassis->turn_set               = chassis->total_yaw;
             vmcl->Tp                        = vmcl->Tp + chassis->leg_tp;
         } else {
             // vmcl->Tp          = 0.0f;
@@ -401,6 +402,13 @@ void chassisL_control_loop(chassis_t *chassis, vmc_leg_t *vmcl, INS_t *ins, floa
             // vmcl->Tp          = 0.0f;
             // vmcl->F0          = 0.0f;
         }
+    }
+    if(chassis_shoutui_flag)
+    {
+        chassis->wheel_motor[1].wheel_T = 0.0f;
+        vmcl->Tp = chassis->leg_tp;
+        chassis->x_filter = 0.0f;
+        chassis->x_set = chassis->x_filter + CHASSIS_X_LEFT_COMPENSATION;
     }
     vmcl->leg_flag = 0;
     mySaturate(&vmcl->F0, -80.0f, 100.0f); // 限幅

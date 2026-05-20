@@ -27,8 +27,8 @@
 #define CHASSIS_LEFT_KEY KEY_PRESSED_OFFSET_Z
 #define CHASSIS_RIGHT_KEY KEY_PRESSED_OFFSET_X
 #define CHASSIS_SPIN_KEY KEY_PRESSED_OFFSET_R
-#define CHASSIS_LEG_UP_KEY KEY_PRESSED_OFFSET_A
-#define CHASSIS_LEG_DOWN_KEY KEY_PRESSED_OFFSET_D
+#define CHASSIS_LEG_UP_KEY KEY_PRESSED_OFFSET_D
+#define CHASSIS_LEG_DOWN_KEY KEY_PRESSED_OFFSET_A
 #define CHASSIS_FLOAT_KEY KEY_PRESSED_OFFSET_C
 #define CHASSIS_AUTO_TEST_KEY KEY_PRESSED_OFFSET_B
 #define CHASSIS_JUMP_KEY KEY_PRESSED_OFFSET_V
@@ -50,6 +50,8 @@
 //c=20/16384*0.3  
 #define CHASSIS_MOTOR_CURRENT_TO_TORQUE_SEN 0.000366211f
 
+// Recovery thresholds for tip-over self-righting logic.
+// 倒地自启逻辑使用的检测与退出阈值。
 #define RECOVER_PITCH_AIR_ANGLE_THRESHOLD       (15.0f * pi / 180.0f)
 #define RECOVER_PITCH_NEG_ANGLE_THRESHOLD       ((-3.1415926f) / 15.0f)
 #define RECOVER_PITCH_POS_ANGLE_THRESHOLD       (3.1415926f / 20.0f)
@@ -59,7 +61,12 @@
 #define RECOVER_PITCH_DETECT_COUNT_THRESHOLD    20
 #define RECOVER_GYRO_DETECT_COUNT_THRESHOLD     15
 #define RECOVER_RELEASE_COUNT_THRESHOLD         25
+// Hold chassis output disabled for a short time after entering recovery.
+// 进入倒地自启后，先整体失能一小段时间，让车体回到更静止的状态。
 #define RECOVER_DISABLE_HOLD_COUNT_THRESHOLD    80
+// Hold the minimum leg length only in the early stage of recovery.
+// 仅在倒地自启初期强制最低腿长，超时后释放腿长控制，避免极端情况下长期锁死腿长。
+#define RECOVER_LEG_HOLD_COUNT_THRESHOLD        800
 
 
 

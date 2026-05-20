@@ -229,11 +229,17 @@ uint8_t chassis_enable_flag=0;
 uint8_t last_chassis_enable_flag=0;
 uint16_t chassis_start_cnt=0;
 uint8_t chassis_stand_flag=0;
+uint8_t chassis_shoutui_flag=0;
+uint16_t chassis_shoutui_cnt=0;
+
+// Latch a temporary disable window right after recovery is entered.
+// 在刚进入倒地自启时锁存一个临时失能窗口，先清掉前冲/残余动作。
 uint8_t recover_disable_hold_flag = 0;
 uint16_t recover_disable_hold_cnt = 0;
+uint8_t recover_leg_hold_flag = 0;
+uint16_t recover_leg_hold_cnt = 0;
 uint8_t  pitch_gyro_over_limit_flag = 0;
 uint16_t pitch_gyro_over_limit_cnt = 0;
-
 
 
 extern supercap_rx_msg_t supercap_rx_msg;
@@ -644,8 +650,8 @@ void ChassisR_task(void)
 					else if (key_move_left) // Move Left Only: 90 deg Left
 					{
 						chassis_move_balance.w_flag = 2;
-						heng_target = 1.5708f; // PI/2
-						chassis_move_balance.target_v = -key_speed;
+						heng_target = -1.5708f; // PI/2
+						chassis_move_balance.target_v = key_speed;
 					}
 					else if (key_move_right) // Move Right Only: 90 deg Right
 					{
@@ -885,18 +891,28 @@ void ChassisR_task(void)
 		chassis_move_balance.recover_flag = recover_detect(&chassis_move_balance);
 		if (pre_recover_flag == 0 && chassis_move_balance.recover_flag != 0)
 		{
+			// Reset the chassis position reference when recovery starts.
+			// 倒地自启刚进入时重置底盘位置参考，避免沿用进入前的前冲目标。
 			chassis_move_balance.x_filter = 0.0f;
 			chassis_move_balance.x_set = chassis_move_balance.x_filter + CHASSIS_X_RIGHT_COMPENSATION;
 			recover_disable_hold_flag = 1;
 			recover_disable_hold_cnt = 0;
+			recover_leg_hold_flag = 1;
+			recover_leg_hold_cnt = 0;
+			chassis_move_balance.w_flag = 0;
+			chassis_move_balance.leg_set = 0.13f;
 		}
 		if (chassis_move_balance.recover_flag == 0)
 		{
 			recover_disable_hold_flag = 0;
 			recover_disable_hold_cnt = 0;
+			recover_leg_hold_flag = 0;
+			recover_leg_hold_cnt = 0;
 		}
 		else if (recover_disable_hold_flag)
 		{
+			// Count a short disable phase before the actual recovery control takes over.
+			// 在真正执行倒地自启控制前，先累计一段失能时间。
 			if (recover_disable_hold_cnt < RECOVER_DISABLE_HOLD_COUNT_THRESHOLD)
 			{
 				recover_disable_hold_cnt++;
@@ -905,6 +921,18 @@ void ChassisR_task(void)
 			{
 				recover_disable_hold_flag = 0;
 				recover_disable_hold_cnt = 0;
+			}
+		}
+		if (chassis_move_balance.recover_flag != 0 && recover_leg_hold_flag)
+		{
+			if (recover_leg_hold_cnt < RECOVER_LEG_HOLD_COUNT_THRESHOLD)
+			{
+				recover_leg_hold_cnt++;
+			}
+			if (recover_leg_hold_cnt >= RECOVER_LEG_HOLD_COUNT_THRESHOLD)
+			{
+				recover_leg_hold_flag = 0;
+				recover_leg_hold_cnt = 0;
 			}
 		}
 
@@ -958,6 +986,10 @@ void ChassisR_task(void)
 		if(last_chassis_enable_flag == 0&& chassis_enable_flag == 1)
 		{
 			chassis_stand_flag = 1;
+			if(right.L0 > 0.2f && left.L0 > 0.2f)
+			{
+				chassis_shoutui_flag = 1;
+			}
 		}
 	}
 }
@@ -1408,12 +1440,14 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		}
 		else
 		{
-			chassis->leg_set = 0.13f;
-			chassis->x_filter = 0.0f;
-			chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
+			if (recover_leg_hold_flag)
+			{
+				chassis_move_balance.leg_set = 0.13f;
+			}
+			// chassis->leg_set = 0.13f;
 			// vmcr->Tp = 0.0f;
 			// vmcr->F0 = 0.0f;
-			chassis_move_balance.w_flag = 0;
+			// chassis_move_balance.w_flag = 0;
 		}
 	}
 	else
@@ -1421,12 +1455,31 @@ void chassisR_control_loop(chassis_t *chassis, vmc_leg_t *vmcr, INS_t *ins, floa
 		land_flag = 0;
 		if (chassis->recover_flag)
 		{
-			chassis->leg_set = 0.13f;
+			if (recover_leg_hold_flag)
+			{
+				chassis_move_balance.leg_set = 0.13f;
+			}
 			// vmcr->Tp = 0.0f;
 			// vmcr->F0 = 0.0f;
-			chassis_move_balance.w_flag = 0;
+			// chassis_move_balance.w_flag = 0;
 		}
 	}
+	if(chassis_shoutui_flag == 1 && right.L0 > 0.18f && left.L0 > 0.18f && chassis_shoutui_cnt < 150)
+	{
+		chassis->wheel_motor[0].wheel_T = 0.0f;
+		chassis->leg_set = 0.13f;
+		vmcr->Tp = chassis->leg_tp;
+		chassis->x_filter = 0.0f;
+		chassis->x_set = chassis->x_filter + CHASSIS_X_RIGHT_COMPENSATION;
+		chassis_shoutui_cnt++;
+		chassis_start_cnt = 0;
+	}
+	else
+	{
+		chassis_shoutui_cnt = 0;
+		chassis_shoutui_flag = 0;
+	}
+
 	vmcr->leg_flag = 0; // 置为0
 
 	// 功率控制，测试
@@ -1457,6 +1510,8 @@ void mySaturate(float *in, float min, float max)
 
 uint8_t recover_detect(chassis_t *chassis)
 {
+	// Separate counters are used for tilt trigger, gyro trigger and recovery release.
+	// 分别使用独立计数器处理倾角触发、角速度触发和自起退出判定。
 	static uint8_t recover_pitch_detect_count = 0;
 	static uint8_t recover_gyro_detect_count = 0;
 	static uint8_t recover_release_count = 0;
@@ -1477,6 +1532,8 @@ uint8_t recover_detect(chassis_t *chassis)
 
 	if (chassis->recover_flag != 0)
 	{
+		// Exit recovery only after both pitch angle and pitch gyro stay in range long enough.
+		// 只有当 pitch 角度和 pitch 角速度同时持续回到合理范围，才允许退出倒地自启。
 		recover_release_ready =
 			(fabsf(chassis->myPithR) < RECOVER_PITCH_EXIT_ANGLE_THRESHOLD) &&
 			(fabsf(chassis->myPithGyroR) < RECOVER_PITCH_GYRO_THRESHOLD);
@@ -1507,6 +1564,8 @@ uint8_t recover_detect(chassis_t *chassis)
 
 		if (recover_gyro_detect_count >= RECOVER_GYRO_DETECT_COUNT_THRESHOLD)
 		{
+			// Gyro-triggered recovery has higher priority and can upgrade the active mode.
+			// 角速度触发的倒地自启优先级更高，可在自起过程中提升当前模式。
 			recover_release_count = 0;
 			return 2;
 		}

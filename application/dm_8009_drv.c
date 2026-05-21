@@ -125,7 +125,7 @@ void c_transmit_date(float yaw_ctrl, float pitch_ctrl,uint8_t mode,uint8_t reser
 	chassis_send_data[3] = (uint8_t)(pitch_value& 0xFF);        // Pitch低字节
 	chassis_send_data[4] = mode;               // 模式标志位
 	chassis_send_data[5] = reserve1;               // 模式标志位
-
+	chassis_send_data[6] = reserve2;               // 保留字节
 	HAL_CAN_AddTxMessage(&hcan1, &chassis_transmit_message, chassis_send_data, &send_mail_box);
 }
 

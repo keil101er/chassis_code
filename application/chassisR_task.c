@@ -553,7 +553,7 @@ void ChassisR_task(void)
 		// gimbal_mode=mode_rc;
 		//测试
 		// shoot_control.shoot_send_flag=0;
-		c_transmit_date(yaw_sen, pitch_sen,gimbal_mode, shoot_control.shoot_send_flag, 11);
+		c_transmit_date(yaw_sen, pitch_sen,gimbal_mode, shoot_control.shoot_send_flag, chassis_move_balance.w_flag);
 		osDelay(1);
 		//测试
 		// yaw_sen = chassis_move_balance.chassis_RC->rc.ch[2] * (0.000007f) + chassis_move_balance.chassis_RC->mouse.x * YAW_MOUSE_SEN; // 偏航角控制
